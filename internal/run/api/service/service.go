@@ -15,6 +15,15 @@ import (
 	"google.golang.org/api/option"
 )
 
+var allRegions = []string{
+	"asia-east1", "asia-northeast1", "asia-northeast2", "asia-northeast3",
+	"asia-south1", "asia-southeast1", "asia-southeast2", "australia-southeast1",
+	"europe-central2", "europe-north1", "europe-west1", "europe-west2",
+	"europe-west3", "europe-west4", "europe-west6", "northamerica-northeast1",
+	"southamerica-east1", "us-central1", "us-east1", "us-east4",
+	"us-west1", "us-west2", "us-west3", "us-west4",
+}
+
 // List returns a list of services for the given project and region.
 // If region is "-", it lists services from all supported Cloud Run regions.
 func List(project, region string) ([]model.Service, error) {
@@ -59,9 +68,9 @@ func List(project, region string) ([]model.Service, error) {
 		name := nameParts[len(nameParts)-1]
 
 		// Determine Last Modifier
-		lastModifier := resp.Annotations["serving.knative.dev/lastModifier"]
+		lastModifier := resp.LastModifier
 		if lastModifier == "" {
-			lastModifier = resp.Annotations["client.knative.dev/user-email"]
+			lastModifier = resp.Creator
 		}
 
 		services = append(services, model.Service{

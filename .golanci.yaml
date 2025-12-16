@@ -1,0 +1,17 @@
+---
+version: "2"
+
+linters:
+  default: all
+  deadline: 1m
+
+run:
+  tests: true
+
+output:
+  format: colored-line-number
+  print-issued-lines: false
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

@@ -1,0 +1,502 @@
+package main
+
+import (
+	"fmt"
+	"os/exec"
+	"runtime"
+	"strings"
+
+	"github.com/gdamore/tcell/v2"
+	"github.com/rivo/tview"
+)
+
+// --- Data Models ---
+type Service struct {
+	Name, Region, Status, Traffic, URL, Age string
+}
+
+type Job struct {
+	Name, Region, Status, Completions, LastRun, Age string
+}
+
+type WorkerPool struct {
+	Name, Region, Status, ActiveWorkers, MaxWorkers, Age string
+}
+
+// --- Global UI Elements ---
+var (
+	app         *tview.Application
+	pages       *tview.Pages
+	titleBar    *tview.TextView
+	contextMenu *tview.TextView
+	searchField *tview.InputField // New Search Box
+
+	// Views
+	logView      *tview.TextView
+	serviceTable *tview.Table
+	jobTable     *tview.Table
+	workerTable  *tview.Table // New Table
+
+	// Data Source (Global so we can filter them)
+	allServices []Service
+	allJobs     []Job
+	allWorkers  []WorkerPool
+
+	// State
+	currentViewName string
+)
+
+func main() {
+	app = tview.NewApplication()
+	pages = tview.NewPages()
+
+	// 1. INITIALIZE DATA
+	allServices = []Service{
+		{"auth-service", "us-central1", "True", "100%", "https://google.com", "2d"},
+		{"payment-api", "us-central1", "True", "100%", "https://google.com", "5h"},
+		{"frontend-web", "europe-west1", "True", "100%", "https://google.com", "10m"},
+		{"legacy-api", "us-east1", "False", "0%", "https://google.com", "4y"},
+	}
+
+	allJobs = []Job{
+		{"db-migration", "us-central1", "True", "1/1", "10m ago", "2d"},
+		{"nightly-report", "us-east1", "False", "0/1", "23h ago", "50d"},
+		{"cleanup-job", "europe-west1", "True", "1/1", "1h ago", "1d"},
+	}
+
+	allWorkers = []WorkerPool{
+		{"image-processor-pool", "us-central1", "True", "5", "10", "5d"},
+		{"video-encoder-pool", "us-west1", "True", "12", "20", "12d"},
+		{"email-sender-pool", "europe-west1", "False", "0", "5", "1h"},
+	}
+
+	// 2. HEADER
+	infoText := tview.NewTextView().SetDynamicColors(true).SetRegions(true)
+	fmt.Fprintf(infoText, "[#ffb86c]Project:  [white]my-gcp-project\n")
+	fmt.Fprintf(infoText, "[#ffb86c]Region:   [white]us-central1\n")
+	fmt.Fprintf(infoText, "[#ffb86c]User:     [white]admin@example.com\n")
+	fmt.Fprintf(infoText, "[#ffb86c]Context:  [white]Cloud Run")
+
+	globalMenu := tview.NewTextView().SetDynamicColors(true).SetTextAlign(tview.AlignLeft)
+	globalMenu.SetText(`[dodgerblue]<?>      [white]Help
+[dodgerblue]<ctrl-s> [white]Services
+[dodgerblue]<ctrl-j> [white]Jobs
+[dodgerblue]<ctrl-w> [white]Workers
+[dodgerblue]</>      [white]Filter
+[dodgerblue]<esc>    [white]Back/Quit`)
+
+	contextMenu = tview.NewTextView().SetDynamicColors(true).SetTextAlign(tview.AlignLeft)
+
+	menuFlex := tview.NewFlex().
+		AddItem(globalMenu, 0, 1, false).
+		AddItem(contextMenu, 0, 1, false)
+
+	logoText := tview.NewTextView().SetDynamicColors(true).SetTextAlign(tview.AlignRight)
+	logoArt := []string{"[#bd93f9] ____  _   _ _   _ ", "|  _ \\| | | | \\ | |", "| |_) | |_| |  \\| |", "|  _ <|  _  | . ` |", "|_| \\_\\_| |_|_| \\_|"}
+	for _, line := range logoArt {
+		fmt.Fprintf(logoText, "%s\n", line)
+	}
+
+	header := tview.NewFlex().
+		AddItem(infoText, 30, 1, false).
+		AddItem(menuFlex, 0, 1, false).
+		AddItem(logoText, 25, 1, false)
+
+	// 3. UI COMPONENTS
+	titleBar = tview.NewTextView().SetDynamicColors(true).SetTextAlign(tview.AlignCenter)
+
+	// Search Field (Initially hidden or styled to look integrated)
+	searchField = tview.NewInputField().
+		SetLabel(" / Filter: ").
+		SetLabelColor(tcell.ColorOrange).
+		SetFieldTextColor(tcell.ColorWhite).
+		SetFieldBackgroundColor(tcell.ColorBlack)
+
+	// Real-time filtering
+	searchField.SetChangedFunc(func(text string) {
+		refreshTables(text)
+	})
+	// On Done (Enter/Esc), go back to table
+	searchField.SetDoneFunc(func(key tcell.Key) {
+		focusCurrentTable()
+	})
+
+	logView = tview.NewTextView().SetDynamicColors(true).SetScrollable(true).SetChangedFunc(func() { app.Draw() })
+	logView.SetBorder(true).SetTitle(" Live Logs ")
+
+	// Initialize Tables
+	serviceTable = makeTable([]string{"NAME", "REGION", "READY", "TRAFFIC", "URL", "AGE"})
+	jobTable = makeTable([]string{"NAME", "REGION", "READY", "COMPLETIONS", "LAST RUN", "AGE"})
+	workerTable = makeTable([]string{"NAME", "REGION", "READY", "ACTIVE", "MAX", "AGE"})
+
+	// Populate initially with empty filter
+	refreshTables("")
+
+	// 4. INPUT HANDLERS
+
+	// -- Services --
+	serviceTable.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		r, _ := serviceTable.GetSelection()
+		if r <= 0 {
+			return event
+		}
+		// Need to resolve selection to actual item (handling filtered lists is tricky by index)
+		// For this demo, we assume the table view matches the filtered list order.
+		// In production, store the filtered list in a temporary slice.
+		cell := serviceTable.GetCell(r, 0) // Get Name from 1st column
+		if cell == nil {
+			return event
+		}
+		name := cell.Text
+
+		switch event.Rune() {
+		case 'd':
+			showDetails("Service Details", generateMockYaml(name, "Service"))
+		case 'l':
+			showLogs(name)
+		case 's':
+			showScaleForm(name)
+		case 'o':
+			// Find URL from mock data
+			for _, s := range allServices {
+				if s.Name == name {
+					openBrowser(s.URL)
+					break
+				}
+			}
+		}
+		return event
+	})
+
+	// -- Jobs --
+	jobTable.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		r, _ := jobTable.GetSelection()
+		if r <= 0 {
+			return event
+		}
+		cell := jobTable.GetCell(r, 0)
+		if cell == nil {
+			return event
+		}
+		name := cell.Text
+
+		switch event.Rune() {
+		case 'd':
+			showDetails("Job Details", generateMockYaml(name, "Job"))
+		case 'l':
+			showLogs(name)
+		case 'x':
+			showJobExecutionModal(name)
+		}
+		return event
+	})
+
+	// -- Workers --
+	workerTable.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		r, _ := workerTable.GetSelection()
+		if r <= 0 {
+			return event
+		}
+		cell := workerTable.GetCell(r, 0)
+		if cell == nil {
+			return event
+		}
+		name := cell.Text
+
+		switch event.Rune() {
+		case 'd':
+			showDetails("Worker Pool Details", generateMockYaml(name, "WorkerPool"))
+		case 'l':
+			showLogs(name)
+		}
+		return event
+	})
+
+	// 5. PAGE ASSEMBLY
+	detailView := tview.NewTextView().SetDynamicColors(true).SetTextColor(tcell.ColorWhite)
+	detailView.SetBorder(true).SetTitle(" YAML Description ")
+
+	pages.AddPage("services", serviceTable, true, true)
+	pages.AddPage("jobs", jobTable, true, false)
+	pages.AddPage("workers", workerTable, true, false) // New Page
+	pages.AddPage("details", detailView, true, false)
+	pages.AddPage("logs", logView, true, false)
+
+	// 6. LAYOUT
+	flex := tview.NewFlex().SetDirection(tview.FlexRow).
+		AddItem(header, 7, 1, false).
+		AddItem(titleBar, 1, 1, false).
+		AddItem(searchField, 1, 1, false). // New Search Bar (Height 1)
+		AddItem(pages, 0, 1, true)
+
+	// 7. GLOBAL INPUT
+	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		// Navigation
+		if event.Key() == tcell.KeyCtrlS {
+			switchTo("services")
+			return nil
+		}
+		if event.Key() == tcell.KeyCtrlJ {
+			switchTo("jobs")
+			return nil
+		}
+		if event.Key() == tcell.KeyCtrlW {
+			switchTo("workers")
+			return nil
+		}
+
+		// Search Shortcut
+		if event.Rune() == '/' {
+			app.SetFocus(searchField)
+			return nil
+		}
+
+		// Escape Handling
+		if event.Key() == tcell.KeyEsc {
+			if pages.HasPage("modal") {
+				closeModal()
+				return nil
+			}
+			// If inside details/logs, go back
+			frontPage, _ := pages.GetFrontPage()
+			if frontPage == "details" || frontPage == "logs" {
+				switchTo(currentViewName)
+				return nil
+			}
+			// If search is focused, unfocus it
+			if app.GetFocus() == searchField {
+				focusCurrentTable()
+				return nil
+			}
+			// Quit
+			app.Stop()
+			return nil
+		}
+		return event
+	})
+
+	// Start
+	switchTo("services")
+	if err := app.SetRoot(flex, true).EnableMouse(true).Run(); err != nil {
+		panic(err)
+	}
+}
+
+// --- LOGIC: TABLE REFRESH & FILTERING ---
+
+func refreshTables(filter string) {
+	filter = strings.ToLower(filter)
+
+	// 1. Refresh Services
+	serviceTable.Clear()
+	// Header
+	for i, h := range []string{"NAME", "REGION", "READY", "TRAFFIC", "URL", "AGE"} {
+		setTableHeader(serviceTable, i, h)
+	}
+	// Rows
+	row := 1
+	for _, svc := range allServices {
+		if filter == "" || strings.Contains(strings.ToLower(svc.Name), filter) {
+			color := tcell.ColorGreenYellow
+			if svc.Status == "False" {
+				color = tcell.ColorRed
+			}
+			setTableRow(serviceTable, row, color, svc.Name, svc.Region, svc.Status, svc.Traffic, svc.URL, svc.Age)
+			row++
+		}
+	}
+
+	// 2. Refresh Jobs
+	jobTable.Clear()
+	for i, h := range []string{"NAME", "REGION", "READY", "COMPLETIONS", "LAST RUN", "AGE"} {
+		setTableHeader(jobTable, i, h)
+	}
+	row = 1
+	for _, job := range allJobs {
+		if filter == "" || strings.Contains(strings.ToLower(job.Name), filter) {
+			color := tcell.ColorGreenYellow
+			if job.Status == "False" {
+				color = tcell.ColorRed
+			}
+			setTableRow(jobTable, row, color, job.Name, job.Region, job.Status, job.Completions, job.LastRun, job.Age)
+			row++
+		}
+	}
+
+	// 3. Refresh Workers
+	workerTable.Clear()
+	for i, h := range []string{"NAME", "REGION", "READY", "ACTIVE", "MAX", "AGE"} {
+		setTableHeader(workerTable, i, h)
+	}
+	row = 1
+	for _, w := range allWorkers {
+		if filter == "" || strings.Contains(strings.ToLower(w.Name), filter) {
+			color := tcell.ColorGreenYellow
+			if w.Status == "False" {
+				color = tcell.ColorRed
+			}
+			setTableRow(workerTable, row, color, w.Name, w.Region, w.Status, w.ActiveWorkers, w.MaxWorkers, w.Age)
+			row++
+		}
+	}
+}
+
+func focusCurrentTable() {
+	if currentViewName == "services" {
+		app.SetFocus(serviceTable)
+	} else if currentViewName == "jobs" {
+		app.SetFocus(jobTable)
+	} else if currentViewName == "workers" {
+		app.SetFocus(workerTable)
+	}
+}
+
+// --- LOGIC: MENU & NAVIGATION ---
+
+func updateMenu(view string) {
+	var contextCmds string
+	if view == "services" {
+		contextCmds = `[dodgerblue]<d> [white]Describe
+[dodgerblue]<l> [white]Logs
+[dodgerblue]<s> [white]Scale
+[dodgerblue]<o> [white]Open URL`
+	} else if view == "jobs" {
+		contextCmds = `[dodgerblue]<d> [white]Describe
+[dodgerblue]<l> [white]Logs
+[dodgerblue]<x> [white]Execute`
+	} else if view == "workers" {
+		contextCmds = `[dodgerblue]<d> [white]Describe
+[dodgerblue]<l> [white]Logs`
+	}
+	contextMenu.SetText(contextCmds)
+}
+
+func switchTo(pageName string) {
+	currentViewName = pageName
+	pages.SwitchToPage(pageName)
+	updateMenu(pageName)
+
+	count := 0
+	titleType := ""
+
+	if pageName == "services" {
+		app.SetFocus(serviceTable)
+		count = len(allServices)
+		titleType = "Services"
+	} else if pageName == "jobs" {
+		app.SetFocus(jobTable)
+		count = len(allJobs)
+		titleType = "Jobs"
+	} else if pageName == "workers" {
+		app.SetFocus(workerTable)
+		count = len(allWorkers)
+		titleType = "Worker Pools"
+	}
+
+	// If a filter is applied, show (filtered/total) logic?
+	// For now, simple count
+	titleBar.SetText(fmt.Sprintf("[black:lightcyan] Cloud Run %s(all)[%d] ", titleType, count))
+}
+
+// --- STANDARD HELPERS ---
+
+func showDetails(title, content string) {
+	dView := pages.GetPage("details")
+	tv := dView.(*tview.TextView)
+	tv.SetTitle(fmt.Sprintf(" %s ", title))
+	tv.SetText(content)
+	pages.SwitchToPage("details")
+}
+
+func showLogs(resourceName string) {
+	logView.Clear()
+	logView.SetTitle(fmt.Sprintf(" Logs: %s ", resourceName))
+	pages.SwitchToPage("logs")
+}
+
+func closeModal() {
+	pages.RemovePage("modal")
+	focusCurrentTable()
+}
+
+func showJobExecutionModal(jobName string) {
+	modal := tview.NewModal().
+		SetText(fmt.Sprintf("Execute Job: %s?", jobName)).
+		AddButtons([]string{"Execute", "Cancel"}).
+		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+			if buttonLabel == "Execute" {
+				go func() {
+					app.QueueUpdateDraw(func() {
+						showLogs(jobName)
+						fmt.Fprintf(logView, "\n[green]>>> JOB STARTED <<<\n")
+					})
+				}()
+			}
+			closeModal()
+		})
+	pages.AddPage("modal", modal, true, true)
+}
+
+func showScaleForm(serviceName string) {
+	form := tview.NewForm().
+		AddInputField("Min", "1", 5, nil, nil).
+		AddInputField("Max", "10", 5, nil, nil)
+	form.SetBorder(true).SetTitle(fmt.Sprintf(" Scale: %s ", serviceName))
+	form.AddButton("Save", func() { closeModal() })
+	form.AddButton("Cancel", func() { closeModal() })
+	flex := tview.NewFlex().
+		AddItem(nil, 0, 1, false).
+		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
+			AddItem(nil, 0, 1, false).
+			AddItem(form, 10, 1, true).
+			AddItem(nil, 0, 1, false), 40, 1, true).
+		AddItem(nil, 0, 1, false)
+	pages.AddPage("modal", flex, true, true)
+}
+
+func openBrowser(url string) {
+	var err error
+	switch runtime.GOOS {
+	case "linux":
+		err = exec.Command("xdg-open", url).Start()
+	case "windows":
+		err = exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+	case "darwin":
+		err = exec.Command("open", url).Start()
+	}
+	if err != nil { /* Handle error */
+	}
+}
+
+func generateMockYaml(name, kind string) string {
+	return fmt.Sprintf(`[green]apiVersion:[white] serving.knative.dev/v1
+[green]kind:[white] %s
+[green]metadata:
+  [green]name:[white] %s`, kind, name)
+}
+
+// --- TABLE BUILDING HELPERS ---
+
+func makeTable(headers []string) *tview.Table {
+	t := tview.NewTable().SetBorders(false).SetSelectable(true, false).SetFixed(1, 1)
+	// Headers are now set in refreshTables
+	return t
+}
+
+func setTableHeader(t *tview.Table, col int, val string) {
+	t.SetCell(0, col, tview.NewTableCell(val).
+		SetTextColor(tcell.ColorBlack).
+		SetBackgroundColor(tcell.ColorLightCyan).
+		SetSelectable(false).
+		SetExpansion(1))
+}
+
+func setTableRow(t *tview.Table, row int, statusColor tcell.Color, values ...string) {
+	for i, v := range values {
+		color := tcell.ColorWhite
+		if i == 2 {
+			color = statusColor
+		}
+		t.SetCell(row, i, tview.NewTableCell(v).SetTextColor(color))
+	}
+}

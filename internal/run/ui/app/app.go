@@ -1,10 +1,12 @@
 package app
 
 import (
+	"github.com/JulienBreux/run-cli/internal/run/auth"
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
 	model_project "github.com/JulienBreux/run-cli/internal/run/model/common/project"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/job"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/project"
+	"github.com/JulienBreux/run-cli/internal/run/ui/app/region"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/service"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/worker"
 	"github.com/JulienBreux/run-cli/internal/run/ui/header"
@@ -21,6 +23,7 @@ var (
 	currentInfo    info.Info
 
 	projectModal tview.Primitive
+	regionModal  tview.Primitive
 )
 
 const (
@@ -44,15 +47,29 @@ func Run() error {
 		switchTo(service.LIST_PAGE_ID)
 	})
 
+	regionModal = region.RegionModal(app, func(selectedRegion string) {
+		currentInfo.Region = selectedRegion
+		header.UpdateInfo(currentInfo)
+		switchTo(previousPageID)
+	}, func() {
+		switchTo(service.LIST_PAGE_ID)
+	})
+
 	// Auth.
 
 	// Load data.
-	// TODO: Mocks.
 	currentInfo = info.Info{
-		User:    "julienbreux@google.com",
-		Project: "Project Alpha 17",
+		User:    "Guest",
+		Project: "None",
 		Version: "dev",
-		Region:  "us-central1",
+		Region:  "-",
+	}
+
+	// Try to load real info
+	if realInfo, err := auth.GetInfo(); err == nil {
+		currentInfo.User = realInfo.User
+		currentInfo.Project = realInfo.Project
+		currentInfo.Region = realInfo.Region
 	}
 
 	return app.SetRoot(layout(), FULLSCREEN).
@@ -70,6 +87,7 @@ func layout() *tview.Flex {
 
 	// Modals.
 	pages.AddPage(project.MODAL_PAGE_ID, projectModal, true, true)
+	pages.AddPage(region.MODAL_PAGE_ID, regionModal, true, true)
 	// pages.AddPage("details", detailView, true, false)
 	// pages.AddPage("logs", logView, true, false)
 
@@ -106,17 +124,14 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 		switchTo(project.MODAL_PAGE_ID)
 		return nil
 	}
+	if event.Key() == region.MODAL_PAGE_SHORTCUT {
+		switchTo(region.MODAL_PAGE_ID)
+		return nil
+	}
 
 	// Open URL for Service list
 	if currentPageID == service.LIST_PAGE_ID {
 		return service.HandleShortcuts(event)
-	}
-
-	// Escape Handling.
-	if event.Key() == ESCAPE_SHORTCUT {
-		// Quit application.
-		app.Stop()
-		return nil
 	}
 
 	return event
@@ -130,15 +145,18 @@ func switchTo(pageID string) {
 	switch pageID {
 	case service.LIST_PAGE_ID:
 		service.Shortcuts()
-		service.ListReload()
+		service.ListReload(currentInfo)
 	case job.LIST_PAGE_ID:
 		job.Shortcuts()
-		job.ListReload()
+		job.ListReload(currentInfo)
 	case worker.LIST_PAGE_ID:
 		worker.Shortcuts()
-		worker.ListReload()
+		worker.ListReload(currentInfo)
 	case project.MODAL_PAGE_ID:
 		header.ContextShortcutView.Clear()
 		app.SetFocus(projectModal)
+	case region.MODAL_PAGE_ID:
+		header.ContextShortcutView.Clear()
+		app.SetFocus(regionModal)
 	}
 }

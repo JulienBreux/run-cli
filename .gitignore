@@ -12,6 +12,7 @@
 *.test
 
 # Code coverage profiles and other test artifacts
+bin/
 *.out
 coverage.*
 *.coverprofile

@@ -25,4 +25,5 @@ type Service struct {
 	TerminalCondition     *condition.Condition           `json:"terminalCondition,omitempty"`
 	Conditions            []*condition.Condition         `json:"conditions,omitempty"`
 	Etag                  string                         `json:"etag,omitempty"`
+	Region                string                         `json:"region"` // New field
 }

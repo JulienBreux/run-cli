@@ -1,9 +1,9 @@
 package project
 
 import (
-	"fmt"
 	"strings"
 
+	api_project "github.com/JulienBreux/run-cli/internal/run/api/project"
 	model "github.com/JulienBreux/run-cli/internal/run/model/common/project"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -17,12 +17,9 @@ const (
 // ProjectModal returns a centered modal primitive with search and list
 func ProjectModal(app *tview.Application, onSelect func(project model.Project), closeModal func()) tview.Primitive {
 	// --- Data ---
-	projects := make([]model.Project, 35)
-	for i := 0; i < 35; i++ {
-		projects[i] = model.Project{
-			Name:   fmt.Sprintf("Project Alpha %02d", i+1),
-			Number: i + 1,
-		}
+	projects, err := api_project.List()
+	if err != nil {
+		projects = []model.Project{}
 	}
 	var filteredProjects []model.Project
 
@@ -106,6 +103,10 @@ func ProjectModal(app *tview.Application, onSelect func(project model.Project), 
 
 	// --- Navigation (Tab Cycling) ---
 	content.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Key() == tcell.KeyEscape {
+			closeModal()
+			return nil
+		}
 		if event.Key() == tcell.KeyTab {
 			switch {
 			case input.HasFocus():

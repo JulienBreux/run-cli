@@ -3,10 +3,9 @@ package job
 import (
 	"fmt"
 	"strings"
-	"time"
 
-	"github.com/JulienBreux/run-cli/internal/run/model/common/condition"
-	model "github.com/JulienBreux/run-cli/internal/run/model/job"
+	api_job "github.com/JulienBreux/run-cli/internal/run/api/job"
+	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
 	"github.com/JulienBreux/run-cli/internal/run/ui/header"
 	"github.com/JulienBreux/run-cli/internal/run/ui/table"
 	"github.com/gdamore/tcell/v2"
@@ -37,46 +36,42 @@ func List() *table.Table {
 	return listTable
 }
 
-func ListReload() {
+func ListReload(currentInfo info.Info) {
 	listTable.Table.Clear()
 	listTable.SetHeaders(listHeaders)
 
-	// Mock data.
-	for i := 0; i < 5; i++ {
-		region := "us-central1"
-		simpleName := fmt.Sprintf("job-processor-%02d", i+1)
-		fullName := fmt.Sprintf("projects/test-project/locations/%s/jobs/%s", region, simpleName)
+	// Fetch real data
+	jobs, err := api_job.List(currentInfo.Project, currentInfo.Region)
+	if err != nil {
+		listTable.Table.SetTitle(fmt.Sprintf(" %s (Error: %s) ", LIST_PAGE_TITLE, err))
+		return
+	}
 
-		j := model.Job{
-			Name: fullName,
-			LatestCreatedExecution: &model.ExecutionReference{
-				CreateTime: time.Now().Add(-time.Duration(i*2) * time.Hour),
-			},
-			TerminalCondition: &condition.Condition{
-				State: "Succeeded",
-			},
-			Creator: fmt.Sprintf("dev-%02d@example.com", i+1),
-		}
-
-		if i%3 == 0 {
-			j.TerminalCondition.State = "Failed"
-		}
-
+	for i, j := range jobs {
 		// Extract info
 		nameParts := strings.Split(j.Name, "/")
 		displayName := nameParts[len(nameParts)-1]
-		displayRegion := nameParts[3]
+
+		status := "-"
+		if j.TerminalCondition != nil {
+			status = j.TerminalCondition.State
+		}
+
+		lastExecuted := "-"
+		if j.LatestCreatedExecution != nil {
+			lastExecuted = j.LatestCreatedExecution.CreateTime.Format("2006-01-02 15:04:05")
+		}
 
 		row := i + 1 // +1 for header row
 		listTable.Table.SetCell(row, 0, tview.NewTableCell(displayName))
-		listTable.Table.SetCell(row, 1, tview.NewTableCell(j.TerminalCondition.State))
-		listTable.Table.SetCell(row, 2, tview.NewTableCell(j.LatestCreatedExecution.CreateTime.Format("2006-01-02 15:04:05")))
-		listTable.Table.SetCell(row, 3, tview.NewTableCell(displayRegion))
+		listTable.Table.SetCell(row, 1, tview.NewTableCell(status))
+		listTable.Table.SetCell(row, 2, tview.NewTableCell(lastExecuted))
+		listTable.Table.SetCell(row, 3, tview.NewTableCell(j.Region))
 		listTable.Table.SetCell(row, 4, tview.NewTableCell(j.Creator))
 	}
 
 	// Refresh title
-	listTable.Table.SetTitle(fmt.Sprintf(" %s (%d) ", listTable.Title, 5))
+	listTable.Table.SetTitle(fmt.Sprintf(" %s (%d) ", LIST_PAGE_TITLE, len(jobs)))
 }
 
 func Shortcuts() {

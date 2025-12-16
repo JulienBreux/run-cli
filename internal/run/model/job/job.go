@@ -33,6 +33,7 @@ type Job struct {
 	LatestCreatedExecution *ExecutionReference  `json:"latestCreatedExecution"`
 	Reconciling            bool                 `json:"reconciling"`
 	SatisfiesPZS           bool                 `json:"satisfiesPzs"`
+	Region                 string               `json:"region"` // New field
 }
 
 // ExecutionReference represents a reference to a specific execution.

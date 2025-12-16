@@ -48,7 +48,8 @@ func columnShortcuts() *tview.Flex {
 // returns the global shortcuts sub column.
 func subColumnGlobalShortcuts() *tview.TextView {
 	view := tview.NewTextView().SetDynamicColors(true).SetTextAlign(tview.AlignLeft)
-	_, _ = fmt.Fprintf(view, "[dodgerblue]<ctrl-p> [white]Project\n\n")
+	_, _ = fmt.Fprintf(view, "[dodgerblue]<ctrl-p> [white]Project\n")
+	_, _ = fmt.Fprintf(view, "[dodgerblue]<ctrl-r> [white]Region\n\n")
 	_, _ = fmt.Fprintf(view, "[dodgerblue]<ctrl-s> [white]Services\n")
 	_, _ = fmt.Fprintf(view, "[dodgerblue]<ctrl-j> [white]Jobs\n")
 	_, _ = fmt.Fprintf(view, "[dodgerblue]<ctrl-w> [white]Worker Pools\n")

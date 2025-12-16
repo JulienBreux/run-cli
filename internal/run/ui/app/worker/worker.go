@@ -3,9 +3,9 @@ package worker
 import (
 	"fmt"
 	"strings"
-	"time"
 
-	model "github.com/JulienBreux/run-cli/internal/run/model/workerpool"
+	api_workerpool "github.com/JulienBreux/run-cli/internal/run/api/workerpool"
+	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
 	"github.com/JulienBreux/run-cli/internal/run/ui/header"
 	"github.com/JulienBreux/run-cli/internal/run/ui/table"
 	"github.com/gdamore/tcell/v2"
@@ -37,42 +37,31 @@ func List() *table.Table {
 	return listTable
 }
 
-func ListReload() {
+func ListReload(currentInfo info.Info) {
 	listTable.Table.Clear()
 	listTable.SetHeaders(listHeaders)
 
-	// Mock data.
-	for i := 0; i < 20; i++ {
-		region := "us-central1"
-		workerPoolName := fmt.Sprintf("my-workerpool-%02d", i+1)
-		fullName := fmt.Sprintf("projects/test-project/locations/%s/workerPools/%s", region, workerPoolName)
+	// Fetch real data
+	workerPools, err := api_workerpool.List(currentInfo.Project, currentInfo.Region)
+	if err != nil {
+		listTable.Table.SetTitle(fmt.Sprintf(" %s (Error: %s) ", LIST_PAGE_TITLE, err))
+		return
+	}
 
-		w := model.WorkerPool{
-			Name:        fullName,
-			DisplayName: workerPoolName,
-			Region:      region,
-			UpdateTime:  time.Now().Add(-time.Duration(i*5) * time.Hour),
-			WorkerConfig: &model.WorkerConfig{
-				MachineType: "e2-medium",
-				DiskSizeGb:  300,
-			},
-			NetworkConfig: &model.NetworkConfig{
-				EgressOption: "PRIVATE_ENDPOINT",
-			},
-			Labels: map[string]string{"env": "prod", "team": "backend"},
-		}
-
-		if i%2 == 0 {
-			w.WorkerConfig.MachineType = "e2-small"
-			w.NetworkConfig.EgressOption = "NO_EXTERNAL_IP"
-			w.Labels["env"] = "dev"
-		}
-
+	for i, w := range workerPools {
 		// Infer Deployment Type
-		deploymentType := "Container"
+		deploymentType := "Standard"
+		if w.PrivatePoolVpcConfig != nil {
+			deploymentType = "Private"
+		} else if w.NetworkConfig != nil && w.NetworkConfig.EgressOption == "PRIVATE_ENDPOINT" {
+			deploymentType = "Hybrid"
+		}
 
 		// Infer Scaling
-		scaling := fmt.Sprintf("Manual: 1")
+		scaling := "-"
+		if w.WorkerConfig != nil {
+			scaling = fmt.Sprintf("Machine: %s, Disk: %dGB", w.WorkerConfig.MachineType, w.WorkerConfig.DiskSizeGb)
+		}
 
 		// Format labels
 		var labels []string
@@ -90,7 +79,7 @@ func ListReload() {
 	}
 
 	// Refresh title
-	listTable.Table.SetTitle(fmt.Sprintf(" %s (%d) ", listTable.Title, 20))
+	listTable.Table.SetTitle(fmt.Sprintf(" %s (%d) ", LIST_PAGE_TITLE, len(workerPools)))
 }
 
 func Shortcuts() {

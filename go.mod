@@ -15,6 +15,7 @@ require (
 	cloud.google.com/go/cloudbuild v1.24.0 // indirect
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
 	cloud.google.com/go/iam v1.5.3 // indirect
+	cloud.google.com/go/logging v1.13.1 // indirect
 	cloud.google.com/go/longrunning v0.7.0 // indirect
 	cloud.google.com/go/resourcemanager v1.10.7 // indirect
 	cloud.google.com/go/run v1.13.0 // indirect

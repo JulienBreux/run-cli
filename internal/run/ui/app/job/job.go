@@ -82,6 +82,18 @@ func ListReload(app *tview.Application, currentInfo info.Info, onResult func(err
 	}()
 }
 
+// GetSelectedJob returns the Name and Region of the selected job.
+func GetSelectedJob() (string, string) {
+	row, _ := listTable.Table.GetSelection()
+	if row < 1 { // Header row or no selection
+		return "", ""
+	}
+	// 0: Name, 3: Region
+	name := listTable.Table.GetCell(row, 0).Text
+	region := listTable.Table.GetCell(row, 3).Text
+	return name, region
+}
+
 func Shortcuts() {
 	header.ContextShortcutView.Clear()
 	shortcuts := `[dodgerblue]<d> [white]Describe

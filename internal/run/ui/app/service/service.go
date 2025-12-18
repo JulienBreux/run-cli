@@ -81,6 +81,18 @@ func GetSelectedServiceURL() string {
 	return cell.Text
 }
 
+// GetSelectedService returns the Name and Region of the selected service.
+func GetSelectedService() (string, string) {
+	row, _ := listTable.Table.GetSelection()
+	if row < 1 { // Header row or no selection
+		return "", ""
+	}
+	// 0: Service, 1: Region
+	name := listTable.Table.GetCell(row, 0).Text
+	region := listTable.Table.GetCell(row, 1).Text
+	return name, region
+}
+
 // HandleShortcuts handles service-specific shortcuts.
 func HandleShortcuts(event *tcell.EventKey) *tcell.EventKey {
 	// Open URL

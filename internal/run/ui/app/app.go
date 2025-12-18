@@ -7,6 +7,7 @@ import (
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
 	model_project "github.com/JulienBreux/run-cli/internal/run/model/common/project"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/job"
+	"github.com/JulienBreux/run-cli/internal/run/ui/app/log"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/project"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/region"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/service"
@@ -139,7 +140,25 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 
 	// Open URL for Service list
 	if currentPageID == service.LIST_PAGE_ID {
+		if event.Rune() == 'l' {
+			name, region := service.GetSelectedService()
+			if name != "" {
+				openLogModal(name, region, "service")
+			}
+			return nil
+		}
 		if result := service.HandleShortcuts(event); result == nil {
+			return nil
+		}
+	}
+
+	// Job List
+	if currentPageID == job.LIST_PAGE_ID {
+		if event.Rune() == 'l' {
+			name, region := job.GetSelectedJob()
+			if name != "" {
+				openLogModal(name, region, "job")
+			}
 			return nil
 		}
 	}
@@ -193,4 +212,27 @@ func switchTo(pageID string) {
 		header.ContextShortcutView.Clear()
 		app.SetFocus(regionModal)
 	}
+}
+
+func openLogModal(name, region, logType string) {
+	var filter string
+	if logType == "service" {
+		filter = fmt.Sprintf(`resource.type="cloud_run_revision" resource.labels.service_name="%s" resource.labels.location="%s"`, name, region)
+	} else if logType == "job" {
+		filter = fmt.Sprintf(`resource.type="cloud_run_job" resource.labels.job_name="%s" resource.labels.location="%s"`, name, region)
+	}
+
+	logModal := log.LogModal(app, currentInfo.Project, filter, name, func() {
+		pages.RemovePage(log.MODAL_PAGE_ID)
+		switchTo(previousPageID)
+	})
+
+	pages.AddPage(log.MODAL_PAGE_ID, logModal, true, true)
+
+	previousPageID = currentPageID
+	currentPageID = log.MODAL_PAGE_ID
+	pages.SwitchToPage(log.MODAL_PAGE_ID)
+
+	header.ContextShortcutView.Clear()
+	app.SetFocus(logModal)
 }

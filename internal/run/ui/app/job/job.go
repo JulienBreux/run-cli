@@ -21,6 +21,14 @@ var (
 		"REGION",
 		"CREATED BY"}
 
+	listExpansions = []int{
+		2, // NAME
+		2, // STATUS OF LAST EXECUTION
+		2, // LAST EXECUTED
+		1, // REGION
+		2, // CREATED BY
+	}
+
 	listTable *table.Table
 )
 
@@ -33,14 +41,13 @@ const (
 // List returns a list of jobs.
 func List() *table.Table {
 	listTable = table.New(LIST_PAGE_TITLE)
-	listTable.SetHeaders(listHeaders)
+	listTable.SetHeadersWithExpansions(listHeaders, listExpansions)
 	return listTable
 }
 
 func ListReload(app *tview.Application, currentInfo info.Info, onResult func(error)) {
 	listTable.Table.Clear()
-	listTable.SetHeaders(listHeaders)
-	app.SetFocus(listTable.Table)
+	listTable.SetHeadersWithExpansions(listHeaders, listExpansions)
 
 	go func() {
 		// Fetch real data

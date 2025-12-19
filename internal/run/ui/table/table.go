@@ -37,19 +37,31 @@ func New(title string) *Table {
 }
 
 // SetHeaders sets the table headers.
+// Deprecated: Use SetHeadersWithExpansions instead.
 func (t *Table) SetHeaders(headers []string) {
 	for i, h := range headers {
-		addTableHeader(t.Table, i, h)
+		addTableHeader(t.Table, i, h, 1)
+	}
+}
+
+// SetHeadersWithExpansions sets the table headers with custom expansion values.
+func (t *Table) SetHeadersWithExpansions(headers []string, expansions []int) {
+	for i, h := range headers {
+		exp := 1
+		if i < len(expansions) {
+			exp = expansions[i]
+		}
+		addTableHeader(t.Table, i, h, exp)
 	}
 }
 
 // addTableHeader adds a table header.
-func addTableHeader(t *tview.Table, col int, val string) {
+func addTableHeader(t *tview.Table, col int, val string, expansion int) {
 	t.SetCell(0, col, tview.NewTableCell(val).
 		SetTextColor(tcell.ColorBlack).
 		SetBackgroundColor(tcell.ColorLightCyan).
 		SetSelectable(false).
-		SetExpansion(1))
+		SetExpansion(expansion))
 }
 
 // setTableRow sets a table row.

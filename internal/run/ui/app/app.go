@@ -249,9 +249,10 @@ func switchTo(pageID string) {
 
 func openLogModal(name, region, logType string) {
 	var filter string
-	if logType == "service" {
+	switch logType {
+	case "service":
 		filter = fmt.Sprintf(`resource.type="cloud_run_revision" resource.labels.service_name="%s" resource.labels.location="%s"`, name, region)
-	} else if logType == "job" {
+	case "job":
 		filter = fmt.Sprintf(`resource.type="cloud_run_job" resource.labels.job_name="%s" resource.labels.location="%s"`, name, region)
 	}
 

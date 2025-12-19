@@ -25,16 +25,17 @@ func StreamLogs(ctx context.Context, projectID, filter string, logChan chan<- st
 	if err != nil {
 		return fmt.Errorf("failed to create logging client: %w", err)
 	}
-	defer client.Close()
+	defer func() {
+		if err := client.Close(); err != nil {
+			logChan <- fmt.Sprintf("failed to close logging client: %v", err)
+		}
+	}()
 
 	// 1. Fetch Initial Backlog (Last 50)
 	// We use NewestFirst to get the 50 most recent, but we need to reverse them for display.
 	iter := client.Entries(ctx, logadmin.Filter(filter), logadmin.NewestFirst())
 	var backlog []*logging.Entry
-	for {
-		if len(backlog) >= 50 {
-			break
-		}
+	for len(backlog) < 50 {
 		entry, err := iter.Next()
 		if err == iterator.Done {
 			break

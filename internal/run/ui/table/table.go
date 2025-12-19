@@ -63,14 +63,3 @@ func addTableHeader(t *tview.Table, col int, val string, expansion int) {
 		SetSelectable(false).
 		SetExpansion(expansion))
 }
-
-// setTableRow sets a table row.
-func setTableRow(t *tview.Table, row int, statusColor tcell.Color, values ...string) {
-	for i, v := range values {
-		color := tcell.ColorWhite
-		if i == 2 {
-			color = statusColor
-		}
-		t.SetCell(row, i, tview.NewTableCell(v).SetTextColor(color))
-	}
-}

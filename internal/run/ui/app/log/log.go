@@ -71,7 +71,7 @@ func LogModal(app *tview.Application, projectID, filter, title string, closeModa
 	// --- Navigation ---
 	content.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyEscape {
-			cancel() // Cancel streaming
+			cancel()       // Cancel streaming
 			close(logChan) // Close channel (optional, but good practice)
 			closeModal()
 			return nil

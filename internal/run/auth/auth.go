@@ -45,7 +45,9 @@ func parseConfig(path string) (info.Info, error) {
 	if err != nil {
 		return info.Info{}, err
 	}
-	defer file.Close()
+	defer func() {
+		_ = file.Close()
+	}()
 
 	var (
 		account, project, region string
@@ -72,9 +74,10 @@ func parseConfig(path string) (info.Info, error) {
 
 		switch section {
 		case "core":
-			if key == "account" {
+			switch key {
+			case "account":
 				account = val
-			} else if key == "project" {
+			case "project":
 				project = val
 			}
 		case "run":

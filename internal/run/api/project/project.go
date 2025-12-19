@@ -28,7 +28,9 @@ func List() ([]model.Project, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer c.Close()
+	defer func() {
+		_ = c.Close()
+	}()
 
 	req := &resourcemanagerpb.SearchProjectsRequest{
 		// Query: "", // Empty query lists all projects

@@ -34,7 +34,9 @@ func List(project, region string) ([]model.WorkerPool, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer c.Close()
+	defer func() {
+		_ = c.Close()
+	}()
 
 	req := &runpb.ListWorkerPoolsRequest{
 		Parent: fmt.Sprintf("projects/%s/locations/%s", project, region),

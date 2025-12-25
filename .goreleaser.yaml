@@ -40,7 +40,7 @@ homebrew_casks:
     description: Run CLI is an interactive CLI to manage your Google Cloud Run resources with panache!
     repository:
       owner: JulienBreux
-      name: tap-homebrew
+      name: homebrew-tap
 
 changelog:
   sort: asc

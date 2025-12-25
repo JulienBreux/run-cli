@@ -52,6 +52,7 @@ Run CLI is available on Linux, OSX and Windows platforms.
 Simply run the command:
 
 ```sh
+gcloud auth application-default login # Currently mandatory :/
 run
 ```
 

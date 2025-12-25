@@ -19,7 +19,7 @@ func TestPrint(t *testing.T) {
 		Message: "Hello Hut!",
 	}
 	var c format.Callback = func(w io.Writer) {
-		fmt.Fprintf(w, "%s", "I'm just the callback!")
+		_, _ = fmt.Fprintf(w, "%s", "I'm just the callback!")
 	}
 
 	// Test JSON

@@ -87,11 +87,9 @@ func Modal(app *tview.Application, service *model_service.Service, pages *tview.
 
 		// Call API
 		go func() {
-			_, err := api_service.UpdateScaling(service.Project, service.Region, service.Name, min, max, manual)
+			_, _ = api_service.UpdateScaling(service.Project, service.Region, service.Name, min, max, manual)
 			app.QueueUpdateDraw(func() {
-				if err != nil {
-					// TODO: Show error to user
-				}
+				// TODO: Show error to user
 				pages.RemovePage(MODAL_PAGE_ID)
 				onCompletion()
 			})

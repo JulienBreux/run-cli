@@ -36,6 +36,7 @@ func List(project, region string) ([]model.Service, error) {
 		return nil, err
 	}
 	defer func() {
+		// TODO: Improve error management.
 		_ = c.Close()
 	}()
 
@@ -111,7 +112,10 @@ func UpdateScaling(project, region, serviceName string, min, max, manual int) (*
 	if err != nil {
 		return nil, err
 	}
-	defer c.Close()
+	defer func() {
+		// TODO: Improve error management.
+		_ = c.Close()
+	}()
 
 	// First, get the latest version of the service
 	service, err := c.GetService(ctx, &runpb.GetServiceRequest{

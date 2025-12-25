@@ -312,7 +312,7 @@ func openLogModal(name, region, logType string) {
 	app.SetFocus(logModal)
 }
 
-func openDescribeModal(resource interface{}, title string) {
+func openDescribeModal(resource any, title string) {
 	describeModal := describe.DescribeModal(app, resource, title, func() {
 		pages.RemovePage(describe.MODAL_PAGE_ID)
 		switchTo(previousPageID)

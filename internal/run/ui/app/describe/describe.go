@@ -11,7 +11,7 @@ import (
 const MODAL_PAGE_ID = "describe"
 
 // DescribeModal creates a modal to display resource details in YAML format.
-func DescribeModal(app *tview.Application, resource interface{}, title string, closeFunc func()) tview.Primitive {
+func DescribeModal(app *tview.Application, resource any, title string, closeFunc func()) tview.Primitive {
 	yamlBytes, err := yaml.Marshal(resource)
 	if err != nil {
 		yamlBytes = []byte("Error: Unable to marshal resource to YAML")

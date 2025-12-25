@@ -38,9 +38,9 @@ func Date() (time.Time, error) {
 func Print(w io.Writer, f string) {
 	var c format.Callback = func(w io.Writer) {
 		const format = "%-15s %s\n"
-		fmt.Fprintf(w, format, "Version:", Version)
-		fmt.Fprintf(w, format, "Commit:", Commit)
-		fmt.Fprintf(w, format, "Build date:", RawDate)
+		_, _ = fmt.Fprintf(w, format, "Version:", Version)
+		_, _ = fmt.Fprintf(w, format, "Commit:", Commit)
+		_, _ = fmt.Fprintf(w, format, "Build date:", RawDate)
 	}
 	var v = version{
 		Version: Version,

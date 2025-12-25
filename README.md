@@ -25,8 +25,8 @@ Run CLI is available on Linux, OSX and Windows platforms.
 * Via Homebrew (Mac OS) or LinuxBrew (Linux)
 
    ```shell
-   brew tap julienbreux/tap/run
-   brew install --cask julienbreux/tap/run
+   brew tap julienbreux/run
+   brew install --cask julienbreux/run/run
    ```
 
 * Via `go get`

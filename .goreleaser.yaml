@@ -29,28 +29,14 @@ archives:
       - goos: windows
         formats: [zip]
 
-brews:
-  - name: rabdis
-    tap:
-      owner: JulienBreux
-      name: run-cli-homebrew
-    commit_author:
-      name: Julien Breux
-      email: julien.breux@gmail.com
-    folder: Formula
+homebrew_casks:
+  - name: run
     homepage: https://github.com/julienbreux/run-cli/
     description: Run CLI is an interactive CLI to manage your Google Cloud Run resources with panache!
-    test: system "run version"
-
-nfpm:
-  - maintainer: Julien Breux <julien.breux@gmail.com>
-    description: Run CLI.
-    homepage: https://gitlab.com/JulienBreux/run-cli
-    license: Apache-2.0
-    formats:
-      - deb
-      - rpm
-      - apk
+    repository:
+      owner: JulienBreux
+      name: run-cli-homebrew
+    token: "{{ .Env.GH_TOKEN }}"
 
 changelog:
   sort: asc

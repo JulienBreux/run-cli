@@ -57,7 +57,6 @@ func Run() error {
 	currentInfo = info.Info{
 		User:    "Guest",
 		Project: "None",
-		Version: "dev",
 		Region:  "-",
 	}
 

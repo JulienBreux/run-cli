@@ -35,8 +35,8 @@ Run CLI is available on Linux, OSX and Windows platforms.
 * Via Homebrew (Mac OS) or LinuxBrew (Linux)
 
    ```shell
-   brew tap JulienBreux/run-cli
-   brew install run-cli
+   brew tap julienbreux/tap/run
+   brew install --cask julienbreux/tap/run
    ```
 
 * Via `go get`

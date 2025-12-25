@@ -5,6 +5,7 @@ import (
 
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
 	"github.com/JulienBreux/run-cli/internal/run/ui/component/logo"
+	"github.com/JulienBreux/run-cli/pkg/version"
 	"github.com/rivo/tview"
 )
 
@@ -26,10 +27,11 @@ func New(currentInfo info.Info) *tview.Flex {
 // UpdateInfo updates the info view.
 func UpdateInfo(currentInfo info.Info) {
 	infoView.Clear()
+
 	_, _ = fmt.Fprintf(infoView, "[white]Project:  [#bd93f9]%s\n", currentInfo.Project)
 	_, _ = fmt.Fprintf(infoView, "[white]Region:   [#bd93f9]%s\n", currentInfo.Region)
 	_, _ = fmt.Fprintf(infoView, "[white]User:     [#bd93f9]%s\n", currentInfo.User)
-	_, _ = fmt.Fprintf(infoView, "[white]Version:  [#bd93f9]%s", currentInfo.Version)
+	_, _ = fmt.Fprintf(infoView, "[white]Version:  [#bd93f9]%s", version.Version)
 }
 
 // returns the info column.

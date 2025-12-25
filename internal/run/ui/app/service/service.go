@@ -38,9 +38,10 @@ var (
 )
 
 const (
-	LIST_PAGE_TITLE    = "Services"
-	LIST_PAGE_ID       = "services-list"
-	LIST_PAGE_SHORTCUT = tcell.KeyCtrlS
+	LIST_PAGE_TITLE       = "Services"
+	LIST_PAGE_ID          = "services-list"
+	LIST_PAGE_SHORTCUT    = tcell.KeyCtrlS
+	SCALE_MODAL_PAGE_ID = "scale"
 )
 
 // List returns a list of services.

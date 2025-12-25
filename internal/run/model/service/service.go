@@ -28,4 +28,5 @@ type Service struct {
 	Scaling               *scaling.Scaling               `json:"scaling,omitempty"`
 	Etag                  string                         `json:"etag,omitempty"`
 	Region                string                         `json:"region"` // New field
+	Project               string                         `json:"project"`
 }

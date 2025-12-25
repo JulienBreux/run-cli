@@ -92,10 +92,94 @@ func List(project, region string) ([]model.Service, error) {
 			UpdateTime:   resp.UpdateTime.AsTime(),
 			Region:       region,
 			Scaling:      &s,
+			Project:      project,
 		})
 	}
 
 	return services, nil
+}
+
+// UpdateScaling updates the scaling settings for a service.
+func UpdateScaling(project, region, serviceName string, min, max, manual int) (*model.Service, error) {
+	ctx := context.Background()
+	creds, err := google.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find default credentials: %w", err)
+	}
+
+	c, err := run.NewServicesClient(ctx, option.WithCredentials(creds))
+	if err != nil {
+		return nil, err
+	}
+	defer c.Close()
+
+	// First, get the latest version of the service
+	service, err := c.GetService(ctx, &runpb.GetServiceRequest{
+		Name: fmt.Sprintf("projects/%s/locations/%s/services/%s", project, region, serviceName),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get service: %w", err)
+	}
+
+	// Modify the scaling settings
+	if service.Scaling == nil {
+		service.Scaling = &runpb.ServiceScaling{}
+	}
+
+	if manual > 0 {
+		service.Scaling.ScalingMode = runpb.ServiceScaling_MANUAL
+		service.Scaling.MinInstanceCount = 0
+		service.Scaling.MaxInstanceCount = 0
+
+		manualInstanceCount := int32(manual)
+		service.Scaling.ManualInstanceCount = &manualInstanceCount
+	} else {
+		service.Scaling.ScalingMode = runpb.ServiceScaling_AUTOMATIC
+		service.Scaling.MinInstanceCount = int32(min)
+		service.Scaling.MaxInstanceCount = int32(max)
+		service.Scaling.ManualInstanceCount = nil
+	}
+
+	// Update the service
+	op, err := c.UpdateService(ctx, &runpb.UpdateServiceRequest{
+		Service: service,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to update service: %w", err)
+	}
+
+	resp, err := op.Wait(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to wait for service update: %w", err)
+	}
+
+	nameParts := strings.Split(resp.Name, "/")
+	name := nameParts[len(nameParts)-1]
+
+	s := model_scaling.Scaling{}
+	if resp.Scaling != nil {
+		switch resp.Scaling.ScalingMode {
+		case runpb.ServiceScaling_AUTOMATIC:
+			s.ScalingMode = "AUTOMATIC"
+			s.MinInstances = resp.Scaling.MinInstanceCount
+			s.MaxInstances = resp.Scaling.MaxInstanceCount
+		case runpb.ServiceScaling_MANUAL:
+			s.ScalingMode = "MANUAL"
+			if resp.Scaling.ManualInstanceCount != nil {
+				s.ManualInstanceCount = *resp.Scaling.ManualInstanceCount
+			}
+		}
+	}
+
+	return &model.Service{
+		Name:         name,
+		URI:          resp.Uri,
+		LastModifier: resp.LastModifier,
+		UpdateTime:   resp.UpdateTime.AsTime(),
+		Region:       region,
+		Scaling:      &s,
+		Project:      project,
+	}, nil
 }
 
 func listAllRegions(project string) ([]model.Service, error) {

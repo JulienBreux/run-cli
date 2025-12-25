@@ -7,12 +7,14 @@ import (
 	"github.com/JulienBreux/run-cli/internal/run/auth"
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
 	model_project "github.com/JulienBreux/run-cli/internal/run/model/common/project"
+	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/describe"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/job"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/log"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/project"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/region"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/service"
+	service_scale "github.com/JulienBreux/run-cli/internal/run/ui/app/service/scale"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/workerpool"
 	"github.com/JulienBreux/run-cli/internal/run/ui/component/loader"
 	"github.com/JulienBreux/run-cli/internal/run/ui/component/spinner"
@@ -163,6 +165,12 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 		if event.Rune() == 'd' {
 			if s := service.GetSelectedServiceFull(); s != nil {
 				openDescribeModal(s, s.Name)
+			}
+			return nil
+		}
+		if event.Rune() == 's' {
+			if s := service.GetSelectedServiceFull(); s != nil {
+				openScaleModal(s)
 			}
 			return nil
 		}
@@ -318,4 +326,18 @@ func openDescribeModal(resource interface{}, title string) {
 
 	header.ContextShortcutView.Clear()
 	app.SetFocus(describeModal)
+}
+
+func openScaleModal(s *model_service.Service) {
+	scaleModal := service_scale.Modal(app, s, pages, func() {
+		switchTo(service.LIST_PAGE_ID)
+	})
+
+	pages.AddPage(service_scale.MODAL_PAGE_ID, scaleModal, true, true)
+	previousPageID = currentPageID
+	currentPageID = service_scale.MODAL_PAGE_ID
+	pages.SwitchToPage(service_scale.MODAL_PAGE_ID)
+
+	header.ContextShortcutView.Clear()
+	app.SetFocus(scaleModal)
 }

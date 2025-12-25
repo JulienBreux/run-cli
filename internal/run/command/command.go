@@ -3,6 +3,7 @@ package command
 import (
 	"io"
 
+	"github.com/JulienBreux/run-cli/internal/run/command/version"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app"
 	"github.com/spf13/cobra"
 )
@@ -16,5 +17,8 @@ func New(in io.Reader, out, err io.Writer) (cmd *cobra.Command) {
 			return app.Run()
 		},
 	}
+
+	cmd.AddCommand(version.NewCmdVersion(in, out, err))
+
 	return
 }

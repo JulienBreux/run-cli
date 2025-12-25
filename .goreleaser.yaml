@@ -17,6 +17,8 @@ builds:
       - linux
       - windows
       - darwin
+    ldflags:
+      - -s -w -X github.com/julienbreux/run-cli/pkg/version.Version={{.Version}} -X github.com/julienbreux/run-cli/pkg/version.Commit={{.Commit}} -X github.com/julienbreux/run-cli/pkg/version.RawDate={{.Date}}
 
 archives:
   - formats: [tar.gz]
@@ -39,7 +41,7 @@ homebrew_casks:
     repository:
       owner: JulienBreux
       name: run-cli-homebrew
-      token: "{{ .Env.GH_TOKEN }}"
+      # token: "{{ .Env.GH_TOKEN }}"
 
 changelog:
   sort: asc

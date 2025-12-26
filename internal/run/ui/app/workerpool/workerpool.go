@@ -18,18 +18,18 @@ import (
 var (
 	listHeaders = []string{
 		"NAME",
-		"STATUS",
 		"REGION",
-		"LAST UPDATE",
-		"MACHINE TYPE",
+		"LAST UPDATED",
+		"SCALING",
+		"MODIFIED BY",
 		"LABELS"}
 
 	listExpansions = []int{
 		2, // NAME
-		1, // STATUS
 		1, // REGION
-		2, // LAST UPDATE
-		2, // MACHINE TYPE
+		2, // LAST UPDATED
+		2, // SCALING
+		2, // MODIFIED BY
 		3, // LABELS
 	}
 
@@ -77,22 +77,22 @@ func ListReload(app *tview.Application, currentInfo info.Info, onResult func(err
 			}
 
 			for i, w := range workers {
-				machineType := "-"
-				if w.WorkerConfig != nil {
-					machineType = w.WorkerConfig.MachineType
-				}
-
 				var labels []string
 				for k, v := range w.Labels {
 					labels = append(labels, fmt.Sprintf("%s=%s", k, v))
 				}
 
+				scaling := "n/a"
+				if w.Scaling != nil {
+					scaling = fmt.Sprintf("Manual: %d", w.Scaling.ManualInstanceCount)
+				}
+
 				row := i + 1 // +1 for header row
 				listTable.Table.SetCell(row, 0, tview.NewTableCell(w.DisplayName))
-				listTable.Table.SetCell(row, 1, tview.NewTableCell(w.State))
-				listTable.Table.SetCell(row, 2, tview.NewTableCell(w.Region))
-				listTable.Table.SetCell(row, 3, tview.NewTableCell(humanize.Time(w.UpdateTime)))
-				listTable.Table.SetCell(row, 4, tview.NewTableCell(machineType))
+				listTable.Table.SetCell(row, 1, tview.NewTableCell(w.Region))
+				listTable.Table.SetCell(row, 2, tview.NewTableCell(humanize.Time(w.UpdateTime)))
+				listTable.Table.SetCell(row, 3, tview.NewTableCell(scaling))
+				listTable.Table.SetCell(row, 4, tview.NewTableCell(w.LastModifier))
 				listTable.Table.SetCell(row, 5, tview.NewTableCell(strings.Join(labels, ", ")))
 			}
 
@@ -113,7 +113,6 @@ func GetSelectedWorkerPoolFull() *model_workerpool.WorkerPool {
 
 func Shortcuts() {
 	header.ContextShortcutView.Clear()
-	shortcuts := `[dodgerblue]<d> [white]Describe
-[dodgerblue]<s> [white]Scale`
+	shortcuts := `[dodgerblue]<d> [white]Describe`
 	header.ContextShortcutView.SetText(shortcuts)
 }

@@ -2,6 +2,8 @@ package workerpool
 
 import (
 	"time"
+
+	"github.com/JulienBreux/run-cli/internal/run/model/workerpool/scaling"
 )
 
 // WorkerPool represents a Cloud Build Worker Pool.
@@ -15,14 +17,16 @@ type WorkerPool struct {
 	DisplayName          string                `json:"displayName"`
 	Annotations          map[string]string     `json:"annotations"`
 	Labels               map[string]string     `json:"labels"`
+	LastModifier         string                `json:"lastModifier,omitempty"`
 	Etag                 string                `json:"etag"`
 	Project              string                `json:"project"` // The ID of the project in which this worker pool is created.
-	Region               string                `json:"region"` // The region of the worker pool.
+	Region               string                `json:"region"`  // The region of the worker pool.
 	WorkerConfig         *WorkerConfig         `json:"workerConfig"`
 	NetworkConfig        *NetworkConfig        `json:"networkConfig"`
 	PrivatePoolVpcConfig *PrivatePoolVpcConfig `json:"privatePoolVpcConfig"`
 	HostIp               string                `json:"hostIp"`
 	PublicIp             string                `json:"publicIp"`
+	Scaling              *scaling.Scaling      `json:"scaling,omitempty"`
 }
 
 // WorkerConfig describes the configuration of the workers in a worker pool.

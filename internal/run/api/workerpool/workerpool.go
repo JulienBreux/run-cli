@@ -10,6 +10,7 @@ import (
 	"cloud.google.com/go/run/apiv2/runpb"
 	api_region "github.com/JulienBreux/run-cli/internal/run/api/region"
 	model "github.com/JulienBreux/run-cli/internal/run/model/workerpool"
+	model_scaling "github.com/JulienBreux/run-cli/internal/run/model/workerpool/scaling"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
@@ -42,14 +43,6 @@ func List(project, region string) ([]model.WorkerPool, error) {
 		Parent: fmt.Sprintf("projects/%s/locations/%s", project, region),
 	}
 
-	// resp, err := c.ListWorkerPools(ctx, req)
-	// if err != nil {
-	// 	if strings.Contains(err.Error(), "Unauthenticated") || strings.Contains(err.Error(), "PermissionDenied") {
-	// 		return nil, fmt.Errorf("authentication failed: %w. Tip: Ensure your 'gcloud auth application-default login' is valid and has permissions", err)
-	// 	}
-	// 	return nil, fmt.Errorf("list worker pools failed (parent=%s): %w", req.Parent, err)
-	// }
-
 	// Fetch worker pools
 	var workerPools []model.WorkerPool
 	it := c.ListWorkerPools(ctx, req)
@@ -69,14 +62,22 @@ func List(project, region string) ([]model.WorkerPool, error) {
 		nameParts := strings.Split(resp.Name, "/")
 		name := nameParts[len(nameParts)-1]
 
+		s := model_scaling.Scaling{}
+		if resp.Scaling != nil {
+			s.ManualInstanceCount = *resp.Scaling.ManualInstanceCount
+
+		}
+
 		// Map fields
 		workerPools = append(workerPools, model.WorkerPool{
-			DisplayName: name,
-			Name:        resp.Name,
-			State:       "...", ///resp.State.String(),
-			UpdateTime:  resp.UpdateTime.AsTime(),
-			Region:      region,
-			Labels:      resp.Annotations,
+			DisplayName:  name,
+			Name:         resp.Name,
+			State:        "...", ///resp.State.String(),
+			UpdateTime:   resp.UpdateTime.AsTime(),
+			LastModifier: resp.LastModifier,
+			Region:       region,
+			Scaling:      &s,
+			Labels:       resp.Annotations,
 		})
 	}
 

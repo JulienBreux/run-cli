@@ -17,9 +17,9 @@ import (
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/service"
 	service_scale "github.com/JulienBreux/run-cli/internal/run/ui/app/service/scale"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/workerpool"
+	"github.com/JulienBreux/run-cli/internal/run/ui/component/header"
 	"github.com/JulienBreux/run-cli/internal/run/ui/component/loader"
 	"github.com/JulienBreux/run-cli/internal/run/ui/component/spinner"
-	"github.com/JulienBreux/run-cli/internal/run/ui/header"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )

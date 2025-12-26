@@ -1,3 +1,4 @@
+// TODO: Refactor with job and worker pool
 package service
 
 import (
@@ -38,9 +39,9 @@ var (
 )
 
 const (
-	LIST_PAGE_TITLE       = "Services"
-	LIST_PAGE_ID          = "services-list"
-	LIST_PAGE_SHORTCUT    = tcell.KeyCtrlS
+	LIST_PAGE_TITLE     = "Services"
+	LIST_PAGE_ID        = "services-list"
+	LIST_PAGE_SHORTCUT  = tcell.KeyCtrlS
 	SCALE_MODAL_PAGE_ID = "scale"
 )
 
@@ -64,7 +65,13 @@ func ListReload(app *tview.Application, currentInfo info.Info, onResult func(err
 		services, err = api_service.List(currentInfo.Project, currentInfo.Region)
 
 		app.QueueUpdateDraw(func() {
-			defer onResult(err)
+			defer func() {
+				if len(services) == 0 {
+					listTable.Table.Clear()
+					listTable.SetHeadersWithExpansions(listHeaders, listExpansions)
+				}
+				onResult(err)
+			}()
 
 			if err != nil {
 				// Keep empty if error

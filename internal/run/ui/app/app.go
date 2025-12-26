@@ -229,6 +229,7 @@ func switchTo(pageID string) {
 		if err != nil {
 			showError(err)
 		} else {
+			// TODO: Check len / if len == 0 -> clear list
 			hideLoading()
 		}
 	}

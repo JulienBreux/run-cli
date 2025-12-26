@@ -1,3 +1,4 @@
+// TODO: Refactor with service and worker pool
 package job
 
 import (
@@ -58,7 +59,13 @@ func ListReload(app *tview.Application, currentInfo info.Info, onResult func(err
 		jobs, err = api_job.List(currentInfo.Project, currentInfo.Region)
 
 		app.QueueUpdateDraw(func() {
-			defer onResult(err)
+			defer func() {
+				if len(jobs) == 0 {
+					listTable.Table.Clear()
+					listTable.SetHeadersWithExpansions(listHeaders, listExpansions)
+				}
+				onResult(err)
+			}()
 
 			if err != nil {
 				// listTable.Table.SetTitle(fmt.Sprintf(" %s (Error) ", LIST_PAGE_TITLE)) // Removed error from title

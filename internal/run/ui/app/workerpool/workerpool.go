@@ -1,3 +1,4 @@
+// TODO: Refactor with service and job
 package workerpool
 
 import (
@@ -63,7 +64,13 @@ func ListReload(app *tview.Application, currentInfo info.Info, onResult func(err
 		workers, err = api_workerpool.List(currentInfo.Project, currentInfo.Region)
 
 		app.QueueUpdateDraw(func() {
-			defer onResult(err)
+			defer func() {
+				if len(workers) == 0 {
+					listTable.Table.Clear()
+					listTable.SetHeadersWithExpansions(listHeaders, listExpansions)
+				}
+				onResult(err)
+			}()
 
 			if err != nil {
 				return

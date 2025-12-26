@@ -2,6 +2,7 @@ package scale
 
 import (
 	"strconv"
+	"time"
 
 	api_service "github.com/JulienBreux/run-cli/internal/run/api/service"
 	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
@@ -90,13 +91,14 @@ func Modal(app *tview.Application, service *model_service.Service, pages *tview.
 			_, _ = api_service.UpdateScaling(service.Project, service.Region, service.Name, min, max, manual)
 			app.QueueUpdateDraw(func() {
 				// TODO: Show error to user
-				pages.RemovePage(MODAL_PAGE_ID)
-				onCompletion()
 			})
 		}()
+
+		time.Sleep(800 * time.Millisecond) // TODO: Fix b-logic.
+
+		onCompletion()
 	})
 	form.AddButton("Cancel", func() {
-		pages.RemovePage(MODAL_PAGE_ID)
 		onCompletion()
 	})
 
@@ -142,7 +144,6 @@ func Modal(app *tview.Application, service *model_service.Service, pages *tview.
 	// Capture escape key
 	modal.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyEscape {
-			pages.RemovePage(MODAL_PAGE_ID)
 			onCompletion()
 			return nil
 		}

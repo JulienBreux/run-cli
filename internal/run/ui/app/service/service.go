@@ -3,14 +3,13 @@ package service
 
 import (
 	"fmt"
-	"os/exec"
-	"runtime"
 
 	api_service "github.com/JulienBreux/run-cli/internal/run/api/service"
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
 	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
 	"github.com/JulienBreux/run-cli/internal/run/ui/component/header"
 	"github.com/JulienBreux/run-cli/internal/run/ui/component/table"
+	"github.com/JulienBreux/run-cli/internal/run/url"
 	"github.com/dustin/go-humanize"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -145,20 +144,10 @@ func GetSelectedServiceFull() *model_service.Service {
 func HandleShortcuts(event *tcell.EventKey) *tcell.EventKey {
 	// Open URL
 	if event.Rune() == 'o' {
-		url := GetSelectedServiceURL()
-		if url != "" {
-			var cmd *exec.Cmd
-			switch runtime.GOOS {
-			case "linux":
-				cmd = exec.Command("xdg-open", url)
-			case "windows":
-				cmd = exec.Command("cmd", "/c", "start", url)
-			case "darwin":
-				cmd = exec.Command("open", url)
-			default:
-				return event // Do nothing if OS is not supported
-			}
-			_ = cmd.Run() // Ignore error for now, ideally log it
+		u := GetSelectedServiceURL()
+		if u != "" {
+			_ = url.OpenInBrowser(u)
+			return event
 		}
 		return nil // Consume the event
 	}

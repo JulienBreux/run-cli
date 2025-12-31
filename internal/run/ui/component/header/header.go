@@ -31,7 +31,8 @@ func UpdateInfo(currentInfo info.Info) {
 	_, _ = fmt.Fprintf(infoView, "[white]Project:  [#bd93f9]%s\n", currentInfo.Project)
 	_, _ = fmt.Fprintf(infoView, "[white]Region:   [#bd93f9]%s\n", currentInfo.Region)
 	_, _ = fmt.Fprintf(infoView, "[white]User:     [#bd93f9]%s\n", currentInfo.User)
-	_, _ = fmt.Fprintf(infoView, "[white]Version:  [#bd93f9]%s", version.Version)
+	_, _ = fmt.Fprintf(infoView, "[white]Version:  [#bd93f9]%s\n\n", version.Version)
+	_, _ = fmt.Fprintf(infoView, "[white]Console:  [dodgerblue]<ctrl-z>")
 }
 
 // returns the info column.

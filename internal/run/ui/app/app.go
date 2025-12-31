@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	api_job "github.com/JulienBreux/run-cli/internal/run/api/job"
 	"github.com/JulienBreux/run-cli/internal/run/auth"
 	"github.com/JulienBreux/run-cli/internal/run/config"
-	api_job "github.com/JulienBreux/run-cli/internal/run/api/job"
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/job"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/project"
@@ -16,6 +16,7 @@ import (
 	"github.com/JulienBreux/run-cli/internal/run/ui/component/header"
 	"github.com/JulienBreux/run-cli/internal/run/ui/component/loader"
 	"github.com/JulienBreux/run-cli/internal/run/ui/component/spinner"
+	"github.com/JulienBreux/run-cli/internal/run/url"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
@@ -44,6 +45,8 @@ const (
 	ESCAPE_SHORTCUT = tcell.KeyEscape
 	LOADER_PAGE_ID  = "loader"
 	LAYOUT_PAGE_ID  = "layout"
+
+	CONSOLE_URL = "https://console.cloud.google.com/run/overview?project=%s"
 )
 
 // Run runs the application.
@@ -135,6 +138,11 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 	}
 
 	// Navigation.
+	if event.Key() == tcell.KeyCtrlZ {
+		u := fmt.Sprintf(CONSOLE_URL, currentInfo.Project)
+		url.OpenInBrowser(u)
+		return nil
+	}
 	if event.Key() == service.LIST_PAGE_SHORTCUT {
 		switchTo(service.LIST_PAGE_ID)
 		return nil

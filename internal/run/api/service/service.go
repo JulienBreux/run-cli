@@ -101,8 +101,7 @@ func List(project, region string) ([]model.Service, error) {
 }
 
 // UpdateScaling updates the scaling settings for a service.
-func UpdateScaling(project, region, serviceName string, min, max, manual int) (*model.Service, error) {
-	ctx := context.Background()
+func UpdateScaling(ctx context.Context, project, region, serviceName string, min, max, manual int) (*model.Service, error) {
 	creds, err := google.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
@@ -143,6 +142,21 @@ func UpdateScaling(project, region, serviceName string, min, max, manual int) (*
 		service.Scaling.MaxInstanceCount = int32(max)
 		service.Scaling.ManualInstanceCount = nil
 	}
+
+	// Clean up output-only fields before update
+	service.Uid = ""
+	service.Generation = 0
+	service.CreateTime = nil
+	service.UpdateTime = nil
+	service.DeleteTime = nil
+	service.ExpireTime = nil
+	service.Creator = ""
+	service.LastModifier = ""
+	service.Reconciling = false
+	service.ObservedGeneration = 0
+	service.TerminalCondition = nil
+	service.Conditions = nil
+	// Keep Etag for concurrency control
 
 	// Update the service
 	op, err := c.UpdateService(ctx, &runpb.UpdateServiceRequest{

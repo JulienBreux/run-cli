@@ -1,6 +1,8 @@
 package scale
 
 import (
+	"context"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -20,6 +22,11 @@ func Modal(app *tview.Application, service *model_service.Service, pages *tview.
 	form := tview.NewForm()
 	form.SetBorder(true)
 	form.SetTitle("Service Scaling")
+
+	// Status text view for feedback
+	statusTextView := tview.NewTextView().
+		SetDynamicColors(true).
+		SetTextAlign(tview.AlignCenter)
 
 	// Create form items
 	var manualInstancesField, minInstancesField, maxInstancesField *tview.InputField
@@ -63,40 +70,50 @@ func Modal(app *tview.Application, service *model_service.Service, pages *tview.
 		if mode == "Manual" {
 			manual, err = strconv.Atoi(manualInstancesField.GetText())
 			if err != nil {
-				// TODO: Show error in modal
+				statusTextView.SetText("[red]Invalid manual instance count")
 				return
 			}
 			min, max = 0, 0
 		} else { // Automatic
 			min, err = strconv.Atoi(minInstancesField.GetText())
 			if err != nil {
-				// TODO: Show error in modal
+				statusTextView.SetText("[red]Invalid min instance count")
 				return
 			}
 
 			if maxInstancesField.GetText() != "" {
 				max, err = strconv.Atoi(maxInstancesField.GetText())
 				if err != nil {
-					// TODO: Show error in modal
+					statusTextView.SetText("[red]Invalid max instance count")
 					return
 				}
 			} else {
 				max = 0
 			}
+
+			if max > 0 && min > max {
+				statusTextView.SetText("[red]Min instances cannot be greater than Max instances")
+				return
+			}
 			manual = 0
 		}
 
+		statusTextView.SetText("[yellow]Saving... (Please wait)")
+
 		// Call API
 		go func() {
-			_, _ = api_service.UpdateScaling(service.Project, service.Region, service.Name, min, max, manual)
+			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+			defer cancel()
+
+			_, err := api_service.UpdateScaling(ctx, service.Project, service.Region, service.Name, min, max, manual)
 			app.QueueUpdateDraw(func() {
-				// TODO: Show error to user
+				if err != nil {
+					statusTextView.SetText(fmt.Sprintf("[red]Error: %v", err))
+				} else {
+					onCompletion()
+				}
 			})
 		}()
-
-		time.Sleep(800 * time.Millisecond) // TODO: Fix b-logic.
-
-		onCompletion()
 	})
 	form.AddButton("Cancel", func() {
 		onCompletion()
@@ -138,6 +155,7 @@ func Modal(app *tview.Application, service *model_service.Service, pages *tview.
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
 			AddItem(nil, 0, 1, false).
 			AddItem(form, 15, 1, true).
+			AddItem(statusTextView, 2, 1, false).
 			AddItem(nil, 0, 1, false), 80, 1, true).
 		AddItem(nil, 0, 1, false)
 

@@ -22,10 +22,7 @@ func LogModal(app *tview.Application, projectID, filter, title string, closeModa
 		SetDynamicColors(true).
 		SetScrollable(true).
 		SetWrap(true).
-		SetTextAlign(tview.AlignLeft).
-		SetChangedFunc(func() {
-			app.Draw()
-		})
+		SetTextAlign(tview.AlignLeft)
 
 	textView.SetBorder(true).SetTitle(fmt.Sprintf(" Logs: %s (Streaming) ", title))
 

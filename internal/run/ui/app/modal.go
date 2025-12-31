@@ -23,15 +23,14 @@ func openProjectModal() {
 		}
 		header.UpdateInfo(currentInfo)
 	}, func() {
-		pages.RemovePage(project.MODAL_PAGE_ID)
+		rootPages.RemovePage(project.MODAL_PAGE_ID)
 		switchTo(previousPageID)
 	})
 
-	pages.AddPage(project.MODAL_PAGE_ID, projectModal, true, true)
+	rootPages.AddPage(project.MODAL_PAGE_ID, projectModal, true, true)
 
 	previousPageID = currentPageID
 	currentPageID = project.MODAL_PAGE_ID
-	pages.SwitchToPage(project.MODAL_PAGE_ID)
 
 	header.ContextShortcutView.Clear()
 	app.SetFocus(projectModal)
@@ -47,15 +46,14 @@ func openRegionModal() {
 		}
 		header.UpdateInfo(currentInfo)
 	}, func() {
-		pages.RemovePage(region.MODAL_PAGE_ID)
+		rootPages.RemovePage(region.MODAL_PAGE_ID)
 		switchTo(previousPageID)
 	})
 
-	pages.AddPage(region.MODAL_PAGE_ID, regionModal, true, true)
+	rootPages.AddPage(region.MODAL_PAGE_ID, regionModal, true, true)
 
 	previousPageID = currentPageID
 	currentPageID = region.MODAL_PAGE_ID
-	pages.SwitchToPage(region.MODAL_PAGE_ID)
 
 	header.ContextShortcutView.Clear()
 	app.SetFocus(regionModal)
@@ -71,15 +69,14 @@ func openLogModal(name, region, logType string) {
 	}
 
 	logModal := log.LogModal(app, currentInfo.Project, filter, name, func() {
-		pages.RemovePage(log.MODAL_PAGE_ID)
+		rootPages.RemovePage(log.MODAL_PAGE_ID)
 		switchTo(previousPageID)
 	})
 
-	pages.AddPage(log.MODAL_PAGE_ID, logModal, true, true)
+	rootPages.AddPage(log.MODAL_PAGE_ID, logModal, true, true)
 
 	previousPageID = currentPageID
 	currentPageID = log.MODAL_PAGE_ID
-	pages.SwitchToPage(log.MODAL_PAGE_ID)
 
 	header.ContextShortcutView.Clear()
 	app.SetFocus(logModal)
@@ -87,30 +84,28 @@ func openLogModal(name, region, logType string) {
 
 func openDescribeModal(resource any, title string) {
 	describeModal := describe.DescribeModal(app, resource, title, func() {
-		pages.RemovePage(describe.MODAL_PAGE_ID)
+		rootPages.RemovePage(describe.MODAL_PAGE_ID)
 		switchTo(previousPageID)
 	})
 
-	pages.AddPage(describe.MODAL_PAGE_ID, describeModal, true, true)
+	rootPages.AddPage(describe.MODAL_PAGE_ID, describeModal, true, true)
 
 	previousPageID = currentPageID
 	currentPageID = describe.MODAL_PAGE_ID
-	pages.SwitchToPage(describe.MODAL_PAGE_ID)
 
 	header.ContextShortcutView.Clear()
 	app.SetFocus(describeModal)
 }
 
 func openServiceScaleModal(s *model_service.Service) {
-	scaleModal := service_scale.Modal(app, s, pages, func() {
-		pages.RemovePage(service_scale.MODAL_PAGE_ID)
+	scaleModal := service_scale.Modal(app, s, rootPages, func() {
+		rootPages.RemovePage(service_scale.MODAL_PAGE_ID)
 		switchTo(previousPageID)
 	})
 
-	pages.AddPage(service_scale.MODAL_PAGE_ID, scaleModal, true, true)
+	rootPages.AddPage(service_scale.MODAL_PAGE_ID, scaleModal, true, true)
 	previousPageID = currentPageID
 	currentPageID = service_scale.MODAL_PAGE_ID
-	pages.SwitchToPage(service_scale.MODAL_PAGE_ID)
 
 	header.ContextShortcutView.Clear()
 	app.SetFocus(scaleModal)

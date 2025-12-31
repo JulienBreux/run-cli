@@ -219,6 +219,12 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 			}
 			return nil
 		}
+		if event.Rune() == 's' {
+			if w := workerpool.GetSelectedWorkerPoolFull(); w != nil {
+				openWorkerPoolScaleModal(w)
+			}
+			return nil
+		}
 	}
 
 	return event

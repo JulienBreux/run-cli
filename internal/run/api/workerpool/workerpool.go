@@ -76,34 +76,86 @@ func List(project, region string) ([]model.WorkerPool, error) {
 			UpdateTime:   resp.UpdateTime.AsTime(),
 			LastModifier: resp.LastModifier,
 			Region:       region,
+			Project:      project,
 			Scaling:      &s,
 			Labels:       resp.Labels,
 		})
 	}
 
 	return workerPools, nil
+}
 
-	// var workerPools []model.WorkerPool
-	// for _, wp := range resp.WorkerPools {
-	// 	// Determine Worker Pool Name (Last part of resource name)
-	// 	nameParts := strings.Split(wp.Name, "/")
-	// 	name := nameParts[len(nameParts)-1]
+// UpdateScaling updates the scaling settings for a worker pool.
+func UpdateScaling(ctx context.Context, project, region, workerPoolName string, instanceCount int) (*model.WorkerPool, error) {
+	creds, err := google.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find default credentials: %w", err)
+	}
 
-	// 	// Map fields
-	// 	// Note: Detailed config fields are commented out due to proto version mismatch issues.
-	// 	// TODO: Map WorkerConfig, NetworkConfig, PrivatePoolVpcConfig when correct proto is available.
+	c, err := run.NewWorkerPoolsClient(ctx, option.WithCredentials(creds))
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		_ = c.Close()
+	}()
 
-	// 	workerPools = append(workerPools, model.WorkerPool{
-	// 		Name:        name, // Use simple name
-	// 		DisplayName: wp.DisplayName,
-	// 		State:       wp.State.String(),
-	// 		UpdateTime:  wp.UpdateTime.AsTime(),
-	// 		Region:      region,
-	// 		Labels:      wp.Annotations,
-	// 	})
-	// }
+	// Get the worker pool
+	fullPoolName := fmt.Sprintf("projects/%s/locations/%s/workerPools/%s", project, region, workerPoolName)
+	workerPool, err := c.GetWorkerPool(ctx, &runpb.GetWorkerPoolRequest{
+		Name: fullPoolName,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get worker pool: %w", err)
+	}
 
-	// return workerPools, nil
+	// Update Scaling
+	if workerPool.Scaling == nil {
+		workerPool.Scaling = &runpb.WorkerPoolScaling{}
+	}
+	manualCount := int32(instanceCount)
+	workerPool.Scaling.ManualInstanceCount = &manualCount
+
+	// Clean up output-only fields
+	workerPool.Uid = ""
+	workerPool.CreateTime = nil
+	workerPool.UpdateTime = nil
+	workerPool.DeleteTime = nil
+	// workerPool.State is not accessible/exported
+	// Keep Etag for concurrency control
+
+	// Update
+	op, err := c.UpdateWorkerPool(ctx, &runpb.UpdateWorkerPoolRequest{
+		WorkerPool: workerPool,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to update worker pool: %w", err)
+	}
+
+	resp, err := op.Wait(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to wait for worker pool update: %w", err)
+	}
+
+	// Map response to model
+	nameParts := strings.Split(resp.Name, "/")
+	name := nameParts[len(nameParts)-1]
+
+	s := model_scaling.Scaling{}
+	if resp.Scaling != nil && resp.Scaling.ManualInstanceCount != nil {
+		s.ManualInstanceCount = *resp.Scaling.ManualInstanceCount
+	}
+
+	return &model.WorkerPool{
+		DisplayName:  name,
+		Name:         resp.Name,
+		State:        "...", // resp.State.String(),
+		UpdateTime:   resp.UpdateTime.AsTime(),
+		LastModifier: resp.LastModifier,
+		Region:       region,
+		Scaling:      &s,
+		Labels:       resp.Labels,
+	}, nil
 }
 
 func listAllRegions(project string) ([]model.WorkerPool, error) {

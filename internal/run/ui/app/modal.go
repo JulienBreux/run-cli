@@ -5,11 +5,13 @@ import (
 
 	model_project "github.com/JulienBreux/run-cli/internal/run/model/common/project"
 	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
+	model_workerpool "github.com/JulienBreux/run-cli/internal/run/model/workerpool"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/describe"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/log"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/project"
 	"github.com/JulienBreux/run-cli/internal/run/ui/app/region"
 	service_scale "github.com/JulienBreux/run-cli/internal/run/ui/app/service/scale"
+	workerpool_scale "github.com/JulienBreux/run-cli/internal/run/ui/app/workerpool/scale"
 	"github.com/JulienBreux/run-cli/internal/run/ui/component/header"
 )
 
@@ -106,6 +108,20 @@ func openServiceScaleModal(s *model_service.Service) {
 	rootPages.AddPage(service_scale.MODAL_PAGE_ID, scaleModal, true, true)
 	previousPageID = currentPageID
 	currentPageID = service_scale.MODAL_PAGE_ID
+
+	header.ContextShortcutView.Clear()
+	app.SetFocus(scaleModal)
+}
+
+func openWorkerPoolScaleModal(w *model_workerpool.WorkerPool) {
+	scaleModal := workerpool_scale.Modal(app, w, rootPages, func() {
+		rootPages.RemovePage(workerpool_scale.MODAL_PAGE_ID)
+		switchTo(previousPageID)
+	})
+
+	rootPages.AddPage(workerpool_scale.MODAL_PAGE_ID, scaleModal, true, true)
+	previousPageID = currentPageID
+	currentPageID = workerpool_scale.MODAL_PAGE_ID
 
 	header.ContextShortcutView.Clear()
 	app.SetFocus(scaleModal)

@@ -38,9 +38,10 @@ var (
 )
 
 const (
-	LIST_PAGE_TITLE    = "Worker Pools"
-	LIST_PAGE_ID       = "workers-list"
-	LIST_PAGE_SHORTCUT = tcell.KeyCtrlW
+	LIST_PAGE_TITLE     = "Worker Pools"
+	LIST_PAGE_ID        = "workers-list"
+	LIST_PAGE_SHORTCUT  = tcell.KeyCtrlW
+	SCALE_MODAL_PAGE_ID = "scale-workerpool"
 )
 
 // List returns a list of workers.
@@ -114,6 +115,7 @@ func GetSelectedWorkerPoolFull() *model_workerpool.WorkerPool {
 func Shortcuts() {
 	header.ContextShortcutView.Clear()
 	shortcuts := `[dodgerblue]<r> [white]Refresh
-[dodgerblue]<d> [white]Describe`
+[dodgerblue]<d> [white]Describe
+[dodgerblue]<s> [white]Scale`
 	header.ContextShortcutView.SetText(shortcuts)
 }

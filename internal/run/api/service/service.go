@@ -10,6 +10,7 @@ import (
 	"cloud.google.com/go/run/apiv2/runpb"
 	api_region "github.com/JulienBreux/run-cli/internal/run/api/region"
 	model "github.com/JulienBreux/run-cli/internal/run/model/service"
+	model_networking "github.com/JulienBreux/run-cli/internal/run/model/service/networking"
 	model_scaling "github.com/JulienBreux/run-cli/internal/run/model/service/scaling"
 	model_traffic "github.com/JulienBreux/run-cli/internal/run/model/service/traffic"
 	"golang.org/x/oauth2/google"
@@ -115,6 +116,18 @@ func List(project, region string) ([]model.Service, error) {
 			latestCreatedRevision = parts[len(parts)-1]
 		}
 
+		n := model_networking.Networking{
+			Ingress:            resp.Ingress.String(),
+			DefaultUriDisabled: resp.DefaultUriDisabled,
+			IapEnabled:         resp.IapEnabled,
+		}
+		if resp.Template != nil && resp.Template.VpcAccess != nil {
+			n.VpcAccess = &model_networking.VpcAccess{
+				Connector: resp.Template.VpcAccess.Connector,
+				Egress:    resp.Template.VpcAccess.Egress.String(),
+			}
+		}
+
 		services = append(services, model.Service{
 			Name:                  name,
 			URI:                   resp.Uri,
@@ -126,6 +139,7 @@ func List(project, region string) ([]model.Service, error) {
 			TrafficStatuses:       trafficStatuses,
 			LatestReadyRevision:   latestReadyRevision,
 			LatestCreatedRevision: latestCreatedRevision,
+			Networking:            &n,
 		})
 	}
 

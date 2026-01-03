@@ -64,7 +64,7 @@ func Run(cfg *config.Config) error {
 
 	// Root Pages (Loader vs App)
 	rootPages = tview.NewPages()
-	rootPages.AddPage(LOADER_PAGE_ID, loader.New(), true, true)
+	rootPages.AddPage(LOADER_PAGE_ID, loader.New(app), true, true)
 
 	// Start initialization in background
 	go initializeApp(cfg)
@@ -121,7 +121,7 @@ func buildLayout() *tview.Flex {
 	errorView = tview.NewTextView().SetDynamicColors(true).SetTextAlign(tview.AlignCenter)
 	footerPages = tview.NewPages()
 	footerPages.AddPage("empty", tview.NewBox(), true, true)
-	footerPages.AddPage("loading", spinner.New(), true, false)
+	footerPages.AddPage("loading", spinner.New(app), true, false)
 	footerPages.AddPage("error", errorView, true, false)
 
 	layout := tview.NewFlex().SetDirection(tview.FlexRow).

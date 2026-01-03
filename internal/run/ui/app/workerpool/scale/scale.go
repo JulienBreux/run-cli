@@ -71,7 +71,33 @@ func Modal(app *tview.Application, workerPool *model_workerpool.WorkerPool, page
 			return
 		}
 
-		statusTextView.SetText("[yellow]Saving... (Please wait)")
+		// Animation control
+		isSaving := true
+		stopAnim := make(chan struct{})
+		go func() {
+			frames := []string{
+				"[yellow]Saving      (Please wait)",
+				"[yellow]Saving .    (Please wait)",
+				"[yellow]Saving ..   (Please wait)",
+				"[yellow]Saving ...  (Please wait)",
+			}
+			i := 0
+			ticker := time.NewTicker(500 * time.Millisecond)
+			defer ticker.Stop()
+			for {
+				select {
+				case <-stopAnim:
+					return
+				case <-ticker.C:
+					app.QueueUpdateDraw(func() {
+						if isSaving {
+							statusTextView.SetText(frames[i])
+						}
+					})
+					i = (i + 1) % len(frames)
+				}
+			}
+		}()
 
 		// Call API
 		go func() {
@@ -80,6 +106,8 @@ func Modal(app *tview.Application, workerPool *model_workerpool.WorkerPool, page
 
 			_, err := api_workerpool.UpdateScaling(ctx, workerPool.Project, workerPool.Region, workerPool.DisplayName, count)
 			app.QueueUpdateDraw(func() {
+				isSaving = false
+				close(stopAnim)
 				if err != nil {
 					statusTextView.SetText(fmt.Sprintf("[red]Error: %v", err))
 				} else {

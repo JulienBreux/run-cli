@@ -18,6 +18,7 @@
 *   **Service Management:** View, search, and manage your Cloud Run services.
 *   **Service Dashboard:** Navigate to a dedicated dashboard for each service with multiple views.
 *   **Networking View:** Monitor ingress settings, endpoints status (URI, IAP), and VPC Access configurations.
+*   **Security View:** Check authentication requirements, service identity, encryption keys, and binary authorization policies.
 *   **Revision Management:** Detailed list of revisions with traffic allocation, tags, and deployment history.
 *   **Deep Insights:** Explore revision details including billing mode, startup CPU boost, concurrency, and request timeouts.
 *   **Resource Monitoring:** View container configurations, images, ports, and resource limits (Memory, CPU, and GPU/Accelerators).

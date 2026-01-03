@@ -6,6 +6,7 @@ import (
 	"github.com/JulienBreux/run-cli/internal/run/model/common/condition"
 	"github.com/JulienBreux/run-cli/internal/run/model/service/networking"
 	"github.com/JulienBreux/run-cli/internal/run/model/service/scaling"
+	"github.com/JulienBreux/run-cli/internal/run/model/service/security"
 	"github.com/JulienBreux/run-cli/internal/run/model/service/traffic"
 )
 
@@ -27,7 +28,8 @@ type Service struct {
 	TerminalCondition     *condition.Condition           `json:"terminalCondition,omitempty"`
 	Conditions            []*condition.Condition         `json:"conditions,omitempty"`
 	Scaling               *scaling.Scaling               `json:"scaling,omitempty"`
-	Networking            *networking.Networking         `json:"networking,omitempty"` // New field
+	Networking            *networking.Networking         `json:"networking,omitempty"`
+	Security              *security.Security             `json:"security,omitempty"` // New field
 	Etag                  string                         `json:"etag,omitempty"`
 	Region                string                         `json:"region"` // New field
 	Project               string                         `json:"project"`

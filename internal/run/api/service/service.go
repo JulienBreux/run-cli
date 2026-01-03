@@ -12,6 +12,7 @@ import (
 	model "github.com/JulienBreux/run-cli/internal/run/model/service"
 	model_networking "github.com/JulienBreux/run-cli/internal/run/model/service/networking"
 	model_scaling "github.com/JulienBreux/run-cli/internal/run/model/service/scaling"
+	model_security "github.com/JulienBreux/run-cli/internal/run/model/service/security"
 	model_traffic "github.com/JulienBreux/run-cli/internal/run/model/service/traffic"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/iterator"
@@ -128,6 +129,21 @@ func List(project, region string) ([]model.Service, error) {
 			}
 		}
 
+		sec := model_security.Security{
+			InvokerIAMDisabled: resp.InvokerIamDisabled,
+		}
+		if resp.BinaryAuthorization != nil {
+			sec.BinaryAuthorization = resp.BinaryAuthorization.GetPolicy()
+			if resp.BinaryAuthorization.GetUseDefault() {
+				sec.BinaryAuthorization = "default"
+			}
+			sec.BreakglassJustification = resp.BinaryAuthorization.BreakglassJustification
+		}
+		if resp.Template != nil {
+			sec.ServiceAccount = resp.Template.ServiceAccount
+			sec.EncryptionKey = resp.Template.EncryptionKey
+		}
+
 		services = append(services, model.Service{
 			Name:                  name,
 			URI:                   resp.Uri,
@@ -140,6 +156,7 @@ func List(project, region string) ([]model.Service, error) {
 			LatestReadyRevision:   latestReadyRevision,
 			LatestCreatedRevision: latestCreatedRevision,
 			Networking:            &n,
+			Security:              &sec,
 		})
 	}
 

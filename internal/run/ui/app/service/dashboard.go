@@ -34,6 +34,9 @@ var (
 	// Networking tab components
 	networkingDetail *tview.TextView
 
+	// Security tab components
+	securityDetail *tview.TextView
+
 	activeTab = 0
 	tabs      = []string{"Revisions", "Observability", "Networking", "Security"}
 )
@@ -58,7 +61,7 @@ func Dashboard(app *tview.Application) *tview.Flex {
 	// Networking Tab
 	dashboardPages.AddPage(tabs[2], buildNetworkingTab(app), true, false)
 	// Security Tab
-	dashboardPages.AddPage(tabs[3], tview.NewBox().SetTitle(" Security (Placeholder) ").SetBorder(true), true, false)
+	dashboardPages.AddPage(tabs[3], buildSecurityTab(app), true, false)
 
 	dashboardFlex = tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(dashboardHeader, 1, 0, false).
@@ -166,6 +169,66 @@ func updateNetworkingTab() {
 	networkingDetail.SetText(sb.String())
 }
 
+func buildSecurityTab(app *tview.Application) tview.Primitive {
+	securityDetail = tview.NewTextView().
+		SetDynamicColors(true).
+		SetScrollable(true).
+		SetWrap(true)
+	securityDetail.SetBorder(true).SetTitle(" Security ")
+	return securityDetail
+}
+
+func updateSecurityTab() {
+	if dashboardService == nil || dashboardService.Security == nil {
+		securityDetail.SetText("No security information available")
+		return
+	}
+
+	s := dashboardService.Security
+
+	var sb strings.Builder
+
+	// Authentication
+	fmt.Fprintln(&sb, "[yellow::b]Authentication[white::-]")
+	auth := "Require authentication"
+	if s.InvokerIAMDisabled {
+		auth = "Allow unauthenticated invocations"
+	}
+	fmt.Fprintf(&sb, "  [lightcyan]Access:[white] %s\n", auth)
+	fmt.Fprintln(&sb, "")
+
+	// Service Account
+	fmt.Fprintln(&sb, "[yellow::b]Service Account[white::-]")
+	sa := "Default compute service account"
+	if s.ServiceAccount != "" {
+		sa = s.ServiceAccount
+	}
+	fmt.Fprintf(&sb, "  [lightcyan]Identity:[white] %s\n", sa)
+	fmt.Fprintln(&sb, "")
+
+	// Encryption
+	fmt.Fprintln(&sb, "[yellow::b]Encryption[white::-]")
+	enc := "Google-managed key"
+	if s.EncryptionKey != "" {
+		enc = s.EncryptionKey
+	}
+	fmt.Fprintf(&sb, "  [lightcyan]Key:[white] %s\n", enc)
+	fmt.Fprintln(&sb, "")
+
+	// Binary Authorization
+	fmt.Fprintln(&sb, "[yellow::b]Binary Authorization[white::-]")
+	binAuth := "Disabled"
+	if s.BinaryAuthorization != "" {
+		binAuth = fmt.Sprintf("Enabled (Policy: %s)", s.BinaryAuthorization)
+		if s.BreakglassJustification != "" {
+			binAuth += fmt.Sprintf("\n  [red]Breakglass used:[white] %s", s.BreakglassJustification)
+		}
+	}
+	fmt.Fprintf(&sb, "  [lightcyan]Status:[white] %s\n", binAuth)
+
+	securityDetail.SetText(sb.String())
+}
+
 func updateTabs() {
 	dashboardTabs.Clear()
 	for i, tab := range tabs {
@@ -265,6 +328,7 @@ func DashboardReload(app *tview.Application, currentInfo info.Info, service *mod
 	activeTab = 0
 	updateTabs()
 	updateNetworkingTab()
+	updateSecurityTab()
 
 	go func() {
 		var err error

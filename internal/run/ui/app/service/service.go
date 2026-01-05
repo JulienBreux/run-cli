@@ -55,7 +55,10 @@ func List(app *tview.Application) *table.Table {
 }
 
 func ListReload(app *tview.Application, currentInfo info.Info, onResult func(error)) {
+	listTable.Table.Clear()
 	listTable.SetHeadersWithExpansions(listHeaders, listExpansions)
+	listTable.Table.SetTitle(fmt.Sprintf(" %s loading ", LIST_PAGE_TITLE))
+
 	app.SetFocus(listTable.Table)
 
 	go func() {
@@ -74,7 +77,6 @@ func ListReload(app *tview.Application, currentInfo info.Info, onResult func(err
 
 			if err != nil {
 				// Keep empty if error
-				// listTable.Table.SetTitle(fmt.Sprintf(" %s (Error) ", LIST_PAGE_TITLE)) // Removed error from title
 				return
 			}
 

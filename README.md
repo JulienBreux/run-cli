@@ -9,6 +9,7 @@
 [![Go version](https://img.shields.io/github/go-mod/go-version/JulienBreux/run-cli)](https://go.dev/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/JulienBreux/run-cli)](https://goreportcard.com/report/github.com/JulienBreux/run-cli)
 [![codecov](https://codecov.io/github/JulienBreux/run-cli/graph/badge.svg?token=NSaxKHzR64)](https://codecov.io/github/JulienBreux/run-cli)
+[![Release](https://img.shields.io/github/release/JulienBreux/run-cli.svg?style=flat-square)](https://github.com/JulienBreux/run-cli/releases)
 [![LICENSE](https://img.shields.io/github/license/JulienBreux/run-cli)](https://github.com/JulienBreux/run-cli/blob/main/LICENSE)
 
 </div>

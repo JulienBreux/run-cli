@@ -12,7 +12,9 @@
 *   **Architecture:**
     *   `cmd/run/`: Contains the main entry point (`main.go`).
     *   `internal/run/command/`: Handles the CLI command definitions and initialization.
-    *   `internal/run/tui/`: Contains the terminal UI logic, including application layout (`app`), pages (`service`, `job`, `worker`), and components (`header`, `table`, `modals`).
+    *   `internal/run/tui/`: Contains the terminal UI logic.
+        *   `app/`: Main application layout and pages (`service`, `job`, `worker`).
+        *   `component/`: Reusable UI components (`header`, `table`, `loader`, `spinner`, `logo`, `modals`).
     *   `internal/run/model/`: Defines the data models used across the application (e.g., `service`, `job`, `info`).
 
 ## Building and Running
@@ -50,4 +52,12 @@ The project uses a `Makefile` to automate common development tasks.
 *   **Project Structure:** Follows standard Go project layout with `cmd` for executables and `internal` for private library code. The `pkg` is used for public libraries.
 *   **Linting:** `golangci-lint` is used to enforce code style and quality. Ensure `make lint` passes before committing.
 *   **Testing:** Unit tests are encouraged. Use `make test` to verify changes.
-*   **UI Components:** The UI is modularized in `internal/run/tui`. New pages or components should be added there and registered in `internal/run/tui/app/app.go`.
+*   **UI Components:** The UI is modularized in `internal/run/tui`.
+    *   **Pages:** Located in `internal/run/tui/app`.
+    *   **Components:** Shared elements (Spinner, Logo, Header) are in `internal/run/tui/component`.
+
+## Application Flow
+
+*   **Initialization:** The application performs a parallel pre-load of **Projects** and **Services** during the initial loading screen (featuring the Logo and Spinner). This ensures the dashboard is populated immediately upon launch.
+*   **Async Operations:** Long-running tasks like scaling services or worker pools use the `spinner` component to provide visual feedback without blocking the UI.
+*   **Data Fetching:** UI packages (`service`, `project`) expose helper functions (`Fetch`, `PreLoad`) to allow data retrieval without tight coupling to the main application logic.

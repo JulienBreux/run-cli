@@ -19,3 +19,9 @@ func TestToJSON(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expected, string(actual))
 }
+
+func TestToJSONError(t *testing.T) {
+	data := make(chan int)
+	_, err := format.ToJSON(data)
+	assert.Error(t, err)
+}

@@ -38,6 +38,19 @@ func TestPrint(t *testing.T) {
 	w.Reset()
 }
 
+func TestPrintError(t *testing.T) {
+	w := &bytes.Buffer{}
+	invalidData := make(chan int)
+
+	// Test JSON Error (silenced)
+	format.Print(w, format.JSON, invalidData, nil)
+	assert.Empty(t, w.String())
+
+	// Test YAML Error (silenced)
+	format.Print(w, format.YAML, invalidData, nil)
+	assert.Empty(t, w.String())
+}
+
 func TestStringToFormat(t *testing.T) {
 	assert.Equal(t, format.StringToFormat("yaml"), format.YAML)
 	assert.Equal(t, format.StringToFormat("json"), format.JSON)

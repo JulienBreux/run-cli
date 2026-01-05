@@ -19,3 +19,12 @@ func TestToYAML(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expected, string(actual))
 }
+
+func TestToYAMLError(t *testing.T) {
+	// YAML encoder fails on invalid map keys like functions or slices?
+	// Or maybe just a channel.
+	// yaml.v3 usually returns error for channels.
+	data := make(chan int)
+	_, err := format.ToYAML(data)
+	assert.Error(t, err)
+}

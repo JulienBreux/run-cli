@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/JulienBreux/run-cli/internal/run/ui/component/logo"
+	"github.com/JulienBreux/run-cli/internal/run/tui/component/logo"
 )
 
 func TestString(t *testing.T) {

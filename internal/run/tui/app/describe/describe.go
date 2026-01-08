@@ -18,8 +18,15 @@ const (
 	defaultHighlightFormatter = "terminal256"
 )
 
+// Describer represents the describe modal component.
+type Describer struct {
+	*tview.Grid
+	Content  *tview.Flex
+	TextView *tview.TextView
+}
+
 // DescribeModal creates a modal to display resource details in YAML format.
-func DescribeModal(app *tview.Application, resource any, title string, closeFunc func()) tview.Primitive {
+func DescribeModal(app *tview.Application, resource any, title string, closeFunc func()) *Describer {
 	yamlBytes, err := yaml.Marshal(resource)
 	if err != nil {
 		yamlBytes = []byte("Error: Unable to marshal resource to YAML")
@@ -64,5 +71,9 @@ func DescribeModal(app *tview.Application, resource any, title string, closeFunc
 		SetRows(0, 30, 0).
 		AddItem(content, 1, 1, 1, 1, 0, 0, true)
 
-	return grid
+	return &Describer{
+		Grid:     grid,
+		Content:  content,
+		TextView: textView,
+	}
 }

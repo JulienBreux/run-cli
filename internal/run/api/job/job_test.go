@@ -2,16 +2,21 @@ package job
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
 	"cloud.google.com/go/run/apiv2/runpb"
 	api_region "github.com/JulienBreux/run-cli/internal/run/api/region"
+	"github.com/googleapis/gax-go/v2"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/iterator"
+	"google.golang.org/api/option"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-// MockClient is a mock implementation of the Client interface.
+// MockClient is a mock implementation of the Client interface (High Level).
 type MockClient struct {
 	ListJobsFunc func(ctx context.Context, project, region string) ([]*runpb.Job, error)
 	RunJobFunc   func(ctx context.Context, name string) (*runpb.Execution, error)
@@ -32,7 +37,6 @@ func (m *MockClient) RunJob(ctx context.Context, name string) (*runpb.Execution,
 }
 
 func TestMapJob(t *testing.T) {
-	// ... (existing test)
 	now := time.Now()
 	resp := &runpb.Job{
 		Name:    "projects/my-project/locations/us-central1/jobs/my-job",
@@ -174,4 +178,238 @@ func TestList_AllRegions(t *testing.T) {
 		}
 	}
 	assert.True(t, found)
+}
+
+// --- Mocks for GCPClient testing ---
+
+type MockJobsClientWrapper struct {
+	ListJobsFunc func(ctx context.Context, req *runpb.ListJobsRequest, opts ...gax.CallOption) JobIteratorWrapper
+	RunJobFunc   func(ctx context.Context, req *runpb.RunJobRequest, opts ...gax.CallOption) (RunJobOperationWrapper, error)
+	CloseFunc    func() error
+}
+
+func (m *MockJobsClientWrapper) ListJobs(ctx context.Context, req *runpb.ListJobsRequest, opts ...gax.CallOption) JobIteratorWrapper {
+	if m.ListJobsFunc != nil {
+		return m.ListJobsFunc(ctx, req, opts...)
+	}
+	return &MockJobIteratorWrapper{}
+}
+
+func (m *MockJobsClientWrapper) RunJob(ctx context.Context, req *runpb.RunJobRequest, opts ...gax.CallOption) (RunJobOperationWrapper, error) {
+	if m.RunJobFunc != nil {
+		return m.RunJobFunc(ctx, req, opts...)
+	}
+	return nil, nil
+}
+
+func (m *MockJobsClientWrapper) Close() error {
+	if m.CloseFunc != nil {
+		return m.CloseFunc()
+	}
+	return nil
+}
+
+type MockJobIteratorWrapper struct {
+	Items []*runpb.Job
+	Index int
+	Err   error
+}
+
+func (m *MockJobIteratorWrapper) Next() (*runpb.Job, error) {
+	if m.Err != nil {
+		return nil, m.Err
+	}
+	if m.Index >= len(m.Items) {
+		return nil, iterator.Done
+	}
+	item := m.Items[m.Index]
+	m.Index++
+	return item, nil
+}
+
+type MockRunJobOperationWrapper struct {
+	WaitFunc func(ctx context.Context, opts ...gax.CallOption) (*runpb.Execution, error)
+}
+
+func (m *MockRunJobOperationWrapper) Wait(ctx context.Context, opts ...gax.CallOption) (*runpb.Execution, error) {
+	if m.WaitFunc != nil {
+		return m.WaitFunc(ctx, opts...)
+	}
+	return nil, nil
+}
+
+func TestGCPClient_ListJobs(t *testing.T) {
+	origFindCreds := findDefaultCredentials
+	origCreateClient := createJobsClient
+	defer func() {
+		findDefaultCredentials = origFindCreds
+		createJobsClient = origCreateClient
+	}()
+
+	findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		return &google.Credentials{}, nil
+	}
+
+	t.Run("Success", func(t *testing.T) {
+		createJobsClient = func(ctx context.Context, opts ...option.ClientOption) (JobsClientWrapper, error) {
+			return &MockJobsClientWrapper{
+				ListJobsFunc: func(ctx context.Context, req *runpb.ListJobsRequest, opts ...gax.CallOption) JobIteratorWrapper {
+					return &MockJobIteratorWrapper{
+						Items: []*runpb.Job{{Name: "job1"}},
+					}
+				},
+				CloseFunc: func() error { return nil },
+			}, nil
+		}
+
+		client := &GCPClient{}
+		jobs, err := client.ListJobs(context.Background(), "p", "r")
+		assert.NoError(t, err)
+		assert.Len(t, jobs, 1)
+		assert.Equal(t, "job1", jobs[0].Name)
+	})
+
+	t.Run("Auth Error", func(t *testing.T) {
+		findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+			return nil, errors.New("auth failed")
+		}
+		client := &GCPClient{}
+		_, err := client.ListJobs(context.Background(), "p", "r")
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "failed to find default credentials")
+	})
+	
+	t.Run("Client Creation Error", func(t *testing.T) {
+		findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+			return &google.Credentials{}, nil
+		}
+		createJobsClient = func(ctx context.Context, opts ...option.ClientOption) (JobsClientWrapper, error) {
+			return nil, errors.New("client error")
+		}
+		client := &GCPClient{}
+		_, err := client.ListJobs(context.Background(), "p", "r")
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "client error")
+	})
+
+	t.Run("Iterator Error", func(t *testing.T) {
+		findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+			return &google.Credentials{}, nil
+		}
+		createJobsClient = func(ctx context.Context, opts ...option.ClientOption) (JobsClientWrapper, error) {
+			return &MockJobsClientWrapper{
+				ListJobsFunc: func(ctx context.Context, req *runpb.ListJobsRequest, opts ...gax.CallOption) JobIteratorWrapper {
+					return &MockJobIteratorWrapper{
+						Err: errors.New("iter error"),
+					}
+				},
+				CloseFunc: func() error { return nil },
+			}, nil
+		}
+		client := &GCPClient{}
+		_, err := client.ListJobs(context.Background(), "p", "r")
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "iter error")
+	})
+	
+	t.Run("Iterator Auth Error", func(t *testing.T) {
+		findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+			return &google.Credentials{}, nil
+		}
+		createJobsClient = func(ctx context.Context, opts ...option.ClientOption) (JobsClientWrapper, error) {
+			return &MockJobsClientWrapper{
+				ListJobsFunc: func(ctx context.Context, req *runpb.ListJobsRequest, opts ...gax.CallOption) JobIteratorWrapper {
+					return &MockJobIteratorWrapper{
+						Err: errors.New("Unauthenticated request"),
+					}
+				},
+				CloseFunc: func() error { return nil },
+			}, nil
+		}
+		client := &GCPClient{}
+		_, err := client.ListJobs(context.Background(), "p", "r")
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "authentication failed")
+	})
+}
+
+func TestGCPClient_RunJob(t *testing.T) {
+	origFindCreds := findDefaultCredentials
+	origCreateClient := createJobsClient
+	defer func() {
+		findDefaultCredentials = origFindCreds
+		createJobsClient = origCreateClient
+	}()
+	
+	findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		return &google.Credentials{}, nil
+	}
+
+	t.Run("Success", func(t *testing.T) {
+		createJobsClient = func(ctx context.Context, opts ...option.ClientOption) (JobsClientWrapper, error) {
+			return &MockJobsClientWrapper{
+				RunJobFunc: func(ctx context.Context, req *runpb.RunJobRequest, opts ...gax.CallOption) (RunJobOperationWrapper, error) {
+					return &MockRunJobOperationWrapper{
+						WaitFunc: func(ctx context.Context, opts ...gax.CallOption) (*runpb.Execution, error) {
+							return &runpb.Execution{Name: "exec-1"}, nil
+						},
+					}, nil
+				},
+				CloseFunc: func() error { return nil },
+			}, nil
+		}
+		
+		client := &GCPClient{}
+		exec, err := client.RunJob(context.Background(), "job1")
+		assert.NoError(t, err)
+		assert.Equal(t, "exec-1", exec.Name)
+	})
+	
+	t.Run("Run Error", func(t *testing.T) {
+		createJobsClient = func(ctx context.Context, opts ...option.ClientOption) (JobsClientWrapper, error) {
+			return &MockJobsClientWrapper{
+				RunJobFunc: func(ctx context.Context, req *runpb.RunJobRequest, opts ...gax.CallOption) (RunJobOperationWrapper, error) {
+					return nil, errors.New("run failed")
+				},
+				CloseFunc: func() error { return nil },
+			}, nil
+		}
+		
+		client := &GCPClient{}
+		_, err := client.RunJob(context.Background(), "job1")
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "run failed")
+	})
+	
+	t.Run("Client Creation Error", func(t *testing.T) {
+		createJobsClient = func(ctx context.Context, opts ...option.ClientOption) (JobsClientWrapper, error) {
+			return nil, errors.New("client creation error")
+		}
+		
+		client := &GCPClient{}
+		_, err := client.RunJob(context.Background(), "job1")
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "client creation error")
+	})
+}
+
+func TestWrappers_Delegation(t *testing.T) {
+	// Expect panics because nil clients are used
+	
+	t.Run("GCPJobsClientWrapper", func(t *testing.T) {
+		w := &GCPJobsClientWrapper{client: nil}
+		assert.Panics(t, func() { w.ListJobs(context.Background(), nil) })
+		assert.Panics(t, func() { w.RunJob(context.Background(), nil) })
+		assert.Panics(t, func() { w.Close() })
+	})
+	
+	t.Run("GCPJobIteratorWrapper", func(t *testing.T) {
+		it := &GCPJobIteratorWrapper{it: nil}
+		assert.Panics(t, func() { it.Next() })
+	})
+	
+	t.Run("GCPRunJobOperationWrapper", func(t *testing.T) {
+		op := &GCPRunJobOperationWrapper{op: nil}
+		assert.Panics(t, func() { op.Wait(context.Background()) })
+	})
 }

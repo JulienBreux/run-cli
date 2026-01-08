@@ -114,6 +114,18 @@ func render(workers []model_workerpool.WorkerPool) {
 	listTable.Table.SetTitle(fmt.Sprintf(" %s (%d) ", LIST_PAGE_TITLE, len(workers)))
 }
 
+// GetSelectedWorkerPool returns the Name and Region of the selected worker pool.
+func GetSelectedWorkerPool() (string, string) {
+	row, _ := listTable.Table.GetSelection()
+	if row < 1 { // Header row or no selection
+		return "", ""
+	}
+	// 0: Name (DisplayName), 1: Region
+	name := listTable.Table.GetCell(row, 0).Text
+	region := listTable.Table.GetCell(row, 1).Text
+	return name, region
+}
+
 // GetSelectedWorkerPoolFull returns the full workerpool object for the selected row.
 func GetSelectedWorkerPoolFull() *model_workerpool.WorkerPool {
 	row, _ := listTable.Table.GetSelection()

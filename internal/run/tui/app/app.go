@@ -49,7 +49,12 @@ const (
 	LOADER_PAGE_ID  = "loader"
 	LAYOUT_PAGE_ID  = "layout"
 
-	CONSOLE_URL = "https://console.cloud.google.com/run/overview?project=%s"
+	CONSOLE_URL               = "https://console.cloud.google.com/run?project=%s"
+	CONSOLE_SERVICE_URL       = "https://console.cloud.google.com/run/detail/%s/%s/metrics?project=%s"
+	CONSOLE_JOB_LIST_URL      = "https://console.cloud.google.com/run/jobs?project=%s"
+	CONSOLE_JOB_DETAIL_URL    = "https://console.cloud.google.com/run/jobs/details/%s/%s/metrics?project=%s"
+	CONSOLE_WORKER_LIST_URL   = "https://console.cloud.google.com/run/workerpools?project=%s"
+	CONSOLE_WORKER_DETAIL_URL = "https://console.cloud.google.com/run/workerpools/details/%s/%s?project=%s"
 )
 
 // Run runs the application.
@@ -175,6 +180,29 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 	// Navigation.
 	if event.Key() == tcell.KeyCtrlZ {
 		u := fmt.Sprintf(CONSOLE_URL, currentInfo.Project)
+
+		switch currentPageID {
+		case service.LIST_PAGE_ID:
+			name, region := service.GetSelectedService()
+			if name != "" && region != "" {
+				u = fmt.Sprintf(CONSOLE_SERVICE_URL, region, name, currentInfo.Project)
+			}
+		case job.LIST_PAGE_ID:
+			name, region := job.GetSelectedJob()
+			if name != "" && region != "" {
+				u = fmt.Sprintf(CONSOLE_JOB_DETAIL_URL, region, name, currentInfo.Project)
+			} else {
+				u = fmt.Sprintf(CONSOLE_JOB_LIST_URL, currentInfo.Project)
+			}
+		case workerpool.LIST_PAGE_ID:
+			name, region := workerpool.GetSelectedWorkerPool()
+			if name != "" && region != "" {
+				u = fmt.Sprintf(CONSOLE_WORKER_DETAIL_URL, region, name, currentInfo.Project)
+			} else {
+				u = fmt.Sprintf(CONSOLE_WORKER_LIST_URL, currentInfo.Project)
+			}
+		}
+
 		_ = browser.OpenURL(u)
 		return nil
 	}

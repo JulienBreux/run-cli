@@ -13,8 +13,18 @@ const (
 	MODAL_PAGE_ID = "modal-logs"
 )
 
+var streamLogsFunc = api_log.StreamLogs
+
+// LogViewer represents the log viewing modal component.
+type LogViewer struct {
+	*tview.Grid
+	Content    *tview.Flex
+	TextView   *tview.TextView
+	StatusText *tview.TextView
+}
+
 // LogModal returns a centered modal primitive for displaying logs
-func LogModal(app *tview.Application, projectID, filter, title string, closeModal func()) tview.Primitive {
+func LogModal(app *tview.Application, projectID, filter, title string, closeModal func()) *LogViewer {
 	// --- Components ---
 
 	// TextView for logs
@@ -36,7 +46,7 @@ func LogModal(app *tview.Application, projectID, filter, title string, closeModa
 
 	// 1. Start Streamer
 	go func() {
-		err := api_log.StreamLogs(ctx, projectID, filter, logChan)
+		err := streamLogsFunc(ctx, projectID, filter, logChan)
 		if err != nil {
 			app.QueueUpdateDraw(func() {
 				textView.SetText(fmt.Sprintf("[red]Error streaming logs: %v", err))
@@ -82,5 +92,10 @@ func LogModal(app *tview.Application, projectID, filter, title string, closeModa
 		SetRows(0, 30, 0).
 		AddItem(content, 1, 1, 1, 1, 0, 0, true)
 
-	return grid
+	return &LogViewer{
+		Grid:       grid,
+		Content:    content,
+		TextView:   textView,
+		StatusText: statusText,
+	}
 }

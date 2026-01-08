@@ -13,8 +13,18 @@ const (
 	MODAL_PAGE_SHORTCUT = tcell.KeyCtrlR
 )
 
+// RegionSelector represents the region selection modal component.
+type RegionSelector struct {
+	*tview.Grid
+	Content *tview.Flex
+	Input   *tview.InputField
+	List    *tview.List
+	Filter  func(string)
+	Submit  func()
+}
+
 // RegionModal returns a centered modal primitive with search and list
-func RegionModal(app *tview.Application, onSelect func(region string), closeModal func()) tview.Primitive {
+func RegionModal(app *tview.Application, onSelect func(region string), closeModal func()) *RegionSelector {
 	// --- Data ---
 	regions := append([]string{"- (All Regions)"}, api_region.List()...)
 	var filteredRegions []string
@@ -139,5 +149,12 @@ func RegionModal(app *tview.Application, onSelect func(region string), closeModa
 		SetRows(0, 20, 0).
 		AddItem(content, 1, 1, 1, 1, 0, 0, true)
 
-	return grid
+	return &RegionSelector{
+		Grid:    grid,
+		Content: content,
+		Input:   input,
+		List:    list,
+		Filter:  populateList,
+		Submit:  submit,
+	}
 }

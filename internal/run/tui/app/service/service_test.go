@@ -173,3 +173,95 @@ func TestFetch(t *testing.T) {
 	assert.Len(t, svcs, 1)
 	assert.Equal(t, "s1", svcs[0].Name)
 }
+
+func TestListReload(t *testing.T) {
+	// Mock
+	origList := listServicesFunc
+	defer func() { listServicesFunc = origList }()
+	
+	listServicesFunc = func(projectID, region string) ([]model_service.Service, error) {
+		return []model_service.Service{{Name: "s1"}}, nil
+	}
+	
+	app := tview.NewApplication()
+	screen := tcell.NewSimulationScreen("UTF-8")
+	_ = screen.Init()
+	app.SetScreen(screen)
+	
+	// Init table
+	_ = List(app)
+	
+	go func() {
+		_ = app.Run()
+	}()
+	defer app.Stop()
+	
+	done := make(chan struct{})
+	ListReload(app, info.Info{}, func(err error) {
+		assert.NoError(t, err)
+		close(done)
+	})
+	
+	select {
+	case <-done:
+		// Verify Render was called (Table should have data)
+		// Header + 1 Item = 2 Rows
+		assert.Equal(t, 2, listTable.Table.GetRowCount())
+		assert.Equal(t, "s1", listTable.Table.GetCell(1, 0).Text)
+	case <-time.After(2 * time.Second):
+		t.Fatal("Timeout waiting for ListReload")
+	}
+}
+
+func TestListReload_Error(t *testing.T) {
+	// Mock Error
+	origList := listServicesFunc
+	defer func() { listServicesFunc = origList }()
+	
+	listServicesFunc = func(projectID, region string) ([]model_service.Service, error) {
+		return nil, assert.AnError
+	}
+	
+	app := tview.NewApplication()
+	screen := tcell.NewSimulationScreen("UTF-8")
+	_ = screen.Init()
+	app.SetScreen(screen)
+	
+	// Init table
+	_ = List(app)
+	
+	go func() {
+		_ = app.Run()
+	}()
+	defer app.Stop()
+	
+	done := make(chan struct{})
+	ListReload(app, info.Info{}, func(err error) {
+		assert.Error(t, err)
+		close(done)
+	})
+	
+	select {
+	case <-done:
+		// Passed
+	case <-time.After(2 * time.Second):
+		t.Fatal("Timeout waiting for ListReload Error")
+	}
+}
+
+func TestRender_ScalingManual(t *testing.T) {
+	app := tview.NewApplication()
+	_ = List(app)
+	
+	svcs := []model_service.Service{
+		{
+			Name: "s2",
+			Scaling: &model_scaling.Scaling{ScalingMode: "MANUAL", ManualInstanceCount: 5},
+		},
+	}
+	
+	render(svcs)
+	
+	assert.Equal(t, 2, listTable.Table.GetRowCount())
+	assert.Contains(t, listTable.Table.GetCell(1, 2).Text, "Manual: 5")
+}

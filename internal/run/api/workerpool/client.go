@@ -3,12 +3,11 @@ package workerpool
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	run "cloud.google.com/go/run/apiv2"
 	"cloud.google.com/go/run/apiv2/runpb"
+	"github.com/JulienBreux/run-cli/internal/run/api/client"
 	"github.com/googleapis/gax-go/v2"
-	"golang.org/x/oauth2/google"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
@@ -30,7 +29,6 @@ type UpdateWorkerPoolOperationWrapper interface {
 }
 
 // Variables for dependency injection
-var findDefaultCredentials = google.FindDefaultCredentials
 var createWorkerPoolsClient = func(ctx context.Context, opts ...option.ClientOption) (WorkerPoolsClientWrapper, error) {
 	c, err := run.NewWorkerPoolsClient(ctx, opts...)
 	if err != nil {
@@ -94,17 +92,17 @@ type GCPClient struct{}
 
 // ListWorkerPools lists worker pools for a project and region.
 func (c *GCPClient) ListWorkerPools(ctx context.Context, project, region string) ([]*runpb.WorkerPool, error) {
-	creds, err := findDefaultCredentials(ctx, run.DefaultAuthScopes()...)
+	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
 	}
 
-	client, err := createWorkerPoolsClient(ctx, option.WithCredentials(creds))
+	cClient, err := createWorkerPoolsClient(ctx, option.WithCredentials(creds))
 	if err != nil {
 		return nil, err
 	}
 	defer func() {
-		_ = client.Close()
+		_ = cClient.Close()
 	}()
 
 	req := &runpb.ListWorkerPoolsRequest{
@@ -112,17 +110,14 @@ func (c *GCPClient) ListWorkerPools(ctx context.Context, project, region string)
 	}
 
 	var workerPools []*runpb.WorkerPool
-	it := client.ListWorkerPools(ctx, req)
+	it := cClient.ListWorkerPools(ctx, req)
 	for {
 		resp, err := it.Next()
 		if err == iterator.Done {
 			break
 		}
 		if err != nil {
-			if strings.Contains(err.Error(), "Unauthenticated") || strings.Contains(err.Error(), "PermissionDenied") {
-				return nil, fmt.Errorf("authentication failed: %w", err)
-			}
-			return nil, err
+			return nil, client.WrapError(err)
 		}
 		workerPools = append(workerPools, resp)
 	}
@@ -132,38 +127,38 @@ func (c *GCPClient) ListWorkerPools(ctx context.Context, project, region string)
 
 // GetWorkerPool gets a worker pool.
 func (c *GCPClient) GetWorkerPool(ctx context.Context, name string) (*runpb.WorkerPool, error) {
-	creds, err := findDefaultCredentials(ctx, run.DefaultAuthScopes()...)
+	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
 	}
 
-	client, err := createWorkerPoolsClient(ctx, option.WithCredentials(creds))
+	cClient, err := createWorkerPoolsClient(ctx, option.WithCredentials(creds))
 	if err != nil {
 		return nil, err
 	}
 	defer func() {
-		_ = client.Close()
+		_ = cClient.Close()
 	}()
 
-	return client.GetWorkerPool(ctx, &runpb.GetWorkerPoolRequest{Name: name})
+	return cClient.GetWorkerPool(ctx, &runpb.GetWorkerPoolRequest{Name: name})
 }
 
 // UpdateWorkerPool updates a worker pool.
 func (c *GCPClient) UpdateWorkerPool(ctx context.Context, workerPool *runpb.WorkerPool) (*runpb.WorkerPool, error) {
-	creds, err := findDefaultCredentials(ctx, run.DefaultAuthScopes()...)
+	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
 	}
 
-	client, err := createWorkerPoolsClient(ctx, option.WithCredentials(creds))
+	cClient, err := createWorkerPoolsClient(ctx, option.WithCredentials(creds))
 	if err != nil {
 		return nil, err
 	}
 	defer func() {
-		_ = client.Close()
+		_ = cClient.Close()
 	}()
 
-	op, err := client.UpdateWorkerPool(ctx, &runpb.UpdateWorkerPoolRequest{WorkerPool: workerPool})
+	op, err := cClient.UpdateWorkerPool(ctx, &runpb.UpdateWorkerPoolRequest{WorkerPool: workerPool})
 	if err != nil {
 		return nil, err
 	}

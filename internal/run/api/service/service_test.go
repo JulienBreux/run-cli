@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/run/apiv2/runpb"
+	"github.com/JulienBreux/run-cli/internal/run/api/client"
 	api_region "github.com/JulienBreux/run-cli/internal/run/api/region"
 	"github.com/googleapis/gax-go/v2"
 	"github.com/stretchr/testify/assert"
@@ -335,14 +336,14 @@ func (m *MockUpdateServiceOperationWrapper) Wait(ctx context.Context, opts ...ga
 }
 
 func TestGCPClient_ListServices(t *testing.T) {
-	origFindCreds := findDefaultCredentials
+	origFindCreds := client.FindDefaultCredentials
 	origCreateClient := createServicesClient
 	defer func() {
-		findDefaultCredentials = origFindCreds
+		client.FindDefaultCredentials = origFindCreds
 		createServicesClient = origCreateClient
 	}()
 	
-	findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+	client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 		return &google.Credentials{}, nil
 	}
 	
@@ -366,7 +367,7 @@ func TestGCPClient_ListServices(t *testing.T) {
 	})
 	
 	t.Run("Auth Error", func(t *testing.T) {
-		findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return nil, errors.New("auth failed")
 		}
 		client := &GCPClient{}
@@ -375,7 +376,7 @@ func TestGCPClient_ListServices(t *testing.T) {
 	})
 	
 	t.Run("Iterator Auth Error", func(t *testing.T) {
-		findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return &google.Credentials{}, nil
 		}
 		createServicesClient = func(ctx context.Context, opts ...option.ClientOption) (ServicesClientWrapper, error) {
@@ -396,14 +397,14 @@ func TestGCPClient_ListServices(t *testing.T) {
 }
 
 func TestGCPClient_GetService(t *testing.T) {
-	origFindCreds := findDefaultCredentials
+	origFindCreds := client.FindDefaultCredentials
 	origCreateClient := createServicesClient
 	defer func() {
-		findDefaultCredentials = origFindCreds
+		client.FindDefaultCredentials = origFindCreds
 		createServicesClient = origCreateClient
 	}()
 
-	findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+	client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 		return &google.Credentials{}, nil
 	}
 
@@ -439,14 +440,14 @@ func TestGCPClient_GetService(t *testing.T) {
 }
 
 func TestGCPClient_UpdateService(t *testing.T) {
-	origFindCreds := findDefaultCredentials
+	origFindCreds := client.FindDefaultCredentials
 	origCreateClient := createServicesClient
 	defer func() {
-		findDefaultCredentials = origFindCreds
+		client.FindDefaultCredentials = origFindCreds
 		createServicesClient = origCreateClient
 	}()
 
-	findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+	client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 		return &google.Credentials{}, nil
 	}
 

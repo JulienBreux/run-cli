@@ -7,10 +7,10 @@ import (
 	"strings"
 
 	resourcemanager "cloud.google.com/go/resourcemanager/apiv3"
-	"cloud.google.com/go/resourcemanager/apiv3/resourcemanagerpb"
+	resourcemanagerpb "cloud.google.com/go/resourcemanager/apiv3/resourcemanagerpb"
+	"github.com/JulienBreux/run-cli/internal/run/api/client"
 	model "github.com/JulienBreux/run-cli/internal/run/model/common/project"
 	"github.com/googleapis/gax-go/v2"
-	"golang.org/x/oauth2/google"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
@@ -26,7 +26,6 @@ type ProjectIteratorWrapper interface {
 }
 
 // Variables for dependency injection
-var findDefaultCredentials = google.FindDefaultCredentials
 var createProjectsClient = func(ctx context.Context, opts ...option.ClientOption) (ProjectsClientWrapper, error) {
 	c, err := resourcemanager.NewProjectsClient(ctx, opts...)
 	if err != nil {
@@ -69,17 +68,17 @@ type GCPClient struct{}
 // ListProjects lists projects for the current user.
 func (c *GCPClient) ListProjects(ctx context.Context) ([]model.Project, error) {
 	// Explicitly find default credentials
-	creds, err := findDefaultCredentials(ctx, resourcemanager.DefaultAuthScopes()...)
+	creds, err := client.FindDefaultCredentials(ctx, resourcemanager.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w. Tip: Try running 'gcloud auth application-default login' to authenticate the Go client", err)
 	}
 
-	client, err := createProjectsClient(ctx, option.WithCredentials(creds))
+	cClient, err := createProjectsClient(ctx, option.WithCredentials(creds))
 	if err != nil {
 		return nil, err
 	}
 	defer func() {
-		_ = client.Close()
+		_ = cClient.Close()
 	}()
 
 	req := &resourcemanagerpb.SearchProjectsRequest{
@@ -87,17 +86,14 @@ func (c *GCPClient) ListProjects(ctx context.Context) ([]model.Project, error) {
 	}
 
 	var projects []model.Project
-	it := client.SearchProjects(ctx, req)
+	it := cClient.SearchProjects(ctx, req)
 	for {
 		resp, err := it.Next()
 		if err == iterator.Done {
 			break
 		}
 		if err != nil {
-			if strings.Contains(err.Error(), "Unauthenticated") || strings.Contains(err.Error(), "PermissionDenied") {
-				return nil, fmt.Errorf("authentication failed: %w. Tip: Ensure your 'gcloud auth application-default login' is valid and has permissions", err)
-			}
-			return nil, err
+			return nil, client.WrapError(err)
 		}
 
 		projects = append(projects, mapProject(resp))
@@ -105,6 +101,7 @@ func (c *GCPClient) ListProjects(ctx context.Context) ([]model.Project, error) {
 
 	return projects, nil
 }
+
 
 func mapProject(resp *resourcemanagerpb.Project) model.Project {
 	// Parse Project Number from Name "projects/123456"

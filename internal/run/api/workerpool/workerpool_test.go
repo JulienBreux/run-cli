@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/run/apiv2/runpb"
+	"github.com/JulienBreux/run-cli/internal/run/api/client"
 	api_region "github.com/JulienBreux/run-cli/internal/run/api/region"
 	"github.com/googleapis/gax-go/v2"
 	"github.com/stretchr/testify/assert"
@@ -250,14 +251,14 @@ func (m *MockUpdateWorkerPoolOperationWrapper) Wait(ctx context.Context, opts ..
 }
 
 func TestGCPClient_ListWorkerPools(t *testing.T) {
-	origFindCreds := findDefaultCredentials
+	origFindCreds := client.FindDefaultCredentials
 	origCreateClient := createWorkerPoolsClient
 	defer func() {
-		findDefaultCredentials = origFindCreds
+		client.FindDefaultCredentials = origFindCreds
 		createWorkerPoolsClient = origCreateClient
 	}()
 
-	findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+	client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 		return &google.Credentials{}, nil
 	}
 
@@ -281,7 +282,7 @@ func TestGCPClient_ListWorkerPools(t *testing.T) {
 	})
 
 	t.Run("Auth Error", func(t *testing.T) {
-		findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return nil, errors.New("auth failed")
 		}
 		client := &GCPClient{}
@@ -291,7 +292,7 @@ func TestGCPClient_ListWorkerPools(t *testing.T) {
 	})
 
 	t.Run("Iterator Auth Error", func(t *testing.T) {
-		findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return &google.Credentials{}, nil
 		}
 		createWorkerPoolsClient = func(ctx context.Context, opts ...option.ClientOption) (WorkerPoolsClientWrapper, error) {
@@ -312,14 +313,14 @@ func TestGCPClient_ListWorkerPools(t *testing.T) {
 }
 
 func TestGCPClient_GetWorkerPool(t *testing.T) {
-	origFindCreds := findDefaultCredentials
+	origFindCreds := client.FindDefaultCredentials
 	origCreateClient := createWorkerPoolsClient
 	defer func() {
-		findDefaultCredentials = origFindCreds
+		client.FindDefaultCredentials = origFindCreds
 		createWorkerPoolsClient = origCreateClient
 	}()
 
-	findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+	client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 		return &google.Credentials{}, nil
 	}
 
@@ -356,14 +357,14 @@ func TestGCPClient_GetWorkerPool(t *testing.T) {
 }
 
 func TestGCPClient_UpdateWorkerPool(t *testing.T) {
-	origFindCreds := findDefaultCredentials
+	origFindCreds := client.FindDefaultCredentials
 	origCreateClient := createWorkerPoolsClient
 	defer func() {
-		findDefaultCredentials = origFindCreds
+		client.FindDefaultCredentials = origFindCreds
 		createWorkerPoolsClient = origCreateClient
 	}()
 
-	findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+	client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 		return &google.Credentials{}, nil
 	}
 

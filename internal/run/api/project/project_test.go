@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"cloud.google.com/go/resourcemanager/apiv3/resourcemanagerpb"
+	"github.com/JulienBreux/run-cli/internal/run/api/client"
 	model "github.com/JulienBreux/run-cli/internal/run/model/common/project"
 	"github.com/googleapis/gax-go/v2"
 	"github.com/stretchr/testify/assert"
@@ -102,14 +103,14 @@ func (m *MockProjectIteratorWrapper) Next() (*resourcemanagerpb.Project, error) 
 
 func TestGCPClient_ListProjects(t *testing.T) {
 	// Mock dependencies
-	origFindCreds := findDefaultCredentials
+	origFindCreds := client.FindDefaultCredentials
 	origCreateClient := createProjectsClient
 	defer func() {
-		findDefaultCredentials = origFindCreds
+		client.FindDefaultCredentials = origFindCreds
 		createProjectsClient = origCreateClient
 	}()
 
-	findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+	client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 		return &google.Credentials{}, nil
 	}
 
@@ -137,7 +138,7 @@ func TestGCPClient_ListProjects(t *testing.T) {
 	})
 
 	t.Run("Auth Error", func(t *testing.T) {
-		findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return nil, errors.New("auth failed")
 		}
 
@@ -150,7 +151,7 @@ func TestGCPClient_ListProjects(t *testing.T) {
 
 	t.Run("Client Creation Error", func(t *testing.T) {
 		// Restore auth mock
-		findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return &google.Credentials{}, nil
 		}
 		createProjectsClient = func(ctx context.Context, opts ...option.ClientOption) (ProjectsClientWrapper, error) {

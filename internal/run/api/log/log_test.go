@@ -8,6 +8,7 @@ import (
 
 	"cloud.google.com/go/logging"
 	"cloud.google.com/go/logging/logadmin"
+	"github.com/JulienBreux/run-cli/internal/run/api/client"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/iterator"
@@ -228,14 +229,14 @@ func (m *MockLogAdminClientWrapper) Close() error {
 }
 
 func TestGCPClient(t *testing.T) {
-	origFindCreds := findDefaultCredentials
+	origFindCreds := client.FindDefaultCredentials
 	origCreateClient := createLogAdminClient
 	defer func() {
-		findDefaultCredentials = origFindCreds
+		client.FindDefaultCredentials = origFindCreds
 		createLogAdminClient = origCreateClient
 	}()
 
-	findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+	client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 		return &google.Credentials{}, nil
 	}
 
@@ -263,7 +264,7 @@ func TestGCPClient(t *testing.T) {
 	})
 
 	t.Run("NewGCPClient_AuthError", func(t *testing.T) {
-		findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return nil, errors.New("auth failed")
 		}
 		
@@ -273,7 +274,7 @@ func TestGCPClient(t *testing.T) {
 	})
 
 	t.Run("NewGCPClient_ClientCreationError", func(t *testing.T) {
-		findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return &google.Credentials{}, nil
 		}
 		createLogAdminClient = func(ctx context.Context, projectID string, opts ...option.ClientOption) (LogAdminClientWrapper, error) {

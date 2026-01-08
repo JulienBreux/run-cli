@@ -3,12 +3,11 @@ package job
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	run "cloud.google.com/go/run/apiv2"
 	"cloud.google.com/go/run/apiv2/runpb"
+	"github.com/JulienBreux/run-cli/internal/run/api/client"
 	"github.com/googleapis/gax-go/v2"
-	"golang.org/x/oauth2/google"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
@@ -29,7 +28,6 @@ type RunJobOperationWrapper interface {
 }
 
 // Variables for dependency injection
-var findDefaultCredentials = google.FindDefaultCredentials
 var createJobsClient = func(ctx context.Context, opts ...option.ClientOption) (JobsClientWrapper, error) {
 	c, err := run.NewJobsClient(ctx, opts...)
 	if err != nil {
@@ -88,17 +86,17 @@ type GCPClient struct{}
 
 // ListJobs lists jobs for a project and region.
 func (c *GCPClient) ListJobs(ctx context.Context, project, region string) ([]*runpb.Job, error) {
-	creds, err := findDefaultCredentials(ctx, run.DefaultAuthScopes()...)
+	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
 	}
 
-	client, err := createJobsClient(ctx, option.WithCredentials(creds))
+	cClient, err := createJobsClient(ctx, option.WithCredentials(creds))
 	if err != nil {
 		return nil, err
 	}
 	defer func() {
-		_ = client.Close()
+		_ = cClient.Close()
 	}()
 
 	req := &runpb.ListJobsRequest{
@@ -106,17 +104,14 @@ func (c *GCPClient) ListJobs(ctx context.Context, project, region string) ([]*ru
 	}
 
 	var jobs []*runpb.Job
-	it := client.ListJobs(ctx, req)
+	it := cClient.ListJobs(ctx, req)
 	for {
 		resp, err := it.Next()
 		if err == iterator.Done {
 			break
 		}
 		if err != nil {
-			if strings.Contains(err.Error(), "Unauthenticated") || strings.Contains(err.Error(), "PermissionDenied") {
-				return nil, fmt.Errorf("authentication failed: %w", err)
-			}
-			return nil, err
+			return nil, client.WrapError(err)
 		}
 		jobs = append(jobs, resp)
 	}
@@ -126,20 +121,20 @@ func (c *GCPClient) ListJobs(ctx context.Context, project, region string) ([]*ru
 
 // RunJob runs a job.
 func (c *GCPClient) RunJob(ctx context.Context, name string) (*runpb.Execution, error) {
-	creds, err := findDefaultCredentials(ctx, run.DefaultAuthScopes()...)
+	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
 	}
 
-	client, err := createJobsClient(ctx, option.WithCredentials(creds))
+	cClient, err := createJobsClient(ctx, option.WithCredentials(creds))
 	if err != nil {
 		return nil, err
 	}
 	defer func() {
-		_ = client.Close()
+		_ = cClient.Close()
 	}()
 
-	op, err := client.RunJob(ctx, &runpb.RunJobRequest{Name: name})
+	op, err := cClient.RunJob(ctx, &runpb.RunJobRequest{Name: name})
 	if err != nil {
 		return nil, err
 	}

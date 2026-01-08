@@ -3,12 +3,11 @@ package service
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	run "cloud.google.com/go/run/apiv2"
 	"cloud.google.com/go/run/apiv2/runpb"
+	"github.com/JulienBreux/run-cli/internal/run/api/client"
 	"github.com/googleapis/gax-go/v2"
-	"golang.org/x/oauth2/google"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
@@ -30,7 +29,6 @@ type UpdateServiceOperationWrapper interface {
 }
 
 // Variables for dependency injection
-var findDefaultCredentials = google.FindDefaultCredentials
 var createServicesClient = func(ctx context.Context, opts ...option.ClientOption) (ServicesClientWrapper, error) {
 	c, err := run.NewServicesClient(ctx, opts...)
 	if err != nil {
@@ -95,17 +93,17 @@ type GCPClient struct{}
 
 // ListServices lists services for a project and region.
 func (c *GCPClient) ListServices(ctx context.Context, project, region string) ([]*runpb.Service, error) {
-	creds, err := findDefaultCredentials(ctx, run.DefaultAuthScopes()...)
+	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
 	}
 
-	client, err := createServicesClient(ctx, option.WithCredentials(creds))
+	cClient, err := createServicesClient(ctx, option.WithCredentials(creds))
 	if err != nil {
 		return nil, err
 	}
 	defer func() {
-		_ = client.Close()
+		_ = cClient.Close()
 	}()
 
 	req := &runpb.ListServicesRequest{
@@ -113,17 +111,14 @@ func (c *GCPClient) ListServices(ctx context.Context, project, region string) ([
 	}
 
 	var services []*runpb.Service
-	it := client.ListServices(ctx, req)
+	it := cClient.ListServices(ctx, req)
 	for {
 		resp, err := it.Next()
 		if err == iterator.Done {
 			break
 		}
 		if err != nil {
-			if strings.Contains(err.Error(), "Unauthenticated") || strings.Contains(err.Error(), "PermissionDenied") {
-				return nil, fmt.Errorf("authentication failed: %w", err)
-			}
-			return nil, err
+			return nil, client.WrapError(err)
 		}
 		services = append(services, resp)
 	}
@@ -133,38 +128,38 @@ func (c *GCPClient) ListServices(ctx context.Context, project, region string) ([
 
 // GetService gets a single service.
 func (c *GCPClient) GetService(ctx context.Context, name string) (*runpb.Service, error) {
-	creds, err := findDefaultCredentials(ctx, run.DefaultAuthScopes()...)
+	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
 	}
 
-	client, err := createServicesClient(ctx, option.WithCredentials(creds))
+	cClient, err := createServicesClient(ctx, option.WithCredentials(creds))
 	if err != nil {
 		return nil, err
 	}
 	defer func() {
-		_ = client.Close()
+		_ = cClient.Close()
 	}()
 
-	return client.GetService(ctx, &runpb.GetServiceRequest{Name: name})
+	return cClient.GetService(ctx, &runpb.GetServiceRequest{Name: name})
 }
 
 // UpdateService updates a service.
 func (c *GCPClient) UpdateService(ctx context.Context, service *runpb.Service) (*runpb.Service, error) {
-	creds, err := findDefaultCredentials(ctx, run.DefaultAuthScopes()...)
+	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
 	}
 
-	client, err := createServicesClient(ctx, option.WithCredentials(creds))
+	cClient, err := createServicesClient(ctx, option.WithCredentials(creds))
 	if err != nil {
 		return nil, err
 	}
 	defer func() {
-		_ = client.Close()
+		_ = cClient.Close()
 	}()
 
-	op, err := client.UpdateService(ctx, &runpb.UpdateServiceRequest{Service: service})
+	op, err := cClient.UpdateService(ctx, &runpb.UpdateServiceRequest{Service: service})
 	if err != nil {
 		return nil, err
 	}

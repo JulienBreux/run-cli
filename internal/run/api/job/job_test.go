@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/run/apiv2/runpb"
+	"github.com/JulienBreux/run-cli/internal/run/api/client"
 	api_region "github.com/JulienBreux/run-cli/internal/run/api/region"
 	"github.com/googleapis/gax-go/v2"
 	"github.com/stretchr/testify/assert"
@@ -239,14 +240,14 @@ func (m *MockRunJobOperationWrapper) Wait(ctx context.Context, opts ...gax.CallO
 }
 
 func TestGCPClient_ListJobs(t *testing.T) {
-	origFindCreds := findDefaultCredentials
+	origFindCreds := client.FindDefaultCredentials
 	origCreateClient := createJobsClient
 	defer func() {
-		findDefaultCredentials = origFindCreds
+		client.FindDefaultCredentials = origFindCreds
 		createJobsClient = origCreateClient
 	}()
 
-	findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+	client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 		return &google.Credentials{}, nil
 	}
 
@@ -270,7 +271,7 @@ func TestGCPClient_ListJobs(t *testing.T) {
 	})
 
 	t.Run("Auth Error", func(t *testing.T) {
-		findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return nil, errors.New("auth failed")
 		}
 		client := &GCPClient{}
@@ -280,7 +281,7 @@ func TestGCPClient_ListJobs(t *testing.T) {
 	})
 	
 	t.Run("Client Creation Error", func(t *testing.T) {
-		findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return &google.Credentials{}, nil
 		}
 		createJobsClient = func(ctx context.Context, opts ...option.ClientOption) (JobsClientWrapper, error) {
@@ -293,7 +294,7 @@ func TestGCPClient_ListJobs(t *testing.T) {
 	})
 
 	t.Run("Iterator Error", func(t *testing.T) {
-		findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return &google.Credentials{}, nil
 		}
 		createJobsClient = func(ctx context.Context, opts ...option.ClientOption) (JobsClientWrapper, error) {
@@ -313,7 +314,7 @@ func TestGCPClient_ListJobs(t *testing.T) {
 	})
 	
 	t.Run("Iterator Auth Error", func(t *testing.T) {
-		findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return &google.Credentials{}, nil
 		}
 		createJobsClient = func(ctx context.Context, opts ...option.ClientOption) (JobsClientWrapper, error) {
@@ -334,14 +335,14 @@ func TestGCPClient_ListJobs(t *testing.T) {
 }
 
 func TestGCPClient_RunJob(t *testing.T) {
-	origFindCreds := findDefaultCredentials
+	origFindCreds := client.FindDefaultCredentials
 	origCreateClient := createJobsClient
 	defer func() {
-		findDefaultCredentials = origFindCreds
+		client.FindDefaultCredentials = origFindCreds
 		createJobsClient = origCreateClient
 	}()
 	
-	findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+	client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 		return &google.Credentials{}, nil
 	}
 

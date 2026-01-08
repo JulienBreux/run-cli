@@ -6,7 +6,7 @@ import (
 
 	"cloud.google.com/go/logging"
 	"cloud.google.com/go/logging/logadmin"
-	"golang.org/x/oauth2/google"
+	"github.com/JulienBreux/run-cli/internal/run/api/client"
 	"google.golang.org/api/option"
 )
 
@@ -33,7 +33,6 @@ type LogAdminClientWrapper interface {
 }
 
 // Variables for dependency injection
-var findDefaultCredentials = google.FindDefaultCredentials
 var createLogAdminClient = func(ctx context.Context, projectID string, opts ...option.ClientOption) (LogAdminClientWrapper, error) {
 	c, err := logadmin.NewClient(ctx, projectID, opts...)
 	if err != nil {
@@ -62,7 +61,7 @@ type GCPClient struct {
 
 // NewGCPClient creates a new GCPClient.
 func NewGCPClient(ctx context.Context, projectID string) (Client, error) {
-	creds, err := findDefaultCredentials(ctx, logging.ReadScope)
+	creds, err := client.FindDefaultCredentials(ctx, logging.ReadScope)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
 	}

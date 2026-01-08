@@ -25,8 +25,18 @@ func PreLoad() error {
 	return err
 }
 
+// ProjectSelector represents the project selection modal component.
+type ProjectSelector struct {
+	*tview.Grid
+	Content *tview.Flex
+	Input   *tview.InputField
+	List    *tview.List
+	Filter  func(string)
+	Submit  func()
+}
+
 // ProjectModal returns a centered modal primitive with search and list
-func ProjectModal(app *tview.Application, onSelect func(project model.Project), closeModal func()) tview.Primitive {
+func ProjectModal(app *tview.Application, onSelect func(project model.Project), closeModal func()) *ProjectSelector {
 	// --- Data ---
 	var projects []model.Project
 	var err error
@@ -158,5 +168,12 @@ func ProjectModal(app *tview.Application, onSelect func(project model.Project), 
 		SetRows(0, 20, 0).
 		AddItem(content, 1, 1, 1, 1, 0, 0, true)
 
-	return grid
+	return &ProjectSelector{
+		Grid:    grid,
+		Content: content,
+		Input:   input,
+		List:    list,
+		Filter:  populateList,
+		Submit:  submit,
+	}
 }

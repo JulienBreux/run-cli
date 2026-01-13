@@ -16,7 +16,15 @@
 
 ## ✨ Features
 
+### 🌍 Global
+
 *   **Interactive TUI:** A user-friendly terminal interface to manage your Cloud Run resources.
+*   **Project & Region Selection:** Easily switch between your Google Cloud projects and regions.
+*   **Log Viewer:** Stream logs from your services directly in the terminal.
+*   **Konami Code:** Try the legendary code for a little surprise!
+
+### 🚀 Services
+
 *   **Service Management:** View, search, and manage your Cloud Run services.
 *   **Service Dashboard:** Navigate to a dedicated dashboard for each service with multiple views.
 *   **Networking View:** Monitor ingress settings, endpoints status (URI, IAP), and VPC Access configurations.
@@ -24,12 +32,17 @@
 *   **Revision Management:** Detailed list of revisions with traffic allocation, tags, and deployment history.
 *   **Deep Insights:** Explore revision details including billing mode, startup CPU boost, concurrency, and request timeouts.
 *   **Resource Monitoring:** View container configurations, images, ports, and resource limits (Memory, CPU, and GPU/Accelerators).
+
+### ⚡ Jobs
+
 *   **Job Management:** Monitor and manage your Cloud Run jobs.
 *   **Job Dashboard:** Dedicated view for jobs including execution history and status.
 *   **Execution Management:** View detailed execution history with task success/failure counts, duration, and status.
-*   **Log Viewer:** Stream logs from your services directly in the terminal.
-*   **Konami Code:** Try the legendary code for a little surprise!
-*   **Project & Region Selection:** Easily switch between your Google Cloud projects and regions.
+
+### 👷 Worker Pools
+
+*   **Worker Pool Management:** View and manage your Cloud Run worker pools.
+*   **Scaling Control:** Monitor and adjust scaling settings.
 
 ## 🚀 Installation
 

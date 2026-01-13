@@ -1,4 +1,4 @@
-# Run CLI
+# Cloud Run Interactive CLI
 
 <p align="center">
   <a href="https://github.com/JulienBreux/run-cli" target="_blank"><img src="docs/assets/run.gif" /></a>

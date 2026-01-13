@@ -28,11 +28,12 @@ func New(currentInfo info.Info) *tview.Flex {
 func UpdateInfo(currentInfo info.Info) {
 	infoView.Clear()
 
-	_, _ = fmt.Fprintf(infoView, "[white]Project:  [#bd93f9]%s\n", currentInfo.Project)
-	_, _ = fmt.Fprintf(infoView, "[white]Region:   [#bd93f9]%s\n", currentInfo.Region)
-	_, _ = fmt.Fprintf(infoView, "[white]User:     [#bd93f9]%s\n", currentInfo.User)
-	_, _ = fmt.Fprintf(infoView, "[white]Version:  [#bd93f9]%s\n\n", version.Version)
-	_, _ = fmt.Fprintf(infoView, "[white]Console:  [dodgerblue]<ctrl-z>")
+	_, _ = fmt.Fprintf(infoView, "[white]Project:        [#bd93f9]%s\n", currentInfo.Project)
+	_, _ = fmt.Fprintf(infoView, "[white]Region:         [#bd93f9]%s\n", currentInfo.Region)
+	_, _ = fmt.Fprintf(infoView, "[white]User:           [#bd93f9]%s\n", currentInfo.User)
+	_, _ = fmt.Fprintf(infoView, "[white]Version:        [#bd93f9]%s\n\n", version.Version)
+	_, _ = fmt.Fprintf(infoView, "[white]Open console:   [dodgerblue]<ctrl-z>\n")
+	_, _ = fmt.Fprintf(infoView, "[white]Open releases:  [dodgerblue]<ctrl-l>")
 }
 
 // returns the info column.

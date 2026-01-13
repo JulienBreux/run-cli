@@ -63,6 +63,7 @@ const (
 	CONSOLE_JOB_DETAIL_URL    = "https://console.cloud.google.com/run/jobs/details/%s/%s/metrics?project=%s"
 	CONSOLE_WORKER_LIST_URL   = "https://console.cloud.google.com/run/workerpools?project=%s"
 	CONSOLE_WORKER_DETAIL_URL = "https://console.cloud.google.com/run/workerpools/details/%s/%s?project=%s"
+	RELEASE_NOTES_URL         = "https://docs.cloud.google.com/run/docs/release-notes"
 )
 
 // Run runs the application.
@@ -221,6 +222,12 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 
 		if !strings.HasSuffix(os.Args[0], ".test") {
 			_ = browser.OpenURL(u)
+		}
+		return nil
+	}
+	if event.Key() == tcell.KeyCtrlL {
+		if !strings.HasSuffix(os.Args[0], ".test") {
+			_ = browser.OpenURL(RELEASE_NOTES_URL)
 		}
 		return nil
 	}

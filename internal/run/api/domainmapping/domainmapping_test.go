@@ -2,10 +2,13 @@ package domainmapping
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
+	"github.com/JulienBreux/run-cli/internal/run/api/client"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/run/v1"
 )
 
@@ -110,4 +113,150 @@ func TestList_Error(t *testing.T) {
 	dms, err := List("p", "r")
 	assert.Error(t, err)
 	assert.Nil(t, dms)
+}
+
+func TestList_AllRegions(t *testing.T) {
+	originalClient := apiClient
+	defer func() { apiClient = originalClient }()
+
+	mock := &MockClient{}
+	apiClient = mock
+
+	mock.ListDomainMappingsFunc = func(ctx context.Context, project, region string) ([]*run.DomainMapping, error) {
+		if region == "us-central1" {
+			return []*run.DomainMapping{
+				{Metadata: &run.ObjectMeta{Name: "dm1"}},
+			}, nil
+		}
+		return nil, nil
+	}
+
+	dms, err := List("p", "all")
+	assert.NoError(t, err)
+	
+	// Since api_region.List() returns many regions, we just want to ensure we called List for them and aggregated results.
+	// We mocked return for "us-central1".
+	found := false
+	for _, dm := range dms {
+		if dm.Name == "dm1" {
+			found = true
+			break
+		}
+	}
+	assert.True(t, found, "Expected to find dm1 from us-central1")
+}
+
+// --- GCPClient Tests ---
+
+type MockDomainMappingsClientWrapper struct {
+	ListFunc func(parent string, pageToken string) (*run.ListDomainMappingsResponse, error)
+}
+
+func (m *MockDomainMappingsClientWrapper) List(parent string, pageToken string) (*run.ListDomainMappingsResponse, error) {
+	if m.ListFunc != nil {
+		return m.ListFunc(parent, pageToken)
+	}
+	return nil, nil
+}
+
+func TestGCPClient_ListDomainMappings(t *testing.T) {
+	// Mock dependencies
+	origFindCreds := client.FindDefaultCredentials
+	origCreateClient := createClient
+	defer func() {
+		client.FindDefaultCredentials = origFindCreds
+		createClient = origCreateClient
+	}()
+
+	client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		return &google.Credentials{}, nil
+	}
+
+	t.Run("Success", func(t *testing.T) {
+		createClient = func(ctx context.Context, creds *google.Credentials) (DomainMappingsClientWrapper, error) {
+			return &MockDomainMappingsClientWrapper{
+				ListFunc: func(parent string, pageToken string) (*run.ListDomainMappingsResponse, error) {
+					return &run.ListDomainMappingsResponse{
+						Items: []*run.DomainMapping{{Metadata: &run.ObjectMeta{Name: "dm1"}}},
+					}, nil
+				},
+			}, nil
+		}
+
+		c := &GCPClient{}
+		dms, err := c.ListDomainMappings(context.Background(), "p", "r")
+		assert.NoError(t, err)
+		assert.Len(t, dms, 1)
+		assert.Equal(t, "dm1", dms[0].Metadata.Name)
+	})
+
+	t.Run("Pagination", func(t *testing.T) {
+		createClient = func(ctx context.Context, creds *google.Credentials) (DomainMappingsClientWrapper, error) {
+			return &MockDomainMappingsClientWrapper{
+				ListFunc: func(parent string, pageToken string) (*run.ListDomainMappingsResponse, error) {
+					if pageToken == "" {
+						return &run.ListDomainMappingsResponse{
+							Items: []*run.DomainMapping{{Metadata: &run.ObjectMeta{Name: "dm1"}}},
+							Metadata: &run.ListMeta{Continue: "next-page"},
+						}, nil
+					}
+					if pageToken == "next-page" {
+						return &run.ListDomainMappingsResponse{
+							Items: []*run.DomainMapping{{Metadata: &run.ObjectMeta{Name: "dm2"}}},
+						}, nil
+					}
+					return nil, errors.New("unexpected page token")
+				},
+			}, nil
+		}
+
+		c := &GCPClient{}
+		dms, err := c.ListDomainMappings(context.Background(), "p", "r")
+		assert.NoError(t, err)
+		assert.Len(t, dms, 2)
+		assert.Equal(t, "dm1", dms[0].Metadata.Name)
+		assert.Equal(t, "dm2", dms[1].Metadata.Name)
+	})
+
+	t.Run("AuthError", func(t *testing.T) {
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+			return nil, errors.New("auth failed")
+		}
+		c := &GCPClient{}
+		_, err := c.ListDomainMappings(context.Background(), "p", "r")
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "failed to find default credentials")
+	})
+
+	t.Run("ClientCreationError", func(t *testing.T) {
+        // Reset auth mock for this test
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+			return &google.Credentials{}, nil
+		}
+		createClient = func(ctx context.Context, creds *google.Credentials) (DomainMappingsClientWrapper, error) {
+			return nil, errors.New("creation failed")
+		}
+		c := &GCPClient{}
+		_, err := c.ListDomainMappings(context.Background(), "p", "r")
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "failed to create domain mappings client")
+	})
+
+	t.Run("ListError", func(t *testing.T) {
+        // Reset auth mock for this test
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+			return &google.Credentials{}, nil
+		}
+		createClient = func(ctx context.Context, creds *google.Credentials) (DomainMappingsClientWrapper, error) {
+			return &MockDomainMappingsClientWrapper{
+				ListFunc: func(parent string, pageToken string) (*run.ListDomainMappingsResponse, error) {
+					return nil, errors.New("list failed")
+				},
+			}, nil
+		}
+		c := &GCPClient{}
+		_, err := c.ListDomainMappings(context.Background(), "p", "r")
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "failed to list domain mappings")
+	})
 }

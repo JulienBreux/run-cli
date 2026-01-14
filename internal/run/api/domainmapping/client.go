@@ -5,9 +5,37 @@ import (
 	"fmt"
 
 	"github.com/JulienBreux/run-cli/internal/run/api/client"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 	"google.golang.org/api/run/v1"
 )
+
+// DomainMappingsClientWrapper defines the interface for the DomainMappings API interactions.
+type DomainMappingsClientWrapper interface {
+	List(parent string, pageToken string) (*run.ListDomainMappingsResponse, error)
+}
+
+// variable for dependency injection
+var createClient = func(ctx context.Context, creds *google.Credentials) (DomainMappingsClientWrapper, error) {
+	s, err := run.NewService(ctx, option.WithCredentials(creds))
+	if err != nil {
+		return nil, err
+	}
+	return &GCPDomainMappingsClient{service: s}, nil
+}
+
+// GCPDomainMappingsClient is the real implementation using the Google Cloud Run API.
+type GCPDomainMappingsClient struct {
+	service *run.APIService
+}
+
+func (c *GCPDomainMappingsClient) List(parent string, pageToken string) (*run.ListDomainMappingsResponse, error) {
+	call := c.service.Projects.Locations.Domainmappings.List(parent)
+	if pageToken != "" {
+		call.Continue(pageToken)
+	}
+	return call.Do()
+}
 
 // Client defines the interface for the DomainMapping API client.
 type Client interface {
@@ -24,9 +52,9 @@ func (c *GCPClient) ListDomainMappings(ctx context.Context, project, region stri
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
 	}
 
-	runService, err := run.NewService(ctx, option.WithCredentials(creds))
+	dmClient, err := createClient(ctx, creds)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create run service: %w", err)
+		return nil, fmt.Errorf("failed to create domain mappings client: %w", err)
 	}
 
 	parent := fmt.Sprintf("projects/%s/locations/%s", project, region)
@@ -35,12 +63,7 @@ func (c *GCPClient) ListDomainMappings(ctx context.Context, project, region stri
 	pageToken := ""
 
 	for {
-		call := runService.Projects.Locations.Domainmappings.List(parent)
-		if pageToken != "" {
-			call.Continue(pageToken)
-		}
-
-		resp, err := call.Do()
+		resp, err := dmClient.List(parent, pageToken)
 		if err != nil {
 			return nil, fmt.Errorf("failed to list domain mappings: %w", err)
 		}

@@ -2,11 +2,17 @@ package revision
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
 	"cloud.google.com/go/run/apiv2/runpb"
+	"github.com/JulienBreux/run-cli/internal/run/api/client"
+	"github.com/googleapis/gax-go/v2"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/iterator"
+	"google.golang.org/api/option"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -120,4 +126,128 @@ func TestMapRevision_NilFields(t *testing.T) {
 	assert.Empty(t, result.Containers)
 	assert.False(t, result.CpuIdle)
 	assert.Empty(t, result.Accelerator)
+}
+
+// --- GCPClient Tests ---
+
+type MockRevisionsClientWrapper struct {
+	ListRevisionsFunc func(ctx context.Context, req *runpb.ListRevisionsRequest, opts ...gax.CallOption) RevisionIteratorWrapper
+	CloseFunc         func() error
+}
+
+func (m *MockRevisionsClientWrapper) ListRevisions(ctx context.Context, req *runpb.ListRevisionsRequest, opts ...gax.CallOption) RevisionIteratorWrapper {
+	if m.ListRevisionsFunc != nil {
+		return m.ListRevisionsFunc(ctx, req, opts...)
+	}
+	return &MockRevisionIteratorWrapper{}
+}
+
+func (m *MockRevisionsClientWrapper) Close() error {
+	if m.CloseFunc != nil {
+		return m.CloseFunc()
+	}
+	return nil
+}
+
+type MockRevisionIteratorWrapper struct {
+	Items []*runpb.Revision
+	Index int
+	Err   error
+}
+
+func (m *MockRevisionIteratorWrapper) Next() (*runpb.Revision, error) {
+	if m.Err != nil {
+		return nil, m.Err
+	}
+	if m.Index >= len(m.Items) {
+		return nil, iterator.Done
+	}
+	item := m.Items[m.Index]
+	m.Index++
+	return item, nil
+}
+
+func TestGCPClient_ListRevisions(t *testing.T) {
+	origFindCreds := client.FindDefaultCredentials
+	origCreateClient := createRevisionsClient
+	defer func() {
+		client.FindDefaultCredentials = origFindCreds
+		createRevisionsClient = origCreateClient
+	}()
+
+	client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		return &google.Credentials{}, nil
+	}
+
+	t.Run("Success", func(t *testing.T) {
+		createRevisionsClient = func(ctx context.Context, opts ...option.ClientOption) (RevisionsClientWrapper, error) {
+			return &MockRevisionsClientWrapper{
+				ListRevisionsFunc: func(ctx context.Context, req *runpb.ListRevisionsRequest, opts ...gax.CallOption) RevisionIteratorWrapper {
+					return &MockRevisionIteratorWrapper{
+						Items: []*runpb.Revision{{Name: "rev1"}},
+					}
+				},
+				CloseFunc: func() error { return nil },
+			}, nil
+		}
+
+		c := &GCPClient{}
+		revs, err := c.ListRevisions(context.Background(), "p", "r", "s")
+		assert.NoError(t, err)
+		assert.Len(t, revs, 1)
+		assert.Equal(t, "rev1", revs[0].Name)
+	})
+
+	t.Run("AuthError", func(t *testing.T) {
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+			return nil, errors.New("auth failed")
+		}
+		c := &GCPClient{}
+		_, err := c.ListRevisions(context.Background(), "p", "r", "s")
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "failed to find default credentials")
+	})
+
+	t.Run("ClientCreationError", func(t *testing.T) {
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+			return &google.Credentials{}, nil
+		}
+		createRevisionsClient = func(ctx context.Context, opts ...option.ClientOption) (RevisionsClientWrapper, error) {
+			return nil, errors.New("creation failed")
+		}
+		c := &GCPClient{}
+		_, err := c.ListRevisions(context.Background(), "p", "r", "s")
+		assert.Error(t, err)
+	})
+
+	t.Run("IteratorError", func(t *testing.T) {
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+			return &google.Credentials{}, nil
+		}
+		createRevisionsClient = func(ctx context.Context, opts ...option.ClientOption) (RevisionsClientWrapper, error) {
+			return &MockRevisionsClientWrapper{
+				ListRevisionsFunc: func(ctx context.Context, req *runpb.ListRevisionsRequest, opts ...gax.CallOption) RevisionIteratorWrapper {
+					return &MockRevisionIteratorWrapper{Err: errors.New("iter failed")}
+				},
+				CloseFunc: func() error { return nil },
+			}, nil
+		}
+		c := &GCPClient{}
+		_, err := c.ListRevisions(context.Background(), "p", "r", "s")
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "iter failed")
+	})
+}
+
+func TestWrappers_Delegation(t *testing.T) {
+	t.Run("GCPRevisionsClientWrapper", func(t *testing.T) {
+		w := &GCPRevisionsClientWrapper{client: nil}
+		assert.Panics(t, func() { _ = w.ListRevisions(context.Background(), nil) })
+		assert.Panics(t, func() { _ = w.Close() })
+	})
+
+	t.Run("GCPRevisionIteratorWrapper", func(t *testing.T) {
+		it := &GCPRevisionIteratorWrapper{it: nil}
+		assert.Panics(t, func() { _, _ = it.Next() })
+	})
 }

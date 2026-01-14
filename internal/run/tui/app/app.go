@@ -176,7 +176,7 @@ func buildLayout() *tview.Flex {
 	shortcutsView := footer.New()
 
 	layout := tview.NewFlex().SetDirection(tview.FlexRow).
-		AddItem(header.New(currentInfo), 7, 1, false).
+		AddItem(header.New(currentInfo), 5, 1, false).
 		AddItem(pages, 0, 1, true).
 		AddItem(shortcutsView, 1, 1, false).
 		AddItem(footerPages, 1, 1, false)

@@ -33,7 +33,7 @@ func TestBuildLayout(t *testing.T) {
 
 	assert.NotNil(t, layout)
 	assert.IsType(t, &tview.Flex{}, layout)
-	assert.Equal(t, 4, layout.GetItemCount()) // Header, PagesContainer, Shortcuts, FooterPages
+	assert.Equal(t, 4, layout.GetItemCount()) // Header, Pages, Shortcuts, Footer
 	assert.NotNil(t, pages)
 	assert.NotNil(t, footerPages)
 	assert.NotNil(t, footerSpinner)

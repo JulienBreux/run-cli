@@ -22,18 +22,16 @@ func New() *tview.TextView {
 func String() string {
 	var logo strings.Builder
 	logoArt := []string{
-		color + " ____  _   _ _   _  ",
-		color + "|  _ \\| | | | \\ | | ",
-		color + "| |_) | | | |  \\| | ",
-		color + "|  _ <| |_| | . ` | ",
-		color + "|_| \\_\\_____|_| \\_| ",
+		color + " ___ _   _ _  _ ",
+		color + "| _ \\ | | | \\| |",
+		color + "|   / |_| | .` |",
+		color + "|_|_\\\\___/|_|\\_|",
 	}
 
 	for _, line := range logoArt {
 		logo.WriteString(line)
 		logo.WriteString("\n")
 	}
-	logo.WriteString("\n") // Add an empty line for spacing
-	logo.WriteString("[white]With[-] [red]♥[-] [white]Julien Breux[-] ")
+	logo.WriteString(" [red]♥[-] [grey]Julien Breux[-] ")
 	return logo.String()
 }

@@ -23,7 +23,7 @@ func New(app *tview.Application) tview.Primitive {
 	flex := tview.NewFlex().
 		SetDirection(tview.FlexRow).
 		AddItem(nil, 0, 1, false).
-		AddItem(logoView, 7, 1, false).
+		AddItem(logoView, 6, 1, false).
 		AddItem(s, 1, 1, false).
 		AddItem(nil, 0, 1, false)
 

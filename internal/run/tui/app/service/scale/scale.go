@@ -9,6 +9,7 @@ import (
 	api_service "github.com/JulienBreux/run-cli/internal/run/api/service"
 	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/spinner"
+	"github.com/JulienBreux/run-cli/pkg/dropdown"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
@@ -56,11 +57,11 @@ func Modal(app *tview.Application, service *model_service.Service, pages *tview.
 
 	// Create form items
 	var manualInstancesField, minInstancesField, maxInstancesField *tview.InputField
-	modeDropdown := tview.NewDropDown().
-		SetLabel("Scaling mode").
-		SetOptions([]string{"Automatic", "Manual"}, nil).
-		SetFieldBackgroundColor(fieldBackgroundColor).
-		SetListStyles(tcell.StyleDefault.Background(tcell.ColorDarkGray), tcell.StyleDefault.Background(tcell.ColorLightCyan).Foreground(tcell.ColorBlack))
+	modeDropdown := dropdown.New()
+	modeDropdown.SetLabel("Scaling mode")
+	modeDropdown.SetOptions([]string{"Automatic", "Manual"}, nil)
+	modeDropdown.SetFieldBackgroundColor(fieldBackgroundColor)
+	modeDropdown.SetListStyles(tcell.StyleDefault.Background(tcell.ColorDarkGray), tcell.StyleDefault.Background(tcell.ColorLightCyan).Foreground(tcell.ColorBlack))
 
 	manualInstancesField = tview.NewInputField().
 		SetLabel("Instances").

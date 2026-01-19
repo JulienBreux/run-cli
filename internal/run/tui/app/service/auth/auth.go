@@ -7,6 +7,7 @@ import (
 
 	api_service "github.com/JulienBreux/run-cli/internal/run/api/service"
 	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
+	"github.com/JulienBreux/run-cli/pkg/dropdown"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/spinner"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -48,11 +49,11 @@ func Modal(app *tview.Application, service *model_service.Service, pages *tview.
 	form.SetButtonTextColor(buttonTextColor)
 
 	// Create form items
-	authDropdown := tview.NewDropDown().
-		SetLabel("Authentication").
-		SetOptions([]string{"Require authentication", "Allow unauthenticated invocations"}, nil).
-		SetFieldBackgroundColor(fieldBackgroundColor).
-		SetListStyles(tcell.StyleDefault.Background(tcell.ColorDarkGray), tcell.StyleDefault.Background(tcell.ColorLightCyan).Foreground(tcell.ColorBlack))
+	authDropdown := dropdown.New()
+	authDropdown.SetLabel("Authentication")
+	authDropdown.SetOptions([]string{"Require authentication", "Allow unauthenticated invocations"}, nil)
+	authDropdown.SetFieldBackgroundColor(fieldBackgroundColor)
+	authDropdown.SetListStyles(tcell.StyleDefault.Background(tcell.ColorDarkGray), tcell.StyleDefault.Background(tcell.ColorLightCyan).Foreground(tcell.ColorBlack))
 
 	// --- Layout ---
 

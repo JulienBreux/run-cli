@@ -312,6 +312,12 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 			}
 			return nil
 		}
+		if event.Rune() == 'a' {
+			if s := service.GetSelectedServiceFull(); s != nil {
+				openServiceAuthModal(s)
+			}
+			return nil
+		}
 		if result := service.HandleShortcuts(event); result == nil {
 			return nil
 		}

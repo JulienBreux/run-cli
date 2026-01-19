@@ -191,6 +191,43 @@ func UpdateScaling(ctx context.Context, project, region, serviceName string, min
 	return &s, nil
 }
 
+// UpdateAuthentication updates the authentication settings for a service.
+func UpdateAuthentication(ctx context.Context, project, region, serviceName string, allowUnauthenticated bool) (*model.Service, error) {
+	fullServiceName := fmt.Sprintf("projects/%s/locations/%s/services/%s", project, region, serviceName)
+
+	service, err := apiClient.GetService(ctx, fullServiceName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get service: %w", err)
+	}
+
+	// Modify the authentication settings
+	service.InvokerIamDisabled = allowUnauthenticated
+
+	// Clean up output-only fields before update
+	service.Uid = ""
+	service.Generation = 0
+	service.CreateTime = nil
+	service.UpdateTime = nil
+	service.DeleteTime = nil
+	service.ExpireTime = nil
+	service.Creator = ""
+	service.LastModifier = ""
+	service.Reconciling = false
+	service.ObservedGeneration = 0
+	service.TerminalCondition = nil
+	service.Conditions = nil
+	// Keep Etag for concurrency control
+
+	// Update the service
+	resp, err := apiClient.UpdateService(ctx, service)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update service: %w", err)
+	}
+
+	s := mapService(resp, project, region)
+	return &s, nil
+}
+
 func listAllRegions(project string) ([]model.Service, error) {
 	var (
 		mu       sync.Mutex

@@ -181,6 +181,6 @@ func HandleShortcuts(event *tcell.EventKey) *tcell.EventKey {
 
 func Shortcuts() {
 	footer.ContextShortcutView.Clear()
-	shortcuts := `[dodgerblue]<r> [white]Refresh  [dodgerblue]<d> [white]Describe  [dodgerblue]<l> [white]Logs  [dodgerblue]<s> [white]Scale  [dodgerblue]<o> [white]Open URL  [dodgerblue]<enter> [white]Details`
+	shortcuts := `[dodgerblue]<r> [white]Refresh  [dodgerblue]<d> [white]Describe  [dodgerblue]<l> [white]Logs  [dodgerblue]<s> [white]Scale  [dodgerblue]<a> [white]Auth  [dodgerblue]<o> [white]Open URL  [dodgerblue]<enter> [white]Details`
 	footer.ContextShortcutView.SetText(shortcuts)
 }

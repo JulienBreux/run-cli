@@ -13,6 +13,7 @@ import (
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/log"
 		"github.com/JulienBreux/run-cli/internal/run/tui/app/project"
 		"github.com/JulienBreux/run-cli/internal/run/tui/app/region"
+		service_auth "github.com/JulienBreux/run-cli/internal/run/tui/app/service/auth"
 		service_scale "github.com/JulienBreux/run-cli/internal/run/tui/app/service/scale"
 		workerpool_scale "github.com/JulienBreux/run-cli/internal/run/tui/app/workerpool/scale"
 		"github.com/JulienBreux/run-cli/internal/run/tui/component/footer"
@@ -117,7 +118,20 @@ import (
 		app.SetFocus(scaleModal)
 	}
 	
-	func openWorkerPoolScaleModal(w *model_workerpool.WorkerPool) {
+	func openServiceAuthModal(s *model_service.Service) {
+		authModal := service_auth.Modal(app, s, rootPages, func() {
+			rootPages.RemovePage(service_auth.MODAL_PAGE_ID)
+			switchTo(previousPageID)
+		})
+	
+		rootPages.AddPage(service_auth.MODAL_PAGE_ID, authModal, true, true)
+		previousPageID = currentPageID
+		currentPageID = service_auth.MODAL_PAGE_ID
+	
+		footer.ContextShortcutView.Clear()
+		app.SetFocus(authModal)
+	}
+		func openWorkerPoolScaleModal(w *model_workerpool.WorkerPool) {
 		scaleModal := workerpool_scale.Modal(app, w, rootPages, func() {
 			rootPages.RemovePage(workerpool_scale.MODAL_PAGE_ID)
 			switchTo(previousPageID)

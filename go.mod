@@ -1,6 +1,6 @@
 module github.com/JulienBreux/run-cli
 
-go 1.25.5
+go 1.25.6
 
 require (
 	cloud.google.com/go/logging v1.13.1

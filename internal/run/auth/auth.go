@@ -18,28 +18,43 @@ package auth
 
 import (
 	"bufio"
+	"context"
+	"fmt"
 	"os"
 	"os/user"
 	"path/filepath"
 	"strings"
 
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
+	"golang.org/x/oauth2/google"
 )
 
-// GetInfo retrieves the current user info from gcloud config files.
-func GetInfo() (info.Info, error) {
+var (
+	scopes = []string{
+		"https://www.googleapis.com/auth/cloud-platform",
+		"openid",
+		"email",
+	}
+)
+
+func getConfigDir() (string, error) {
 	configDir := os.Getenv("CLOUDSDK_CONFIG")
 	if configDir == "" {
 		usr, err := user.Current()
 		if err != nil {
-			return info.Info{}, err
+			return "", err
 		}
 		// Check standard location for gcloud config
-		// On macOS/Linux it is usually ~/.config/gcloud
-		// On Windows it is %APPDATA%/gcloud, but user.Current().HomeDir + .config is not standard for Windows.
-		// However, gcloud often uses ~/.config/gcloud even on macOS.
-		// Let's rely on checking ~/.config/gcloud first.
 		configDir = filepath.Join(usr.HomeDir, ".config", "gcloud")
+	}
+	return configDir, nil
+}
+
+// GetInfo retrieves the current user info from gcloud config files.
+func GetInfo() (info.Info, error) {
+	configDir, err := getConfigDir()
+	if err != nil {
+		return info.Info{}, err
 	}
 
 	// Read active config
@@ -112,4 +127,24 @@ func parseConfig(path string) (info.Info, error) {
 		Project: project,
 		Region:  region,
 	}, nil
+}
+
+// GetIDToken retrieves an identity token for the given audience using Google Cloud credentials.
+var GetIDToken = func(ctx context.Context) (string, error) {
+	creds, err := google.FindDefaultCredentials(ctx, scopes...)
+	if err != nil {
+		return "", fmt.Errorf("failed to find default credentials: %w", err)
+	}
+
+	token, err := creds.TokenSource.Token()
+	if err != nil {
+		return "", err
+	}
+
+	idToken, ok := token.Extra("id_token").(string)
+	if !ok {
+		return "", fmt.Errorf("token response did not contain an id_token")
+	}
+
+	return idToken, nil
 }

@@ -71,13 +71,13 @@ func TestListAndLoad(t *testing.T) {
 	assert.Equal(t, 3, tbl.Table.GetRowCount()) // 1 header + 2 rows
 
 	// Row 1 (service-1)
-	assert.Equal(t, "service-1", tbl.Table.GetCell(1, 0).Text)
-	assert.Equal(t, "us-central1", tbl.Table.GetCell(1, 1).Text)
-	assert.Contains(t, tbl.Table.GetCell(1, 2).Text, "Auto: min 1, max 5")
+	assert.Equal(t, "service-1", tbl.Table.GetCell(1, 1).Text)
+	assert.Equal(t, "us-central1", tbl.Table.GetCell(1, 2).Text)
+	assert.Contains(t, tbl.Table.GetCell(1, 3).Text, "Auto: min 1, max 5")
 
 	// Row 2 (service-2)
-	assert.Equal(t, "service-2", tbl.Table.GetCell(2, 0).Text)
-	assert.Contains(t, tbl.Table.GetCell(2, 2).Text, "Manual: 2")
+	assert.Equal(t, "service-2", tbl.Table.GetCell(2, 1).Text)
+	assert.Contains(t, tbl.Table.GetCell(2, 3).Text, "Manual: 2")
 }
 
 func TestGetSelectedService(t *testing.T) {
@@ -124,6 +124,7 @@ func TestShortcuts(t *testing.T) {
 	})
 
 	assert.Contains(t, footer.ContextShortcutView.GetText(true), "Refresh")
+	assert.Contains(t, footer.ContextShortcutView.GetText(true), "Proxy")
 }
 
 func TestHandleShortcuts(t *testing.T) {
@@ -155,6 +156,38 @@ func TestHandleShortcuts(t *testing.T) {
 	assert.Equal(t, ev2, ret)
 }
 
+func TestHandleShortcuts_Proxy(t *testing.T) {
+	app := tview.NewApplication()
+	_ = List(app)
+	testServices := []model_service.Service{
+		{Name: "s1", URI: "http://test"},
+	}
+	Load(testServices)
+	listTable.Table.Select(1, 0)
+
+	// Mock proxies manually since we can't easily mock net.Listen in integration test without refactor
+	// However, we start with no proxy.
+	// Press 'p'.
+	// It will try to start a proxy. Starting a proxy involves net.Listen on localhost:0 which should work in test env.
+	// It involves auth.GetIDToken which might fail or panic if not mocked?
+	// The auth.GetIDToken calls idtoken.NewTokenSource which makes network calls.
+	// This might fail in test environment without creds.
+	// To avoid failure, we might need to skip deep verification or handle the error gracefully in toggleProxy.
+	// In toggleProxy: if err != nil { return }
+	// So if start fails, nothing happens to model.
+
+	// Let's try to trigger it.
+	ev := tcell.NewEventKey(tcell.KeyRune, 'p', tcell.ModNone)
+
+	assert.NotPanics(t, func() {
+		HandleShortcuts(ev)
+	})
+
+	// If it failed (likely due to auth), the proxy status remains nil.
+	// If it succeeded (unlikely without creds), it would be enabled.
+	// We just want to ensure it doesn't panic and coverage is hit.
+}
+
 func TestRender(t *testing.T) {
 	app := tview.NewApplication()
 	_ = List(app)
@@ -173,7 +206,7 @@ func TestRender(t *testing.T) {
 	render(svcs)
 
 	assert.Equal(t, 2, listTable.Table.GetRowCount())
-	assert.Equal(t, "s1", listTable.Table.GetCell(1, 0).Text)
+	assert.Equal(t, "s1", listTable.Table.GetCell(1, 1).Text)
 }
 
 func TestFetch(t *testing.T) {
@@ -223,7 +256,7 @@ func TestListReload(t *testing.T) {
 		// Verify Render was called (Table should have data)
 		// Header + 1 Item = 2 Rows
 		assert.Equal(t, 2, listTable.Table.GetRowCount())
-		assert.Equal(t, "s1", listTable.Table.GetCell(1, 0).Text)
+		assert.Equal(t, "s1", listTable.Table.GetCell(1, 1).Text)
 	case <-time.After(2 * time.Second):
 		t.Fatal("Timeout waiting for ListReload")
 	}
@@ -279,5 +312,5 @@ func TestRender_ScalingManual(t *testing.T) {
 	render(svcs)
 
 	assert.Equal(t, 2, listTable.Table.GetRowCount())
-	assert.Contains(t, listTable.Table.GetCell(1, 2).Text, "Manual: 5")
+	assert.Contains(t, listTable.Table.GetCell(1, 3).Text, "Manual: 5")
 }

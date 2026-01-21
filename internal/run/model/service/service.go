@@ -49,4 +49,12 @@ type Service struct {
 	Etag                  string                         `json:"etag,omitempty"`
 	Region                string                         `json:"region"` // New field
 	Project               string                         `json:"project"`
+	Proxy                 *ProxyStatus                   `json:"proxy,omitempty"`
+}
+
+// ProxyStatus represents the status of a local proxy for the service.
+type ProxyStatus struct {
+	Enabled bool
+	Port    int
+	URL     string
 }

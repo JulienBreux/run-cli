@@ -83,6 +83,11 @@ func ListReload(app *tview.Application, currentInfo info.Info, onResult func(err
 	listTable.SetHeadersWithExpansions(listHeaders, listExpansions)
 	listTable.Table.SetTitle(fmt.Sprintf(" %s loading ", LIST_PAGE_TITLE))
 
+	// Clear shortcuts
+	if footer.ContextShortcutView != nil {
+		footer.ContextShortcutView.Clear()
+	}
+
 	app.SetFocus(listTable.Table)
 
 	go func() {
@@ -95,6 +100,7 @@ func ListReload(app *tview.Application, currentInfo info.Info, onResult func(err
 				if len(workers) == 0 {
 					listTable.Table.Clear()
 					listTable.SetHeadersWithExpansions(listHeaders, listExpansions)
+					Shortcuts() // Ensure shortcuts are updated (cleared)
 				}
 				onResult(err)
 			}()
@@ -134,6 +140,8 @@ func render(workers []model_workerpool.WorkerPool) {
 
 	// Refresh title
 	listTable.Table.SetTitle(fmt.Sprintf(" %s (%d) ", LIST_PAGE_TITLE, len(workers)))
+
+	Shortcuts() // Refresh shortcuts (handles empty list case)
 }
 
 // GetSelectedWorkerPool returns the Name and Region of the selected worker pool.
@@ -158,7 +166,15 @@ func GetSelectedWorkerPoolFull() *model_workerpool.WorkerPool {
 }
 
 func Shortcuts() {
+	if footer.ContextShortcutView == nil {
+		return
+	}
 	footer.ContextShortcutView.Clear()
+
+	if len(workers) == 0 {
+		return
+	}
+
 	shortcuts := `[dodgerblue]<r> [white]Refresh  [dodgerblue]<d> [white]Describe  [dodgerblue]<s> [white]Scale`
 	footer.ContextShortcutView.SetText(shortcuts)
 }

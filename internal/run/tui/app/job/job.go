@@ -78,6 +78,11 @@ func ListReload(app *tview.Application, currentInfo info.Info, onResult func(err
 	listTable.SetHeadersWithExpansions(listHeaders, listExpansions)
 	listTable.Table.SetTitle(fmt.Sprintf(" %s loading ", LIST_PAGE_TITLE))
 
+	// Clear shortcuts
+	if footer.ContextShortcutView != nil {
+		footer.ContextShortcutView.Clear()
+	}
+
 	app.SetFocus(listTable.Table)
 
 	go func() {
@@ -90,6 +95,7 @@ func ListReload(app *tview.Application, currentInfo info.Info, onResult func(err
 				if len(jobs) == 0 {
 					listTable.Table.Clear()
 					listTable.SetHeadersWithExpansions(listHeaders, listExpansions)
+					Shortcuts() // Ensure shortcuts are updated (cleared)
 				}
 				onResult(err)
 			}()
@@ -133,6 +139,13 @@ func render(jobs []model_job.Job) {
 
 	// Refresh title
 	listTable.Table.SetTitle(fmt.Sprintf(" %s (%d) ", LIST_PAGE_TITLE, len(jobs)))
+
+	// selection change
+	listTable.Table.SetSelectionChangedFunc(func(row, column int) {
+		Shortcuts()
+	})
+
+	Shortcuts() // Refresh shortcuts (handles empty list case)
 }
 
 // GetSelectedJob returns the Name and Region of the selected job.
@@ -157,7 +170,15 @@ func GetSelectedJobFull() *model_job.Job {
 }
 
 func Shortcuts() {
+	if footer.ContextShortcutView == nil {
+		return
+	}
 	footer.ContextShortcutView.Clear()
+
+	if len(jobs) == 0 {
+		return
+	}
+
 	shortcuts := `[dodgerblue]<r> [white]Refresh  [dodgerblue]<d> [white]Describe  [dodgerblue]<l> [white]Logs  [dodgerblue]<x> [white]Execute  [dodgerblue]<enter> [white]Details`
 	footer.ContextShortcutView.SetText(shortcuts)
 }

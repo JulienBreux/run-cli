@@ -188,6 +188,9 @@ func TestGetSelectedDomainMappingFull_Empty(t *testing.T) {
 func TestShortcuts(t *testing.T) {
 	_ = footer.New()
 
+	// Ensure domainMappings list is not empty
+	domainMappings = []model_domainmapping.DomainMapping{{Name: "example.com"}}
+
 	assert.NotPanics(t, func() {
 		Shortcuts()
 	})

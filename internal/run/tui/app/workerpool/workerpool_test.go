@@ -181,6 +181,9 @@ func TestGetSelectedWorkerPoolFull_Empty(t *testing.T) {
 func TestShortcuts(t *testing.T) {
 	_ = footer.New()
 
+	// Ensure workers list is not empty
+	workers = []model_workerpool.WorkerPool{{DisplayName: "pool-1"}}
+
 	assert.NotPanics(t, func() {
 		Shortcuts()
 	})

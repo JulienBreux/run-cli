@@ -51,10 +51,10 @@ var (
 )
 
 const (
-	LIST_PAGE_TITLE     = "Domain Mappings"
-	LIST_PAGE_ID        = "domainmappings-list"
-	LIST_PAGE_SHORTCUT  = tcell.KeyCtrlD
-	MODAL_PAGE_ID       = "modal-dns-records"
+	LIST_PAGE_TITLE    = "Domain Mappings"
+	LIST_PAGE_ID       = "domainmappings-list"
+	LIST_PAGE_SHORTCUT = tcell.KeyCtrlD
+	MODAL_PAGE_ID      = "modal-dns-records"
 )
 
 var listDomainMappingsFunc = api_domainmapping.List
@@ -80,6 +80,11 @@ func ListReload(app *tview.Application, currentInfo info.Info, onResult func(err
 	listTable.SetHeadersWithExpansions(listHeaders, listExpansions)
 	listTable.Table.SetTitle(fmt.Sprintf(" %s loading ", LIST_PAGE_TITLE))
 
+	// Clear shortcuts
+	if footer.ContextShortcutView != nil {
+		footer.ContextShortcutView.Clear()
+	}
+
 	app.SetFocus(listTable.Table)
 
 	go func() {
@@ -92,6 +97,7 @@ func ListReload(app *tview.Application, currentInfo info.Info, onResult func(err
 				if len(domainMappings) == 0 {
 					listTable.Table.Clear()
 					listTable.SetHeadersWithExpansions(listHeaders, listExpansions)
+					Shortcuts() // Ensure shortcuts are updated (cleared)
 				}
 				onResult(err)
 			}()
@@ -121,6 +127,8 @@ func render(dms []model_domainmapping.DomainMapping) {
 
 	// Refresh title
 	listTable.Table.SetTitle(fmt.Sprintf(" %s (%d) ", LIST_PAGE_TITLE, len(dms)))
+
+	Shortcuts() // Refresh shortcuts (handles empty list case)
 }
 
 // GetSelectedDomainMappingFull returns the full domain mapping object for the selected row.
@@ -144,7 +152,15 @@ func GetSelectedDomainURL() string {
 }
 
 func Shortcuts() {
+	if footer.ContextShortcutView == nil {
+		return
+	}
 	footer.ContextShortcutView.Clear()
+
+	if len(domainMappings) == 0 {
+		return
+	}
+
 	shortcuts := `[dodgerblue]<r> [white]Refresh  [dodgerblue]<o> [white]Open URL  [dodgerblue]<enter> [white]Info`
 	footer.ContextShortcutView.SetText(shortcuts)
 }
@@ -208,7 +224,7 @@ func DomainMappingInfoModal(app *tview.Application, dm *model_domainmapping.Doma
 		}
 		return event
 	})
-	
+
 	// Create a Grid to center the modal
 	grid := tview.NewGrid().
 		SetColumns(0, 80, 0).

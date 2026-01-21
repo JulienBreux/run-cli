@@ -185,6 +185,9 @@ func TestGetSelectedJobFull_Empty(t *testing.T) {
 func TestShortcuts(t *testing.T) {
 	_ = footer.New()
 
+	// Ensure jobs list is not empty
+	jobs = []model_job.Job{{Name: "job-1"}}
+
 	assert.NotPanics(t, func() {
 		Shortcuts()
 	})

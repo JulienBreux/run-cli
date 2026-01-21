@@ -113,6 +113,11 @@ func ListReload(app *tview.Application, currentInfo info.Info, onResult func(err
 	listTable.SetHeadersWithExpansions(listHeaders, listExpansions)
 	listTable.Table.SetTitle(fmt.Sprintf(" %s loading ", LIST_PAGE_TITLE))
 
+	// Clear shortcuts
+	if footer.ContextShortcutView != nil {
+		footer.ContextShortcutView.Clear()
+	}
+
 	app.SetFocus(listTable.Table)
 
 	go func() {
@@ -125,6 +130,7 @@ func ListReload(app *tview.Application, currentInfo info.Info, onResult func(err
 				if len(services) == 0 {
 					listTable.Table.Clear()
 					listTable.SetHeadersWithExpansions(listHeaders, listExpansions)
+					Shortcuts() // Ensure shortcuts are updated (cleared)
 				}
 				onResult(err)
 			}()
@@ -181,6 +187,8 @@ func render(svc []model_service.Service) {
 	listTable.Table.SetSelectionChangedFunc(func(row, column int) {
 		Shortcuts()
 	})
+
+	Shortcuts() // Refresh shortcuts (handles empty list case)
 }
 
 // GetSelectedServiceURL returns the URL of the currently selected service.
@@ -266,7 +274,15 @@ func toggleProxy() {
 }
 
 func Shortcuts() {
+	if footer.ContextShortcutView == nil {
+		return
+	}
 	footer.ContextShortcutView.Clear()
+
+	if len(services) == 0 {
+		return
+	}
+
 	shortcuts := `[dodgerblue]<r> [white]Refresh  [dodgerblue]<d> [white]Describe  [dodgerblue]<l> [white]Logs [dodgerblue]<s> [white]Scale [dodgerblue]<a> [white]Auth [dodgerblue]<o> [white]Open URL  [dodgerblue]<enter> [white]Details`
 
 	// Check selected service proxy status

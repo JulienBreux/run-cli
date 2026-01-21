@@ -61,3 +61,9 @@ The project uses a `Makefile` to automate common development tasks.
 *   **Initialization:** The application performs a parallel pre-load of **Projects** and **Services** during the initial loading screen (featuring the Logo and Spinner). This ensures the dashboard is populated immediately upon launch.
 *   **Async Operations:** Long-running tasks like scaling services or worker pools use the `spinner` component to provide visual feedback without blocking the UI.
 *   **Data Fetching:** UI packages (`service`, `project`) expose helper functions (`Fetch`, `PreLoad`) to allow data retrieval without tight coupling to the main application logic.
+
+## Gemini Added Memories
+
+- Always add new features to the README.md file.
+- Always use `make build` instead of `go build` to compile the project.
+- Always add unit tests for every code change or new feature.

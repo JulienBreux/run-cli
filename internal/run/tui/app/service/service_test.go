@@ -156,6 +156,61 @@ func TestHandleShortcuts(t *testing.T) {
 	assert.Equal(t, ev2, ret)
 }
 
+func TestHandleShortcuts_ProxyOpenURL(t *testing.T) {
+	app := tview.NewApplication()
+	_ = List(app)
+	testServices := []model_service.Service{
+		{
+			Name: "s1",
+			URI:  "http://public",
+			Proxy: &model_service.ProxyStatus{
+				Enabled: true,
+				Port:    8080,
+				URL:     "http://127.0.0.1:8080",
+			},
+		},
+	}
+	Load(testServices)
+	listTable.Table.Select(1, 0)
+
+	// Test 'o' shortcut
+	ev := tcell.NewEventKey(tcell.KeyRune, 'o', tcell.ModNone)
+
+	assert.NotPanics(t, func() {
+		HandleShortcuts(ev)
+		// We expect this to try opening the PROXY URL.
+		// Since we can't intercept the browser.OpenURL call easily in this unit test format,
+		// we mainly ensure that the logic doesn't crash and follows the proxy path if possible.
+		// Ideally we would mock browser.OpenURL but it is a package level function.
+		// For now, this ensures checking Proxy field doesn't crash.
+	})
+}
+
+func TestShortcuts_Proxy(t *testing.T) {
+	_ = footer.New()
+	app := tview.NewApplication()
+	_ = List(app)
+
+	testServices := []model_service.Service{
+		{
+			Name: "s1",
+			Proxy: &model_service.ProxyStatus{
+				Enabled: true,
+				Port:    1234,
+				URL:     "http://local",
+			},
+		},
+	}
+	Load(testServices)
+	listTable.Table.Select(1, 0)
+
+	Shortcuts()
+
+	text := footer.ContextShortcutView.GetText(true)
+	assert.Contains(t, text, "Proxy (127.0.0.1:1234)")
+	assert.Contains(t, text, "Open URL (proxy)")
+}
+
 func TestHandleShortcuts_Proxy(t *testing.T) {
 	app := tview.NewApplication()
 	_ = List(app)

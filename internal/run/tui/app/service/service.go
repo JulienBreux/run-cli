@@ -227,9 +227,14 @@ func GetSelectedServiceFull() *model_service.Service {
 func HandleShortcuts(event *tcell.EventKey) *tcell.EventKey {
 	// Open URL
 	if event.Rune() == 'o' {
-		u := GetSelectedServiceURL()
-		if u != "" && !strings.HasSuffix(os.Args[0], ".test") {
-			_ = browser.OpenURL(u)
+		url := GetSelectedServiceURL()
+		svc := GetSelectedServiceFull()
+		if svc != nil && svc.Proxy != nil && svc.Proxy.Enabled {
+			url = svc.Proxy.URL
+		}
+
+		if url != "" && !strings.HasSuffix(os.Args[0], ".test") {
+			_ = browser.OpenURL(url)
 			return event
 		}
 		return nil // Consume the event
@@ -290,6 +295,7 @@ func Shortcuts() {
 	if svc != nil && svc.Proxy != nil && svc.Proxy.Enabled {
 		s := fmt.Sprintf("[white]Auth [dodgerblue]<p> [green]Proxy (127.0.0.1:%d)", svc.Proxy.Port)
 		shortcuts = strings.Replace(shortcuts, "[white]Auth", s, 1)
+		shortcuts = strings.Replace(shortcuts, "[white]Open URL", "[white]Open URL (proxy)", 1)
 	} else {
 		shortcuts = strings.Replace(shortcuts, "[white]Auth", "[white]Auth [dodgerblue]<p> [white]Proxy", 1)
 	}

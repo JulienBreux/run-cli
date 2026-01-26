@@ -28,33 +28,32 @@ import (
 func TestModal(t *testing.T) {
 	app := tview.NewApplication()
 	pages := tview.NewPages()
-	
+
 	service := &model_service.Service{
 		Name: "s1",
 		Scaling: &model_scaling.Scaling{
-			ScalingMode: "AUTOMATIC",
+			ScalingMode:  "AUTOMATIC",
 			MinInstances: 1,
 			MaxInstances: 5,
 		},
 	}
-	
+
 	onCompletion := func() {}
-	
+
 	modal := Modal(app, service, pages, onCompletion)
-	
-	assert.NotNil(t, modal)
+
 	_, ok := modal.(*tview.Grid)
 	assert.True(t, ok, "Expected Modal to return a Grid")
 }
 
 func TestValidateScaleParams(t *testing.T) {
 	tests := []struct {
-		name      string
-		mode      string
-		manual    string
-		min       string
-		max       string
-		wantErr   bool
+		name       string
+		mode       string
+		manual     string
+		min        string
+		max        string
+		wantErr    bool
 		wantManual int64
 		wantMin    int64
 		wantMax    int64

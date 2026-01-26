@@ -50,20 +50,29 @@ func Modal(app *tview.Application, service *model_service.Service, pages *tview.
 	statusSpinner := spinner.New(app)
 	statusSpinner.SetTextAlign(tview.AlignCenter)
 
-	// Container for Form + Status
+	// Container for Forms + Status
+	// We use a Flex to stack ModeForm, ParamsForm, and Spinner
 	container := tview.NewFlex().SetDirection(tview.FlexRow)
 	container.SetBorder(true).
 		SetTitle(" Scale Service ").
 		SetTitleAlign(tview.AlignCenter)
 
-	// Form
-	form := tview.NewForm()
-	form.SetBorder(false)
-	form.SetLabelColor(labelColor)
-	form.SetFieldBackgroundColor(fieldBackgroundColor)
-	form.SetFieldTextColor(fieldTextColor)
-	form.SetButtonBackgroundColor(buttonBgColor)
-	form.SetButtonTextColor(buttonTextColor)
+	// 1. Mode Form (Static)
+	modeForm := tview.NewForm()
+	modeForm.SetBorder(false)
+	modeForm.SetLabelColor(labelColor)
+	modeForm.SetFieldBackgroundColor(fieldBackgroundColor)
+	modeForm.SetFieldTextColor(fieldTextColor)
+	modeForm.SetItemPadding(0)
+
+	// 2. Params Form (Dynamic)
+	paramsForm := tview.NewForm()
+	paramsForm.SetBorder(false)
+	paramsForm.SetLabelColor(labelColor)
+	paramsForm.SetFieldBackgroundColor(fieldBackgroundColor)
+	paramsForm.SetFieldTextColor(fieldTextColor)
+	paramsForm.SetButtonBackgroundColor(buttonBgColor)
+	paramsForm.SetButtonTextColor(buttonTextColor)
 
 	// Fields helper
 	styleField := func(f *tview.InputField) {
@@ -71,44 +80,62 @@ func Modal(app *tview.Application, service *model_service.Service, pages *tview.
 		f.SetFieldTextColor(fieldTextColor)
 	}
 
-	// Create form items
-	var manualInstancesField, minInstancesField, maxInstancesField *tview.InputField
+	// Mode Dropdown (Attached to modeForm)
 	modeDropdown := dropdown.New()
 	modeDropdown.SetLabel("Scaling mode")
 	modeDropdown.SetOptions([]string{"Automatic", "Manual"}, nil)
 	modeDropdown.SetFieldBackgroundColor(fieldBackgroundColor)
-	modeDropdown.SetListStyles(tcell.StyleDefault.Background(tcell.ColorDarkGray), tcell.StyleDefault.Background(tcell.ColorLightCyan).Foreground(tcell.ColorBlack))
+	modeDropdown.SetListStyles(
+		tcell.StyleDefault.Background(tcell.ColorDarkGray),
+		tcell.StyleDefault.Background(tcell.ColorLightCyan).Foreground(tcell.ColorBlack),
+	)
 
-	manualInstancesField = tview.NewInputField().
-		SetLabel("Instances").
-		SetFieldWidth(10)
-	styleField(manualInstancesField)
+	// Add static items to ModeForm
+	modeForm.AddFormItem(modeDropdown)
 
-	minInstancesField = tview.NewInputField().
-		SetLabel("Min Instances").
-		SetFieldWidth(10)
-	styleField(minInstancesField)
-
-	maxInstancesField = tview.NewInputField().
-		SetLabel("Max Instances").
-		SetFieldWidth(10)
-	styleField(maxInstancesField)
+	// Form Item references for ParamsForm
+	var manualInstancesField, minInstancesField, maxInstancesField *tview.InputField
 
 	// --- Layout ---
-
-	// Assemble Container
-	container.AddItem(form, 0, 1, true)
+	// ModeForm (Fixed height usually 1-2 lines) -> ParamsForm (Flex) -> Spinner
+	container.AddItem(modeForm, 3, 0, true) // 3 lines default to ensure visibility
+	container.AddItem(paramsForm, 0, 1, false)
 	container.AddItem(statusSpinner, 1, 0, false)
 
-	// Centering with Grid
-	// Columns: auto, 50, auto (Centered width 50)
-	// Rows: auto, 10, auto (Centered height 10)
+	// Global Grid wrapper for centering
 	grid := tview.NewGrid().
-		SetColumns(0, 50, 0).
-		SetRows(0, 10, 0).
+		SetColumns(0, 40, 0).
+		SetRows(0, 14, 0). // Adjusted height estimate
 		AddItem(container, 1, 1, 1, 1, 0, 0, true)
 
-	// Capture escape key on the Container
+	// --- Focus Management ---
+
+	// Tab from ModeForm -> ParamsForm
+	modeForm.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Key() == tcell.KeyTab {
+			// If we are at the last item (which is the only item here), jump to paramsForm
+			if paramsForm.GetFormItemCount() > 0 {
+				app.SetFocus(paramsForm)
+				return nil
+			}
+		}
+		return event
+	})
+
+	// Backtab from ParamsForm -> ModeForm
+	paramsForm.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Key() == tcell.KeyBacktab {
+			// If we are at the first item, jumpt to modeForm
+			index, _ := paramsForm.GetFocusedItemIndex()
+			if index == 0 {
+				app.SetFocus(modeForm)
+				return nil
+			}
+		}
+		return event
+	})
+
+	// Escape to Close
 	container.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyEscape {
 			onCompletion()
@@ -117,95 +144,131 @@ func Modal(app *tview.Application, service *model_service.Service, pages *tview.
 		return event
 	})
 
-	// Function to update form based on selected mode
+	// Function to update ParamsForm based on selected mode
 	updateForm := func() {
 		_, mode := modeDropdown.GetCurrentOption()
-		form.Clear(false)
-		form.AddFormItem(modeDropdown)
+		paramsForm.Clear(true) // Clear items and buttons
 
 		if mode == "Manual" {
-			form.AddFormItem(manualInstancesField)
-			// Rows: auto, 10, auto (Centered height 10)
-			grid.SetRows(0, 10, 0)
+			val := 0
+			if service.Scaling != nil {
+				val = int(service.Scaling.ManualInstanceCount)
+			}
+			manualInstancesField = tview.NewInputField().
+				SetLabel("Instances").
+				SetFieldWidth(10).
+				SetText(strconv.Itoa(val))
+			styleField(manualInstancesField)
+			paramsForm.AddFormItem(manualInstancesField)
+			grid.SetRows(0, 14, 0)
 		} else { // Automatic
-			form.AddFormItem(minInstancesField)
-			form.AddFormItem(maxInstancesField)
-			// Rows: auto, 12, auto (Centered height 12)
-			grid.SetRows(0, 12, 0)
+			minVal := 0
+			if service.Scaling != nil {
+				minVal = int(service.Scaling.MinInstances)
+			}
+			minInstancesField = tview.NewInputField().
+				SetLabel("Min Instances").
+				SetFieldWidth(10).
+				SetText(strconv.Itoa(minVal))
+			styleField(minInstancesField)
+
+			maxVal := 0
+			if service.Scaling != nil {
+				maxVal = int(service.Scaling.MaxInstances)
+			}
+			maxInstancesField = tview.NewInputField().
+				SetLabel("Max Instances").
+				SetFieldWidth(10).
+				SetText(strconv.Itoa(maxVal))
+			styleField(maxInstancesField)
+
+			paramsForm.AddFormItem(minInstancesField)
+			paramsForm.AddFormItem(maxInstancesField)
+			grid.SetRows(0, 14, 0)
 		}
-	}
 
-	// Add buttons
-	form.AddButton("Save", func() {
-		// Get values from fields
-		_, mode := modeDropdown.GetCurrentOption()
-		min, max, manual, err := validateScaleParams(mode, manualInstancesField.GetText(), minInstancesField.GetText(), maxInstancesField.GetText())
-		
-		if err != nil {
-			statusSpinner.SetText(fmt.Sprintf("[red]%v", err))
-			return
-		}
-
-		// Start Animation
-		statusSpinner.Start("[yellow]Operation in progress... (Please wait)")
-
-		// Call API
-		go func() {
-			ctx, cancel := context.WithTimeout(context.Background(), time.Minute*2)
-			defer cancel()
-
-			_, err := api_service.UpdateScaling(ctx, service.Project, service.Region, service.Name, int32(min), int32(max), int32(manual))
-			app.QueueUpdateDraw(func() {
-				if err != nil {
-					statusSpinner.Stop(fmt.Sprintf("[red]Error: %v", err))
-				} else {
-					statusSpinner.Stop("")
-					onCompletion()
+		// Re-add Buttons
+		paramsForm.AddButton("Save", func() {
+			// Get values from fields safe helpers
+			getText := func(f *tview.InputField) string {
+				if f == nil {
+					return ""
 				}
-			})
-		}()
-	})
-	form.AddButton("Cancel", func() {
-		onCompletion()
-	})
+				return f.GetText()
+			}
 
-	// Style Buttons (Hack: tview.Form doesn't expose buttons directly by name, so we access by index)
-	// Button 0: Save (Green)
-	// Button 1: Cancel (Red)
-	if form.GetButtonCount() >= 2 {
-		form.GetButton(0).SetBackgroundColor(tcell.ColorDarkGreen)
-		form.GetButton(1).SetBackgroundColor(tcell.ColorDarkRed)
+			// Validate
+			min, max, manual, err := validateScaleParams(
+				mode,
+				getText(manualInstancesField),
+				getText(minInstancesField),
+				getText(maxInstancesField),
+			)
+			if err != nil {
+				statusSpinner.SetText(fmt.Sprintf("[red]%v", err))
+				return
+			}
+
+			// Execute
+			statusSpinner.Start("[yellow]Operation in progress...")
+			go func() {
+				ctx, cancel := context.WithTimeout(context.Background(), time.Minute*2)
+				defer cancel()
+				_, err := api_service.UpdateScaling(
+					ctx, service.Project,
+					service.Region,
+					service.Name,
+					int32(min),
+					int32(max),
+					int32(manual),
+				)
+				app.QueueUpdateDraw(func() {
+					if err != nil {
+						statusSpinner.Stop(fmt.Sprintf("[red]Error: %v", err))
+					} else {
+						statusSpinner.Stop("")
+						onCompletion()
+					}
+				})
+			}()
+		})
+		paramsForm.AddButton("Cancel", func() {
+			onCompletion()
+		})
+
+		// Style Buttons
+		if paramsForm.GetButtonCount() >= 2 {
+			paramsForm.GetButton(0).SetBackgroundColor(tcell.ColorDarkGreen)
+			paramsForm.GetButton(1).SetBackgroundColor(tcell.ColorDarkRed)
+		}
 	}
 
-	// Dropdown selection handler
+	// Dropdown Selection Handler
 	modeDropdown.SetSelectedFunc(func(text string, index int) {
 		updateForm()
-		if text == "Manual" {
-			app.SetFocus(manualInstancesField)
-		} else {
-			app.SetFocus(minInstancesField)
-		}
+		// No need to mess with focus here; user is in ModeForm (Dropdown).
+		// If they want to edit params, they press Tab.
 	})
 
-	// Set initial values
+	// Initial Setup
 	if service.Scaling != nil {
 		if service.Scaling.ScalingMode == "MANUAL" {
 			modeDropdown.SetCurrentOption(1)
+			updateForm()
 			manualInstancesField.SetText(strconv.Itoa(int(service.Scaling.ManualInstanceCount)))
 		} else {
 			modeDropdown.SetCurrentOption(0)
+			updateForm()
 			minInstancesField.SetText(strconv.Itoa(int(service.Scaling.MinInstances)))
 			if service.Scaling.MaxInstances > 0 {
 				maxInstancesField.SetText(strconv.Itoa(int(service.Scaling.MaxInstances)))
 			}
 		}
 	} else {
-		// Default to Automatic
 		modeDropdown.SetCurrentOption(0)
+		updateForm()
 		minInstancesField.SetText("0")
 	}
-
-	updateForm() // Initial form setup
 
 	return grid
 }
@@ -218,7 +281,7 @@ func validateScaleParams(mode, manualStr, minStr, maxStr string) (min, max, manu
 		}
 		return 0, 0, manual, nil
 	}
-	
+
 	// Automatic
 	min, err = strconv.ParseInt(minStr, 10, 32)
 	if err != nil {
@@ -237,6 +300,6 @@ func validateScaleParams(mode, manualStr, minStr, maxStr string) (min, max, manu
 	if max > 0 && min > max {
 		return 0, 0, 0, fmt.Errorf("min instances cannot be greater than max instances")
 	}
-	
+
 	return min, max, 0, nil
 }

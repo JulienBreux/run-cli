@@ -81,11 +81,8 @@ func (m *Manager) Start(ctx context.Context, serviceName, targetURL string) (*In
 		token, err := auth.GetIDToken(context.Background())
 		if err == nil {
 			req.Header.Set("Authorization", "Bearer "+token)
-		} else {
-			// In TUI apps, logging to stderr might disrupt the UI, but it's better than silent failure.
-			// Ideally we'd have a log file. For now, let's try to print to stderr only if it's really needed.
-			// Or better, since we validated in Start, this runtime failure is less likely but still possible (expired creds).
 		}
+
 	}
 
 	server := &http.Server{

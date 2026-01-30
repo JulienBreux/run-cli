@@ -38,7 +38,7 @@ func TestModal(t *testing.T) {
 		},
 	}
 
-	onCompletion := func() {}
+	onCompletion := func(refresh bool) {}
 
 	modal := Modal(app, service, pages, onCompletion)
 

@@ -35,7 +35,7 @@ const (
 )
 
 // Modal returns a modal primitive for scaling a service.
-func Modal(app *tview.Application, service *model_service.Service, pages *tview.Pages, onCompletion func()) tview.Primitive {
+func Modal(app *tview.Application, service *model_service.Service, pages *tview.Pages, onCompletion func(refresh bool)) tview.Primitive {
 
 	// --- Styles ---
 	fieldBackgroundColor := tcell.ColorBlack
@@ -138,7 +138,7 @@ func Modal(app *tview.Application, service *model_service.Service, pages *tview.
 	// Escape to Close
 	container.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyEscape {
-			onCompletion()
+			onCompletion(false)
 			return nil
 		}
 		return event
@@ -227,13 +227,13 @@ func Modal(app *tview.Application, service *model_service.Service, pages *tview.
 						statusSpinner.Stop(fmt.Sprintf("[red]Error: %v", err))
 					} else {
 						statusSpinner.Stop("")
-						onCompletion()
+						onCompletion(true)
 					}
 				})
 			}()
 		})
 		paramsForm.AddButton("Cancel", func() {
-			onCompletion()
+			onCompletion(false)
 		})
 
 		// Style Buttons

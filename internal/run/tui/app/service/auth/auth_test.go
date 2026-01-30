@@ -33,6 +33,6 @@ func TestModal(t *testing.T) {
 		Region:  "us-central1",
 	}
 
-	modal := Modal(app, service, pages, func() {})
+	modal := Modal(app, service, pages, func(refresh bool) {})
 	assert.NotNil(t, modal)
 }

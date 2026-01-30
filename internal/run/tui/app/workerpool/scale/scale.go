@@ -34,7 +34,7 @@ const (
 )
 
 // Modal returns a modal primitive for scaling a worker pool.
-func Modal(app *tview.Application, workerPool *model_workerpool.WorkerPool, pages *tview.Pages, onCompletion func()) tview.Primitive {
+func Modal(app *tview.Application, workerPool *model_workerpool.WorkerPool, pages *tview.Pages, onCompletion func(refresh bool)) tview.Primitive {
 	// --- Styles ---
 	fieldBackgroundColor := tcell.ColorBlack
 	fieldTextColor := tcell.ColorWhite
@@ -100,13 +100,13 @@ func Modal(app *tview.Application, workerPool *model_workerpool.WorkerPool, page
 					statusSpinner.Stop(fmt.Sprintf("[red]Error: %v", err))
 				} else {
 					statusSpinner.Stop("")
-					onCompletion()
+					onCompletion(true)
 				}
 			})
 		}()
 	})
 	form.AddButton("Cancel", func() {
-		onCompletion()
+		onCompletion(false)
 	})
 
 	// Style Buttons
@@ -139,7 +139,7 @@ func Modal(app *tview.Application, workerPool *model_workerpool.WorkerPool, page
 	// Capture escape key on the Container
 	container.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyEscape {
-			onCompletion()
+			onCompletion(false)
 			return nil
 		}
 		return event

@@ -28,18 +28,18 @@ import (
 func TestModal(t *testing.T) {
 	app := tview.NewApplication()
 	pages := tview.NewPages()
-	
+
 	pool := &model_workerpool.WorkerPool{
 		DisplayName: "pool-1",
 		Scaling: &model_scaling.Scaling{
 			ManualInstanceCount: 2,
 		},
 	}
-	
-	onCompletion := func() {}
-	
+
+	onCompletion := func(refresh bool) {}
+
 	modal := Modal(app, pool, pages, onCompletion)
-	
+
 	assert.NotNil(t, modal)
 	_, ok := modal.(*tview.Grid)
 	assert.True(t, ok, "Expected Modal to return a Grid")
@@ -47,9 +47,9 @@ func TestModal(t *testing.T) {
 
 func TestValidateScaleParams(t *testing.T) {
 	tests := []struct {
-		input     string
-		want      int64
-		wantErr   bool
+		input   string
+		want    int64
+		wantErr bool
 	}{
 		{"5", 5, false},
 		{"0", 0, false},

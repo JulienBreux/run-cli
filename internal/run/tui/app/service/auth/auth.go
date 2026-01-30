@@ -23,8 +23,8 @@ import (
 
 	api_service "github.com/JulienBreux/run-cli/internal/run/api/service"
 	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
-	"github.com/JulienBreux/run-cli/pkg/dropdown"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/spinner"
+	"github.com/JulienBreux/run-cli/pkg/dropdown"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
@@ -34,7 +34,7 @@ const (
 )
 
 // Modal returns a modal primitive for updating service authentication.
-func Modal(app *tview.Application, service *model_service.Service, pages *tview.Pages, onCompletion func()) tview.Primitive {
+func Modal(app *tview.Application, service *model_service.Service, pages *tview.Pages, onCompletion func(refresh bool)) tview.Primitive {
 
 	// --- Styles ---
 	fieldBackgroundColor := tcell.ColorBlack
@@ -88,7 +88,7 @@ func Modal(app *tview.Application, service *model_service.Service, pages *tview.
 	// Capture escape key on the Container
 	container.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyEscape {
-			onCompletion()
+			onCompletion(false)
 			return nil
 		}
 		return event
@@ -114,13 +114,13 @@ func Modal(app *tview.Application, service *model_service.Service, pages *tview.
 					statusSpinner.Stop(fmt.Sprintf("[red]Error: %v", err))
 				} else {
 					statusSpinner.Stop("")
-					onCompletion()
+					onCompletion(true)
 				}
 			})
 		}()
 	})
 	form.AddButton("Cancel", func() {
-		onCompletion()
+		onCompletion(false)
 	})
 
 	// Style Buttons (Hack: tview.Form doesn't expose buttons directly by name, so we access by index)

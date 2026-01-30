@@ -41,6 +41,7 @@ var (
 		"SERVICE",
 		"REGION",
 		"SCALING",
+		"AUTH",
 		"URL",
 		"LAST DEPLOYED BY",
 		"LAST DEPLOYED AT"}
@@ -50,6 +51,7 @@ var (
 		2, // SERVICE
 		1, // REGION
 		1, // SCALING
+		1, // AUTH
 		4, // URL
 		2, // LAST DEPLOYED BY
 		1, // LAST DEPLOYED AT
@@ -171,13 +173,19 @@ func render(svc []model_service.Service) {
 			proxyStatus = "[green]P[white]"
 		}
 
+		authStatus := "[red]Yes"
+		if s.Security != nil && s.Security.InvokerIAMDisabled {
+			authStatus = "[green]No"
+		}
+
 		listTable.Table.SetCell(row, 0, tview.NewTableCell(proxyStatus))
 		listTable.Table.SetCell(row, 1, tview.NewTableCell(s.Name))
 		listTable.Table.SetCell(row, 2, tview.NewTableCell(s.Region))
 		listTable.Table.SetCell(row, 3, tview.NewTableCell(scaling))
-		listTable.Table.SetCell(row, 4, tview.NewTableCell(s.URI))
-		listTable.Table.SetCell(row, 5, tview.NewTableCell(s.LastModifier))
-		listTable.Table.SetCell(row, 6, tview.NewTableCell(humanize.Time(s.UpdateTime)))
+		listTable.Table.SetCell(row, 4, tview.NewTableCell(authStatus))
+		listTable.Table.SetCell(row, 5, tview.NewTableCell(s.URI))
+		listTable.Table.SetCell(row, 6, tview.NewTableCell(s.LastModifier))
+		listTable.Table.SetCell(row, 7, tview.NewTableCell(humanize.Time(s.UpdateTime)))
 	}
 
 	// Refresh title
@@ -197,8 +205,8 @@ func GetSelectedServiceURL() string {
 	if row == 0 { // Header row
 		return ""
 	}
-	// URL is now at index 4 (0: Proxy, 1: Service, 2: Region, 3: Scaling, 4: URL)
-	cell := listTable.Table.GetCell(row, 4)
+	// URL is now at index 5 (0: Proxy, 1: Service, 2: Region, 3: Scaling, 4: Auth, 5: URL)
+	cell := listTable.Table.GetCell(row, 5)
 	return cell.Text
 }
 

@@ -3,6 +3,7 @@ Copyright 2026 Julien Breux
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     https://www.apache.org/licenses/LICENSE-2.0
@@ -25,16 +26,57 @@ import (
 type Table struct {
 	Title string
 	Table *tview.Table
+	View  tview.Primitive
+}
+
+// BorderWrapper wraps tview.Table to provide dynamic border styles.
+type BorderWrapper struct {
+	*tview.Table
+}
+
+// Draw overrides the default Draw to swap borders based on focus.
+func (b *BorderWrapper) Draw(screen tcell.Screen) {
+	// Define border styles
+	// We use value copies to avoid modifying global state permanently for other components (if threaded),
+	// but tview Draw is single-threaded usually.
+
+	// Default/Sharp Borders (ASCII)
+	borderSharp := tview.Borders
+	borderSharp.Horizontal = '-'
+	borderSharp.Vertical = '|'
+	borderSharp.TopLeft = '+'
+	borderSharp.TopRight = '+'
+	borderSharp.BottomLeft = '+'
+	borderSharp.BottomRight = '+'
+
+	// Smooth Borders (Unicode Box Drawing)
+	borderSmooth := tview.Borders
+	borderSmooth.Horizontal = tview.BoxDrawingsLightHorizontal
+	borderSmooth.Vertical = tview.BoxDrawingsLightVertical
+	borderSmooth.TopLeft = tview.BoxDrawingsLightDownAndRight
+	borderSmooth.TopRight = tview.BoxDrawingsLightDownAndLeft
+	borderSmooth.BottomLeft = tview.BoxDrawingsLightUpAndRight
+	borderSmooth.BottomRight = tview.BoxDrawingsLightUpAndLeft
+
+	// Swap logic
+	originalBorders := tview.Borders
+	if b.HasFocus() {
+		tview.Borders = borderSharp
+	} else {
+		tview.Borders = borderSmooth
+	}
+
+	// Draw inner table
+	b.Table.Draw(screen)
+
+	// Restore
+	tview.Borders = originalBorders
 }
 
 // New creates a new table.
 func New(title string) *Table {
-	tview.Borders.Horizontal = '-'
-	tview.Borders.Vertical = '|'
-	tview.Borders.TopLeft = '+'
-	tview.Borders.TopRight = '+'
-	tview.Borders.BottomLeft = '+'
-	tview.Borders.BottomRight = '+'
+	// Set default global for consistency (optional, effectively defaults to sharp if we want)
+	// But relying on Wrapper Draw is better.
 
 	table := tview.NewTable().SetBorders(false).SetSelectable(true, false).SetFixed(1, 1)
 	table.SetBorder(true)
@@ -46,9 +88,14 @@ func New(title string) *Table {
 	table.SetTitleColor(tcell.ColorLightCyan)
 	table.SetTitleAlign(tview.AlignCenter)
 
+	wrapper := &BorderWrapper{
+		Table: table,
+	}
+
 	return &Table{
 		Title: title,
 		Table: table,
+		View:  wrapper,
 	}
 }
 

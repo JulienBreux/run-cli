@@ -176,10 +176,10 @@ func initializeApp(cfg *config.Config) {
 func buildLayout() *tview.Flex {
 	pages = tview.NewPages()
 	// Lists
-	pages.AddPage(service.LIST_PAGE_ID, service.List(app).Table, true, true)
-	pages.AddPage(job.LIST_PAGE_ID, job.List(app).Table, true, true)
-	pages.AddPage(workerpool.LIST_PAGE_ID, workerpool.List(app).Table, true, true)
-	pages.AddPage(domainmapping.LIST_PAGE_ID, domainmapping.List(app).Table, true, true)
+	pages.AddPage(service.LIST_PAGE_ID, service.List(app).View, true, true)
+	pages.AddPage(job.LIST_PAGE_ID, job.List(app).View, true, true)
+	pages.AddPage(workerpool.LIST_PAGE_ID, workerpool.List(app).View, true, true)
+	pages.AddPage(domainmapping.LIST_PAGE_ID, domainmapping.List(app).View, true, true)
 
 	// Dashboards
 	pages.AddPage(service.DASHBOARD_PAGE_ID, service.Dashboard(app), true, false)

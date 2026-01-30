@@ -19,6 +19,7 @@ package spinner
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -38,13 +39,15 @@ type Spinner struct {
 	message string
 	context string
 	mu      sync.Mutex
+	space   int
 }
 
 // New returns a new spinner component.
-func New(app *tview.Application) *Spinner {
+func New(app *tview.Application, space int) *Spinner {
 	s := &Spinner{
 		TextView: tview.NewTextView(),
 		app:      app,
+		space:    space,
 	}
 	s.SetTextColor(tcell.ColorWhite).
 		SetTextAlign(tview.AlignRight).
@@ -63,6 +66,8 @@ func (s *Spinner) SetContext(context string) {
 // Start starts the spinner animation with the given message.
 func (s *Spinner) Start(message string) {
 	s.Stop("") // Stop any existing animation
+
+	prefixSpace := strings.Repeat(" ", s.space)
 
 	s.mu.Lock()
 	s.message = message
@@ -88,9 +93,9 @@ func (s *Spinner) Start(message string) {
 				s.mu.Unlock()
 
 				s.app.QueueUpdateDraw(func() {
-					text := fmt.Sprintf(" %s %s", frames[i], msg)
+					text := fmt.Sprintf("%s%s %s", prefixSpace, frames[i], msg)
 					if ctxInfo != "" {
-						text += fmt.Sprintf("\n [gray]%s", ctxInfo)
+						text += fmt.Sprintf("\n%s[gray]%s", prefixSpace, ctxInfo)
 					}
 					s.SetText(text)
 				})

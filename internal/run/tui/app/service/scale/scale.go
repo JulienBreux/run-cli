@@ -47,7 +47,7 @@ func Modal(app *tview.Application, service *model_service.Service, pages *tview.
 	// --- Components ---
 
 	// Spinner for feedback and status
-	statusSpinner := spinner.New(app)
+	statusSpinner := spinner.New(app, 1)
 	statusSpinner.SetTextAlign(tview.AlignCenter)
 
 	// Container for Forms + Status

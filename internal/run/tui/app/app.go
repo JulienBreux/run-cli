@@ -186,7 +186,7 @@ func buildLayout() *tview.Flex {
 	pages.AddPage(job.DASHBOARD_PAGE_ID, job.Dashboard(app), true, false)
 
 	// Loading (Top)
-	loadingSpinner = spinner.New(app)
+	loadingSpinner = spinner.New(app, 1)
 	loadingSpinner.SetTextAlign(tview.AlignLeft)
 	loadingPages = tview.NewPages()
 	loadingPages.AddPage("empty", tview.NewBox(), true, true)

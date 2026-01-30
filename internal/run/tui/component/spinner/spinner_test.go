@@ -27,7 +27,7 @@ import (
 
 func TestNew(t *testing.T) {
 	app := tview.NewApplication()
-	s := New(app)
+	s := New(app, 0)
 	assert.NotNil(t, s)
 	assert.NotNil(t, s.TextView)
 	assert.Equal(t, app, s.app)
@@ -47,15 +47,15 @@ func TestStartStop(t *testing.T) {
 	go func() {
 		_ = app.Run()
 	}()
-	
+
 	// Ensure app stops at end of test
 	defer app.Stop()
 
-	s := New(app)
+	s := New(app, 0)
 
 	// Start
 	s.Start("Loading...")
-	
+
 	s.mu.Lock()
 	assert.NotNil(t, s.cancel, "Cancel function should be set after Start")
 	s.mu.Unlock()
@@ -73,7 +73,7 @@ func TestStartStop(t *testing.T) {
 
 func TestSetContext(t *testing.T) {
 	app := tview.NewApplication()
-	s := New(app)
+	s := New(app, 0)
 
 	s.SetContext("loading something")
 	s.mu.Lock()

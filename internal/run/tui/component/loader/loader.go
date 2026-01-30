@@ -31,7 +31,7 @@ type Loader struct {
 // New returns a new loader component.
 func New(app *tview.Application) *Loader {
 	// Spinner
-	s := spinner.New(app)
+	s := spinner.New(app, 0)
 	s.SetTextAlign(tview.AlignCenter)
 	s.Start("Please wait")
 
@@ -46,7 +46,7 @@ func New(app *tview.Application) *Loader {
 		SetDirection(tview.FlexRow).
 		AddItem(nil, 0, 1, false).
 		AddItem(logoView, 6, 1, false).
-		AddItem(s, 2, 1, false). // Increased height to 2 for second line
+		AddItem(s, 2, 0, false). // Increased height to 2 for second line
 		AddItem(nil, 0, 1, false)
 
 	return &Loader{

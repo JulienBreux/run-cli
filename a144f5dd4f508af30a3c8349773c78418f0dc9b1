@@ -1,0 +1,1 @@
+Task: Create a Revision detail view showing configuration and status.\n\nSummary:\n- Verified and tested the DetailComponent implemented in previous task.\n- Added explicit unit tests for Update methods.\n\nFiles:\n- internal/run/tui/app/service/revision/revision_test.go

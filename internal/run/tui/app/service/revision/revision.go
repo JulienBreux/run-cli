@@ -42,8 +42,8 @@ type DetailComponent struct {
 func NewListComponent(app *tview.Application) *ListComponent {
 	t := table.New(" Revisions ")
 	t.SetHeadersWithExpansions(
-		[]string{"NAME", "TRAFFIC", "DEPLOYED", "AUTHOR", "REVISION TAGS"},
-		[]int{2, 1, 1, 2, 2},
+		[]string{"NAME", "TRAFFIC", "DEPLOYED", "REVISION TAGS"},
+		[]int{2, 1, 1, 2},
 	)
 
 	return &ListComponent{
@@ -69,8 +69,8 @@ func NewDetailComponent() *DetailComponent {
 func (c *ListComponent) Update(service *model_service.Service, revisions []model_revision.Revision) {
 	c.Table.Table.Clear()
 	c.SetHeadersWithExpansions(
-		[]string{"NAME", "TRAFFIC", "DEPLOYED", "AUTHOR", "REVISION TAGS"},
-		[]int{2, 1, 1, 2, 2},
+		[]string{"NAME", "TRAFFIC", "DEPLOYED", "REVISION TAGS"},
+		[]int{2, 1, 1, 2},
 	)
 
 	for i, rev := range revisions {
@@ -101,8 +101,7 @@ func (c *ListComponent) Update(service *model_service.Service, revisions []model
 		c.Table.Table.SetCell(row, 0, tview.NewTableCell(rev.Name))
 		c.Table.Table.SetCell(row, 1, tview.NewTableCell(traffic))
 		c.Table.Table.SetCell(row, 2, tview.NewTableCell(humanize.Time(rev.CreateTime)))
-		c.Table.Table.SetCell(row, 3, tview.NewTableCell(rev.Author))
-		c.Table.Table.SetCell(row, 4, tview.NewTableCell(tags))
+		c.Table.Table.SetCell(row, 3, tview.NewTableCell(tags))
 	}
 
 	c.Table.Table.SetTitle(fmt.Sprintf(" Revisions (%d) ", len(revisions)))

@@ -7,10 +7,10 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: API Client Enhancements' (Protocol in workflow.md) caaadf2
 
 ## Phase 2: Traffic Split Modal
-- [ ] Task: Create a new TUI modal for entering traffic split percentages.
-    - [ ] Write unit tests for percentage validation logic (must sum to 100).
-    - [ ] Implement the modal component in `internal/run/tui/app/service/traffic/split.go`.
-    - [ ] Ensure the modal dynamically lists selected revisions and provides input fields.
+- [x] Task: Create a new TUI modal for entering traffic split percentages. a855d3c
+    - [x] Write unit tests for percentage validation logic (must sum to 100).
+    - [x] Implement the modal component in `internal/run/tui/app/service/traffic/split.go`.
+    - [x] Ensure the modal dynamically lists selected revisions and provides input fields.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Traffic Split Modal' (Protocol in workflow.md)
 
 ## Phase 3: Integration and Selection

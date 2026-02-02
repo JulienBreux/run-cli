@@ -1,0 +1,1 @@
+Phase: Phase 1: Component Reset Logic\n\nAutomated Verification:\n- Command: go test -v ./internal/run/tui/app/service/revision/...\n- Result: Passed\n\nManual Verification:\n- Reviewed code for ListComponent.Clear and DetailComponent.Clear.\n- Verified tests assert UI reset state.\n- User confirmed expectations: Yes

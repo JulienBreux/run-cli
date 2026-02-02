@@ -196,7 +196,13 @@ func openServiceTrafficSplitModal(s *model_service.Service, revs []model_revisio
 			currentPageID = previousPageID
 			pages.SwitchToPage(currentPageID)
 			app.SetFocus(pages)
-			service.DashboardShortcuts()
+			
+			switch previousPageID {
+			case service.LIST_PAGE_ID:
+				service.Shortcuts()
+			case service.DASHBOARD_PAGE_ID:
+				service.DashboardShortcuts()
+			}
 		}
 	})
 

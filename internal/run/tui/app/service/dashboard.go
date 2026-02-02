@@ -305,6 +305,6 @@ func DashboardReload(app *tview.Application, currentInfo info.Info, service *mod
 // DashboardShortcuts sets the shortcuts for the dashboard.
 func DashboardShortcuts() {
 	footer.ContextShortcutView.Clear()
-	shortcuts := `[dodgerblue]<esc> [white]Back  [dodgerblue]<tab> [white]Next Tab  [dodgerblue]<shift-tab> [white]Prev Tab`
+	shortcuts := `[dodgerblue]<esc> [white]Back  [dodgerblue]<tab> [white]Next Tab  [dodgerblue]<shift-tab> [white]Prev Tab  [dodgerblue]<t> [white]Traffic Split`
 	footer.ContextShortcutView.SetText(shortcuts)
 }

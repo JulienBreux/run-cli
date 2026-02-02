@@ -14,10 +14,10 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Traffic Split Modal' (Protocol in workflow.md) 0870cff
 
 ## Phase 3: Integration and Selection
-- [ ] Task: Implement multi-selection logic for the Revisions table.
-    - [ ] Write unit tests for selection tracking logic.
-    - [ ] Update `table` component or `dashboard.go` to support marking/selecting multiple rows.
-- [ ] Task: Connect the Revisions table selection to the Traffic Split modal.
-    - [ ] Add a shortcut (e.g., `t`) to trigger the modal for selected revisions.
-    - [ ] Integrate the API call with the modal's "Save" action using a spinner for feedback.
+- [x] Task: Implement multi-selection logic for the Revisions table. b29dbbe
+    - [x] Write unit tests for selection tracking logic.
+    - [x] Update `table` component or `dashboard.go` to support marking/selecting multiple rows.
+- [x] Task: Connect the Revisions table selection to the Traffic Split modal. b29dbbe
+    - [x] Add a shortcut (e.g., `t`) to trigger the modal for selected revisions.
+    - [x] Integrate the API call with the modal's "Save" action using a spinner for feedback.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Integration and Selection' (Protocol in workflow.md)

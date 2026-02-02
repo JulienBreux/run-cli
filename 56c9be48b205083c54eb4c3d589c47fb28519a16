@@ -1,0 +1,1 @@
+Phase: Phase 1: Shortcut Registry Enhancements\n\nAutomated Verification:\n- Command: go test -v ./internal/run/tui/app/shortcut/...\n- Result: Passed\n\nManual Verification:\n- Verified Registry population and formatting logic.\n- User confirmed expectations: N/A (Internal logic)

@@ -84,6 +84,9 @@ func TestMapRevision(t *testing.T) {
 		Name:       "projects/p/locations/l/services/s/revisions/my-rev",
 		CreateTime: timestamppb.New(now),
 		UpdateTime: timestamppb.New(now),
+		Annotations: map[string]string{
+			"serving.knative.dev/creator": "user@example.com",
+		},
 		Containers: []*runpb.Container{
 			{
 				Name:  "c1",
@@ -111,6 +114,7 @@ func TestMapRevision(t *testing.T) {
 
 	assert.Equal(t, "my-rev", result.Name)
 	assert.Equal(t, "my-service", result.Service)
+	assert.Equal(t, "user@example.com", result.Author)
 	assert.Equal(t, now.Unix(), result.CreateTime.Unix())
 	
 	// Containers

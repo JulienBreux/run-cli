@@ -45,4 +45,7 @@ type Revision struct {
 	CpuIdle                       bool          `json:"cpuIdle"`
 	StartupCpuBoost               bool          `json:"startupCpuBoost"`
 	Accelerator                   string        `json:"accelerator"`
+	// Enhanced fields
+	TrafficShare int    `json:"trafficShare"`
+	Author       string `json:"author"`
 }

@@ -86,6 +86,11 @@ func mapRevision(resp *runpb.Revision, service string) model.Revision {
 		accelerator = resp.NodeSelector.Accelerator
 	}
 
+	var author string
+	if resp.Annotations != nil {
+		author = resp.Annotations["serving.knative.dev/creator"]
+	}
+
 	return model.Revision{
 		Name:                          name,
 		CreateTime:                    resp.CreateTime.AsTime(),
@@ -98,5 +103,6 @@ func mapRevision(resp *runpb.Revision, service string) model.Revision {
 		CpuIdle:                       cpuIdle,
 		StartupCpuBoost:               startupCpuBoost,
 		Accelerator:                   accelerator,
+		Author:                        author,
 	}
 }

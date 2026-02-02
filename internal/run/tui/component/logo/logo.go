@@ -48,6 +48,5 @@ func String() string {
 		logo.WriteString(line)
 		logo.WriteString("\n")
 	}
-	logo.WriteString(" [red]♥[-] [grey]Julien Breux[-] ")
 	return logo.String()
 }

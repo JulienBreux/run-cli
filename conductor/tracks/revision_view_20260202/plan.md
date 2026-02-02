@@ -1,10 +1,10 @@
 # Implementation Plan - Service Revision View
 
 ## Phase 1: Models and API Client
-- [ ] Task: Update Revision models and client to ensure all necessary fields for traffic and history are captured.
-    - [ ] Write unit tests for Revision model parsing and client data retrieval.
-    - [ ] Implement/Update Revision model in internal/run/model/service/revision.
-    - [ ] Update API client in internal/run/api/service/revision.
+- [x] Task: Update Revision models and client to ensure all necessary fields for traffic and history are captured. 7ecda3e
+    - [x] Write unit tests for Revision model parsing and client data retrieval.
+    - [x] Implement/Update Revision model in internal/run/model/service/revision.
+    - [x] Update API client in internal/run/api/service/revision.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Models and API Client' (Protocol in workflow.md)
 
 ## Phase 2: TUI Components

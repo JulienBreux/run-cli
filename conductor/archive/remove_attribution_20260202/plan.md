@@ -8,7 +8,7 @@
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Header Modification' (Protocol in workflow.md)
 
 ## Phase 2: Verification of Preservation
-- [ ] Task: Confirm attribution remains in other areas.
-    - [ ] Verify `internal/run/tui/app/credits/credits.go` still contains the attribution.
-    - [ ] Verify `internal/run/tui/component/logo/logo.go` (or equivalent startup component) still contains the attribution.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Verification of Preservation' (Protocol in workflow.md)
+- [x] Task: Confirm attribution remains in other areas.
+    - [x] Verify `internal/run/tui/app/credits/credits.go` still contains the attribution.
+    - [x] Verify `internal/run/tui/component/logo/logo.go` (or equivalent startup component) still contains the attribution.
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Verification of Preservation' (Protocol in workflow.md) 1607869

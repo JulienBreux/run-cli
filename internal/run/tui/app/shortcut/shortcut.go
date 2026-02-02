@@ -55,6 +55,8 @@ var Registry = []Shortcut{
 	{Key: "?", Rune: '?', Description: "Help Page", Category: CategoryGlobal},
 	{Key: "Ctrl+P", TCellKey: tcell.KeyCtrlP, Description: "Project Selection", Category: CategoryGlobal},
 	{Key: "Ctrl+R", TCellKey: tcell.KeyCtrlR, Description: "Region Selection", Category: CategoryGlobal},
+	{Key: "Ctrl+Z", TCellKey: tcell.KeyCtrlZ, Description: "Console", Category: CategoryGlobal},
+	{Key: "Ctrl+L", TCellKey: tcell.KeyCtrlL, Description: "Releases", Category: CategoryGlobal},
 	{Key: "Esc", TCellKey: tcell.KeyEscape, Description: "Back / Close Modal", Category: CategoryGlobal},
 
 	// Service List
@@ -65,6 +67,7 @@ var Registry = []Shortcut{
 	{Key: "a", Rune: 'a', Description: "Auth", Category: CategoryServiceList},
 	{Key: "t", Rune: 't', Description: "Traffic", Category: CategoryServiceList},
 	{Key: "o", Rune: 'o', Description: "Open URL", Category: CategoryServiceList},
+	{Key: "p", Rune: 'p', Description: "Toggle Proxy", Category: CategoryServiceList},
 	{Key: "enter", TCellKey: tcell.KeyEnter, Description: "Details", Category: CategoryServiceList},
 	{Key: "?", Rune: '?', Description: "Help", Category: CategoryServiceList},
 

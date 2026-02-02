@@ -24,6 +24,7 @@ import (
 	api_workerpool "github.com/JulienBreux/run-cli/internal/run/api/workerpool"
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
 	model_workerpool "github.com/JulienBreux/run-cli/internal/run/model/workerpool"
+	"github.com/JulienBreux/run-cli/internal/run/tui/app/shortcut"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/footer"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/table"
 	"github.com/dustin/go-humanize"
@@ -175,6 +176,6 @@ func Shortcuts() {
 		return
 	}
 
-	shortcuts := `[dodgerblue]<r> [white]Refresh  [dodgerblue]<d> [white]Describe  [dodgerblue]<s> [white]Scale`
-	footer.ContextShortcutView.SetText(shortcuts)
+	s := shortcut.FormatByCategory(shortcut.CategoryWorkerList, nil)
+	footer.ContextShortcutView.SetText(s)
 }

@@ -25,6 +25,7 @@ import (
 	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
 	model_revision "github.com/JulienBreux/run-cli/internal/run/model/service/revision"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/service/revision"
+	"github.com/JulienBreux/run-cli/internal/run/tui/app/shortcut"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/footer"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -317,6 +318,6 @@ func DashboardClear() {
 // DashboardShortcuts sets the shortcuts for the dashboard.
 func DashboardShortcuts() {
 	footer.ContextShortcutView.Clear()
-	shortcuts := `[dodgerblue]<esc> [white]Back  [dodgerblue]<tab> [white]Next Tab  [dodgerblue]<shift-tab> [white]Prev Tab  [dodgerblue]<t> [white]Traffic Split`
-	footer.ContextShortcutView.SetText(shortcuts)
+	s := shortcut.FormatByCategory(shortcut.CategoryServiceDashboard, nil)
+	footer.ContextShortcutView.SetText(s)
 }

@@ -28,6 +28,7 @@ import (
 	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
 	model_revision "github.com/JulienBreux/run-cli/internal/run/model/service/revision"
 	"github.com/JulienBreux/run-cli/internal/run/proxy"
+	"github.com/JulienBreux/run-cli/internal/run/tui/app/shortcut"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/footer"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/table"
 	"github.com/dustin/go-humanize"
@@ -302,17 +303,17 @@ func Shortcuts() {
 		return
 	}
 
-	shortcuts := `[dodgerblue]<r> [white]Refresh  [dodgerblue]<d> [white]Describe  [dodgerblue]<l> [white]Logs [dodgerblue]<s> [white]Scale [dodgerblue]<a> [white]Auth [dodgerblue]<t> [white]Traffic [dodgerblue]<o> [white]Open URL  [dodgerblue]<enter> [white]Details`
+	overrides := make(map[string]string)
 
 	// Check selected service proxy status
 	svc := GetSelectedServiceFull()
 	if svc != nil && svc.Proxy != nil && svc.Proxy.Enabled {
-		s := fmt.Sprintf("[white]Auth [dodgerblue]<p> [green]Proxy (127.0.0.1:%d)", svc.Proxy.Port)
-		shortcuts = strings.Replace(shortcuts, "[white]Auth", s, 1)
-		shortcuts = strings.Replace(shortcuts, "[white]Open URL", "[white]Open URL (proxy)", 1)
+		overrides["p"] = fmt.Sprintf("[green]Proxy (127.0.0.1:%d)", svc.Proxy.Port)
+		overrides["o"] = "Open URL (proxy)"
 	} else {
-		shortcuts = strings.Replace(shortcuts, "[white]Auth", "[white]Auth [dodgerblue]<p> [white]Proxy", 1)
+		overrides["p"] = "Proxy"
 	}
 
-	footer.ContextShortcutView.SetText(shortcuts)
+	s := shortcut.FormatByCategory(shortcut.CategoryServiceList, overrides)
+	footer.ContextShortcutView.SetText(s)
 }

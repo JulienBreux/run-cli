@@ -23,6 +23,7 @@ import (
 	api_domainmapping "github.com/JulienBreux/run-cli/internal/run/api/domainmapping"
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
 	model_domainmapping "github.com/JulienBreux/run-cli/internal/run/model/domainmapping"
+	"github.com/JulienBreux/run-cli/internal/run/tui/app/shortcut"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/footer"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/table"
 	"github.com/dustin/go-humanize"
@@ -161,8 +162,8 @@ func Shortcuts() {
 		return
 	}
 
-	shortcuts := `[dodgerblue]<r> [white]Refresh  [dodgerblue]<o> [white]Open URL  [dodgerblue]<enter> [white]Info`
-	footer.ContextShortcutView.SetText(shortcuts)
+	s := shortcut.FormatByCategory(shortcut.CategoryDomainMapping, nil)
+	footer.ContextShortcutView.SetText(s)
 }
 
 // DomainMappingInfoModal creates a modal to display info for the domain mapping.

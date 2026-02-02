@@ -24,6 +24,7 @@ import (
 	api_job "github.com/JulienBreux/run-cli/internal/run/api/job"
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
 	model_job "github.com/JulienBreux/run-cli/internal/run/model/job"
+	"github.com/JulienBreux/run-cli/internal/run/tui/app/shortcut"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/footer"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/table"
 	"github.com/dustin/go-humanize"
@@ -179,6 +180,6 @@ func Shortcuts() {
 		return
 	}
 
-	shortcuts := `[dodgerblue]<r> [white]Refresh  [dodgerblue]<d> [white]Describe  [dodgerblue]<l> [white]Logs  [dodgerblue]<x> [white]Execute  [dodgerblue]<enter> [white]Details`
-	footer.ContextShortcutView.SetText(shortcuts)
+	s := shortcut.FormatByCategory(shortcut.CategoryJobList, nil)
+	footer.ContextShortcutView.SetText(s)
 }

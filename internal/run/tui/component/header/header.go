@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
+	"github.com/JulienBreux/run-cli/internal/run/tui/app/shortcut"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/logo"
 	"github.com/JulienBreux/run-cli/pkg/version"
 	"github.com/rivo/tview"
@@ -59,17 +60,60 @@ func columnInfo(currentInfo info.Info) *tview.TextView {
 // returns the shortcuts column.
 func columnShortcuts() *tview.Flex {
 	col1 := tview.NewTextView().SetDynamicColors(true).SetTextAlign(tview.AlignLeft)
-	_, _ = fmt.Fprintf(col1, "[dodgerblue]<ctrl-p> [white]Project\n")
-	_, _ = fmt.Fprintf(col1, "[dodgerblue]<ctrl-r> [white]Region\n\n")
-	_, _ = fmt.Fprintf(col1, "[dodgerblue]<ctrl-z> [white]Console\n")
-	_, _ = fmt.Fprintf(col1, "[dodgerblue]<ctrl-l> [white]Releases\n")
-
 	col2 := tview.NewTextView().SetDynamicColors(true).SetTextAlign(tview.AlignLeft)
-	_, _ = fmt.Fprintf(col2, "[dodgerblue]<ctrl-s> [white]Services\n")
-	_, _ = fmt.Fprintf(col2, "[dodgerblue]<ctrl-j> [white]Jobs\n")
-	_, _ = fmt.Fprintf(col2, "[dodgerblue]<ctrl-w> [white]Worker Pools\n")
-	_, _ = fmt.Fprintf(col2, "[dodgerblue]<ctrl-d> [white]Domain Mappings\n")
-	_, _ = fmt.Fprintf(col2, "[dodgerblue]<?>\t    [white]Help\n")
+
+	shortcuts := shortcut.GetByCategory(shortcut.CategoryGlobal)
+	// Filter out "Esc"
+	var visibleShortcuts []shortcut.Shortcut
+	for _, s := range shortcuts {
+		if s.Key != "Esc" {
+			visibleShortcuts = append(visibleShortcuts, s)
+		}
+	}
+
+	// Split roughly in half or specific logic
+	// Registry order: S, J, W, D, ?, P, R, Z, L
+	// Desired Col 1: P, R, Z, L (Indices 5, 6, 7, 8)
+	// Desired Col 2: S, J, W, D, ? (Indices 0, 1, 2, 3, 4)
+
+	// Since we know the order, let's just pick them.
+	// But that defeats the purpose of dynamic registry somewhat.
+	// Let's just list them. Using the registry order might change the visual layout.
+	// Registry order is: Services, Jobs, Workers, Domain, Help, Project, Region, Console, Releases.
+
+	// If I iterate:
+	// Col 1: Services, Jobs, Workers, Domain
+	// Col 2: Help, Project, Region, Console, Releases
+
+	// Let's stick to the registry order for now, splitting in half.
+	mid := len(visibleShortcuts) / 2
+	// Adjust mid to shift more to Col 2 if odd? 9 items. 4 in Col 1, 5 in Col 2.
+	// Services, Jobs, Workers, Domain -> Col 1
+	// Help, Project, Region, Console, Releases -> Col 2
+
+	// Wait, the current layout has Project/Region in Col 1.
+	// I should probably reorder the Registry to match the desired visual layout if I want consistency, OR accept the new order.
+	// The prompt implies "using the shortcut package", so I should rely on it.
+	// I'll split them evenly.
+
+	for i, s := range visibleShortcuts {
+		formatted := s.Format() + "\n"
+		if i < mid {
+			// This puts Services... in Col 1.
+			// Current Col 1 has Project...
+			// I'll swap the columns in the Flex addition if I want Services in Col 2?
+			// No, standard reading is Col 1 then Col 2.
+			// Current: Col 1 (Project) | Col 2 (Services)
+			// Registry: Services, ..., Project
+			
+			// If I want Project in Col 1, I should reorder Registry or filter specifically.
+			// Reordering Registry seems cleanest for "Single Source of Truth defining order".
+			
+			_, _ = fmt.Fprint(col2, formatted) // Put early items in Col 2 to match existing (Services on right)
+		} else {
+			_, _ = fmt.Fprint(col1, formatted) // Put later items in Col 1 (Project on left)
+		}
+	}
 
 	return tview.NewFlex().
 		AddItem(col1, 20, 1, false).

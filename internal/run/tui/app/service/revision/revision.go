@@ -124,7 +124,7 @@ func (c *DetailComponent) Update(rev model_revision.Revision) {
 	fmt.Fprintf(&sb, "[lightcyan]Author:[white] %s\n", rev.Author)
 	fmt.Fprintf(&sb, "[lightcyan]Created:[white] %s\n", rev.CreateTime.Format("2006-01-02 15:04:05"))
 	fmt.Fprintln(&sb, "")
-	fmt.Fprintln(&sb, "[yellow::b]General[white::-")
+	fmt.Fprintln(&sb, "[yellow::b]General[white]")
 
 	// Billing
 	billing := "CPU is always allocated"
@@ -159,7 +159,7 @@ func (c *DetailComponent) Update(rev model_revision.Revision) {
 	fmt.Fprintf(&sb, "[lightcyan]Execution environment:[white] %s\n", execEnv)
 
 	fmt.Fprintln(&sb, "")
-	fmt.Fprintln(&sb, "[yellow::b]Containers[white::-")
+	fmt.Fprintln(&sb, "[yellow::b]Containers[white]")
 	for i, c := range rev.Containers {
 		name := c.Name
 		if name == "" {

@@ -1,0 +1,1 @@
+Phase: Phase 1: Models and API Client\n\nAutomated Verification:\n- Command: go test -v ./internal/run/model/service/revision/... ./internal/run/api/service/revision/...\n- Result: Passed\n\nManual Verification:\n- Reviewed code for model updates and API client mapping logic.\n- User confirmed expectations: Yes

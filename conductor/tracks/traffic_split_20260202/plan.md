@@ -6,12 +6,12 @@
     - [x] Implement `UpdateTraffic` method in `internal/run/api/service/service.go`.
 - [x] Task: Conductor - User Manual Verification 'Phase 1: API Client Enhancements' (Protocol in workflow.md) caaadf2
 
-## Phase 2: Traffic Split Modal (Refactor)
+## Phase 2: Traffic Split Modal (Refactor) [checkpoint: e51ddd2]
 - [x] Task: Refactor Traffic Split Modal to use dynamic Dropdown selectors. 428e71c
     - [x] Update `Modal` signature to accept all revisions (not just selected).
     - [x] Implement dynamic form with "Add Revision" button.
     - [x] Use `pkg/dropdown` for revision selection in each row.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Traffic Split Modal (Refactor)' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Traffic Split Modal (Refactor)' (Protocol in workflow.md) e51ddd2
 
 ## Phase 3: Integration
 - [ ] Task: Connect the Service Dashboard to the new Traffic Split modal.

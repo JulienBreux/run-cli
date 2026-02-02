@@ -299,18 +299,6 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 		}
 	}
 
-	if currentPageID == service.DASHBOARD_PAGE_ID {
-		if event.Rune() == 't' {
-			if s := service.GetSelectedServiceFull(); s != nil {
-				revs := service.GetSelectedRevisions()
-				if len(revs) > 0 {
-					openServiceTrafficSplitModal(s, revs)
-				}
-			}
-			return nil
-		}
-	}
-
 	// Open URL for Service list
 	if currentPageID == service.LIST_PAGE_ID {
 		if event.Key() == tcell.KeyEnter {

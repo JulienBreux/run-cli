@@ -22,7 +22,6 @@ import (
 	model_project "github.com/JulienBreux/run-cli/internal/run/model/common/project"
 	model_domainmapping "github.com/JulienBreux/run-cli/internal/run/model/domainmapping"
 	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
-	model_revision "github.com/JulienBreux/run-cli/internal/run/model/service/revision"
 	model_workerpool "github.com/JulienBreux/run-cli/internal/run/model/workerpool"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/credits"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/describe"
@@ -34,7 +33,6 @@ import (
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/service"
 	service_auth "github.com/JulienBreux/run-cli/internal/run/tui/app/service/auth"
 	service_scale "github.com/JulienBreux/run-cli/internal/run/tui/app/service/scale"
-	service_traffic "github.com/JulienBreux/run-cli/internal/run/tui/app/service/traffic"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/workerpool"
 	workerpool_scale "github.com/JulienBreux/run-cli/internal/run/tui/app/workerpool/scale"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/footer"
@@ -185,27 +183,6 @@ func openServiceAuthModal(s *model_service.Service) {
 
 	footer.ContextShortcutView.Clear()
 	app.SetFocus(authModal)
-}
-
-func openServiceTrafficSplitModal(s *model_service.Service, revs []model_revision.Revision) {
-	trafficModal := service_traffic.Modal(app, s, revs, func(refresh bool) {
-		rootPages.RemovePage(service_traffic.MODAL_PAGE_ID)
-		if refresh {
-			switchTo(previousPageID)
-		} else {
-			currentPageID = previousPageID
-			pages.SwitchToPage(currentPageID)
-			app.SetFocus(pages)
-			service.DashboardShortcuts()
-		}
-	})
-
-	rootPages.AddPage(service_traffic.MODAL_PAGE_ID, trafficModal, true, true)
-	previousPageID = currentPageID
-	currentPageID = service_traffic.MODAL_PAGE_ID
-
-	footer.ContextShortcutView.Clear()
-	app.SetFocus(trafficModal)
 }
 func openWorkerPoolScaleModal(w *model_workerpool.WorkerPool) {
 	scaleModal := workerpool_scale.Modal(app, w, rootPages, func(refresh bool) {

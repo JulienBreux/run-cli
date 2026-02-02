@@ -257,11 +257,6 @@ func updateRevisionDetail(row int) {
 	revisionsDetail.Update(dashboardRevisions[row-1])
 }
 
-// GetSelectedRevisions returns the selected revisions from the dashboard.
-func GetSelectedRevisions() []model_revision.Revision {
-	return revisionsList.GetSelectedRevisions(dashboardRevisions)
-}
-
 // DashboardReload reloads the dashboard for a specific service.
 func DashboardReload(app *tview.Application, currentInfo info.Info, service *model_service.Service, onResult func(error)) {
 	dashboardService = service
@@ -295,6 +290,6 @@ func DashboardReload(app *tview.Application, currentInfo info.Info, service *mod
 // DashboardShortcuts sets the shortcuts for the dashboard.
 func DashboardShortcuts() {
 	footer.ContextShortcutView.Clear()
-	shortcuts := `[dodgerblue]<esc> [white]Back  [dodgerblue]<tab> [white]Next Tab  [dodgerblue]<shift-tab> [white]Prev Tab  [dodgerblue]t [white]Traffic Split  [dodgerblue]<space> [white]Select`
+	shortcuts := `[dodgerblue]<esc> [white]Back  [dodgerblue]<tab> [white]Next Tab  [dodgerblue]<shift-tab> [white]Prev Tab`
 	footer.ContextShortcutView.SetText(shortcuts)
 }

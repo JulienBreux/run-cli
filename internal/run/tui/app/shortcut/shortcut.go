@@ -16,7 +16,12 @@ limitations under the License.
 
 package shortcut
 
-import "github.com/gdamore/tcell/v2"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/gdamore/tcell/v2"
+)
 
 // Shortcut represents a keyboard shortcut.
 type Shortcut struct {
@@ -25,6 +30,11 @@ type Shortcut struct {
 	Rune        rune
 	Description string
 	Category    string
+}
+
+// Format returns the formatted string for the shortcut.
+func (s Shortcut) Format() string {
+	return fmt.Sprintf("[dodgerblue]<%s> [white]%s", s.Key, s.Description)
 }
 
 const (
@@ -48,35 +58,68 @@ var Registry = []Shortcut{
 	{Key: "Esc", TCellKey: tcell.KeyEscape, Description: "Back / Close Modal", Category: CategoryGlobal},
 
 	// Service List
-	{Key: "Enter", TCellKey: tcell.KeyEnter, Description: "Service Dashboard", Category: CategoryServiceList},
 	{Key: "r", Rune: 'r', Description: "Refresh List", Category: CategoryServiceList},
-	{Key: "l", Rune: 'l', Description: "View Logs", Category: CategoryServiceList},
 	{Key: "d", Rune: 'd', Description: "Describe Service", Category: CategoryServiceList},
-	{Key: "s", Rune: 's', Description: "Scale Service", Category: CategoryServiceList},
-	{Key: "a", Rune: 'a', Description: "Manage Authentication", Category: CategoryServiceList},
-	{Key: "t", Rune: 't', Description: "Traffic Split", Category: CategoryServiceList},
+	{Key: "l", Rune: 'l', Description: "Logs", Category: CategoryServiceList},
+	{Key: "s", Rune: 's', Description: "Scale", Category: CategoryServiceList},
+	{Key: "a", Rune: 'a', Description: "Auth", Category: CategoryServiceList},
+	{Key: "t", Rune: 't', Description: "Traffic", Category: CategoryServiceList},
 	{Key: "o", Rune: 'o', Description: "Open URL", Category: CategoryServiceList},
-	{Key: "p", Rune: 'p', Description: "Toggle Proxy", Category: CategoryServiceList},
+	{Key: "enter", TCellKey: tcell.KeyEnter, Description: "Details", Category: CategoryServiceList},
+	{Key: "?", Rune: '?', Description: "Help", Category: CategoryServiceList},
 
 	// Service Dashboard
-	{Key: "Tab", TCellKey: tcell.KeyTab, Description: "Next Tab", Category: CategoryServiceDashboard},
-	{Key: "Shift+Tab", TCellKey: tcell.KeyBacktab, Description: "Previous Tab", Category: CategoryServiceDashboard},
+	{Key: "esc", TCellKey: tcell.KeyEscape, Description: "Back", Category: CategoryServiceDashboard},
+	{Key: "tab", TCellKey: tcell.KeyTab, Description: "Next Tab", Category: CategoryServiceDashboard},
+	{Key: "shift-tab", TCellKey: tcell.KeyBacktab, Description: "Prev Tab", Category: CategoryServiceDashboard},
 	{Key: "t", Rune: 't', Description: "Traffic Split", Category: CategoryServiceDashboard},
+	{Key: "?", Rune: '?', Description: "Help", Category: CategoryServiceDashboard},
 
 	// Job List
-	{Key: "Enter", TCellKey: tcell.KeyEnter, Description: "Job Dashboard", Category: CategoryJobList},
-	{Key: "r", Rune: 'r', Description: "Refresh List", Category: CategoryJobList},
-	{Key: "l", Rune: 'l', Description: "View Logs", Category: CategoryJobList},
-	{Key: "d", Rune: 'd', Description: "Describe Job", Category: CategoryJobList},
-	{Key: "x", Rune: 'x', Description: "Execute Job", Category: CategoryJobList},
+	{Key: "r", Rune: 'r', Description: "Refresh", Category: CategoryJobList},
+	{Key: "d", Rune: 'd', Description: "Describe", Category: CategoryJobList},
+	{Key: "l", Rune: 'l', Description: "Logs", Category: CategoryJobList},
+	{Key: "x", Rune: 'x', Description: "Execute", Category: CategoryJobList},
+	{Key: "enter", TCellKey: tcell.KeyEnter, Description: "Details", Category: CategoryJobList},
+	{Key: "?", Rune: '?', Description: "Help", Category: CategoryJobList},
 
 	// Worker List
-	{Key: "r", Rune: 'r', Description: "Refresh List", Category: CategoryWorkerList},
-	{Key: "d", Rune: 'd', Description: "Describe Worker Pool", Category: CategoryWorkerList},
-	{Key: "s", Rune: 's', Description: "Scale Worker Pool", Category: CategoryWorkerList},
+	{Key: "r", Rune: 'r', Description: "Refresh", Category: CategoryWorkerList},
+	{Key: "d", Rune: 'd', Description: "Describe", Category: CategoryWorkerList},
+	{Key: "s", Rune: 's', Description: "Scale", Category: CategoryWorkerList},
+	{Key: "?", Rune: '?', Description: "Help", Category: CategoryWorkerList},
 
 	// Domain Mapping
-	{Key: "Enter", TCellKey: tcell.KeyEnter, Description: "DNS Info", Category: CategoryDomainMapping},
-	{Key: "r", Rune: 'r', Description: "Refresh List", Category: CategoryDomainMapping},
+	{Key: "r", Rune: 'r', Description: "Refresh", Category: CategoryDomainMapping},
 	{Key: "o", Rune: 'o', Description: "Open URL", Category: CategoryDomainMapping},
+	{Key: "enter", TCellKey: tcell.KeyEnter, Description: "Info", Category: CategoryDomainMapping},
+	{Key: "?", Rune: '?', Description: "Help", Category: CategoryDomainMapping},
+}
+
+// GetByCategory returns shortcuts for a given category.
+func GetByCategory(category string) []Shortcut {
+	var filtered []Shortcut
+	for _, s := range Registry {
+		if s.Category == category {
+			filtered = append(filtered, s)
+		}
+	}
+	return filtered
+}
+
+// FormatByCategory returns a formatted string of shortcuts for a given category.
+// overrides is a map of Key -> Description to override default descriptions.
+func FormatByCategory(category string, overrides map[string]string) string {
+	shortcuts := GetByCategory(category)
+	var formatted []string
+	for _, s := range shortcuts {
+		desc := s.Description
+		if val, ok := overrides[s.Key]; ok {
+			desc = val
+		}
+		// Use local struct to format with override
+		temp := Shortcut{Key: s.Key, Description: desc}
+		formatted = append(formatted, temp.Format())
+	}
+	return strings.Join(formatted, "  ")
 }

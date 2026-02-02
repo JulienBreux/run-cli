@@ -1,0 +1,1 @@
+Phase: Phase 2: Traffic Split Modal (Refactor)\n\nAutomated Verification:\n- Command: go test -v ./internal/run/tui/app/service/traffic/...\n- Result: Passed\n\nManual Verification:\n- Reviewed refactored modal code for dropdown usage and dynamic rows.\n- Confirmed API contract update.\n- User confirmed expectations: Yes

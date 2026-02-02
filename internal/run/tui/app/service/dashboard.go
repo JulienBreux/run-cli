@@ -317,6 +317,6 @@ func DashboardClear() {
 // DashboardShortcuts sets the shortcuts for the dashboard.
 func DashboardShortcuts() {
 	footer.ContextShortcutView.Clear()
-	shortcuts := `[dodgerblue]<esc> [white]Back  [dodgerblue]<tab> [white]Next Tab  [dodgerblue]<shift-tab> [white]Prev Tab  [dodgerblue]<t> [white]Traffic Split`
+	shortcuts := `[dodgerblue]<esc> [white]Back  [dodgerblue]<tab> [white]Next Tab  [dodgerblue]<shift-tab> [white]Prev Tab  [dodgerblue]<t> [white]Traffic Split  [dodgerblue]<?> [white]Help`
 	footer.ContextShortcutView.SetText(shortcuts)
 }

@@ -261,6 +261,10 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 		}
 		return nil
 	}
+	if event.Rune() == '?' {
+		openHelpModal()
+		return nil
+	}
 	if event.Key() == service.LIST_PAGE_SHORTCUT {
 		switchTo(service.LIST_PAGE_ID)
 		return nil

@@ -302,7 +302,7 @@ func Shortcuts() {
 		return
 	}
 
-	shortcuts := `[dodgerblue]<r> [white]Refresh  [dodgerblue]<d> [white]Describe  [dodgerblue]<l> [white]Logs [dodgerblue]<s> [white]Scale [dodgerblue]<a> [white]Auth [dodgerblue]<t> [white]Traffic [dodgerblue]<o> [white]Open URL  [dodgerblue]<enter> [white]Details`
+	shortcuts := `[dodgerblue]<r> [white]Refresh  [dodgerblue]<d> [white]Describe  [dodgerblue]<l> [white]Logs [dodgerblue]<s> [white]Scale [dodgerblue]<a> [white]Auth [dodgerblue]<t> [white]Traffic [dodgerblue]<o> [white]Open URL  [dodgerblue]<enter> [white]Details  [dodgerblue]<?> [white]Help`
 
 	// Check selected service proxy status
 	svc := GetSelectedServiceFull()

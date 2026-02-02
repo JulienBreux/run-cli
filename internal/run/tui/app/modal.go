@@ -27,6 +27,7 @@ import (
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/credits"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/describe"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/domainmapping"
+	"github.com/JulienBreux/run-cli/internal/run/tui/app/help"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/job"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/log"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/project"
@@ -247,6 +248,38 @@ func openCreditsModal() {
 	footer.ContextShortcutView.Clear()
 	app.SetFocus(c)
 	c.StartAnimation()
+}
+
+func openHelpModal() {
+	helpModal := help.HelpModal(app, func() {
+		rootPages.RemovePage(help.MODAL_PAGE_ID)
+		currentPageID = previousPageID
+		pages.SwitchToPage(currentPageID)
+		app.SetFocus(pages)
+
+		switch currentPageID {
+		case service.LIST_PAGE_ID:
+			service.Shortcuts()
+		case service.DASHBOARD_PAGE_ID:
+			service.DashboardShortcuts()
+		case job.LIST_PAGE_ID:
+			job.Shortcuts()
+		case job.DASHBOARD_PAGE_ID:
+			job.DashboardShortcuts()
+		case workerpool.LIST_PAGE_ID:
+			workerpool.Shortcuts()
+		case domainmapping.LIST_PAGE_ID:
+			domainmapping.Shortcuts()
+		}
+	})
+
+	rootPages.AddPage(help.MODAL_PAGE_ID, helpModal, true, true)
+
+	previousPageID = currentPageID
+	currentPageID = help.MODAL_PAGE_ID
+
+	footer.ContextShortcutView.Clear()
+	app.SetFocus(helpModal)
 }
 
 func openDomainMappingInfoModal(dm *model_domainmapping.DomainMapping) {

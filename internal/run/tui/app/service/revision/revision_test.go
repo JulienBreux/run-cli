@@ -19,6 +19,8 @@ package revision
 import (
 	"testing"
 
+	model_revision "github.com/JulienBreux/run-cli/internal/run/model/service/revision"
+	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
 	"github.com/rivo/tview"
 	"github.com/stretchr/testify/assert"
 )
@@ -34,4 +36,23 @@ func TestNewDetailComponent(t *testing.T) {
 	comp := NewDetailComponent()
 	assert.NotNil(t, comp)
 	assert.IsType(t, &DetailComponent{}, comp)
+}
+
+func TestListComponent_Update(t *testing.T) {
+	app := tview.NewApplication()
+	comp := NewListComponent(app)
+	svc := &model_service.Service{Name: "s1"}
+	revs := []model_revision.Revision{{Name: "rev1"}}
+
+	comp.Update(svc, revs)
+	assert.Equal(t, 2, comp.Table.Table.GetRowCount()) // Header + 1 row
+}
+
+func TestDetailComponent_Update(t *testing.T) {
+	comp := NewDetailComponent()
+	rev := model_revision.Revision{Name: "rev1", Author: "user@example.com"}
+
+	comp.Update(rev)
+	assert.Contains(t, comp.GetText(true), "rev1")
+	assert.Contains(t, comp.GetText(true), "user@example.com")
 }

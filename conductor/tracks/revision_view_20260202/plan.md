@@ -16,8 +16,8 @@
     - [x] Implement the detail view component.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: TUI Components' (Protocol in workflow.md) e863d9d
 
-## Phase 3: Integration and Navigation
+## Phase 3: Integration and Navigation [checkpoint: 5e92f29]
 - [x] Task: Integrate the new Revision views into the Service Dashboard. bb96a70
     - [x] Update Service Dashboard layout to include a Revisions tab/view.
     - [x] Implement navigation between Service list, Dashboard, and Revision details.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Integration and Navigation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Integration and Navigation' (Protocol in workflow.md) 5e92f29

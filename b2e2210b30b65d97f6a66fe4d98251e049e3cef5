@@ -1,0 +1,1 @@
+Task: Locate and remove the attribution text from the header component.\n\nSummary:\n- Removed '♥ Julien Breux' attribution from the logo component used in the global header.\n- Verified that the logo rendering remains intact.\n\nFiles:\n- internal/run/tui/component/logo/logo.go

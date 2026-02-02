@@ -281,6 +281,10 @@ func DashboardReload(app *tview.Application, currentInfo info.Info, service *mod
 	updateNetworkingTab()
 	updateSecurityTab()
 
+	// Clear previous data immediately
+	revisionsList.Clear()
+	revisionsDetail.Clear()
+
 	go func() {
 		var err error
 		dashboardRevisions, err = listRevisionsFunc(currentInfo.Project, service.Region, service.Name)
@@ -300,6 +304,14 @@ func DashboardReload(app *tview.Application, currentInfo info.Info, service *mod
 			onResult(nil)
 		})
 	}()
+}
+
+// DashboardClear clears the dashboard state and components.
+func DashboardClear() {
+	dashboardService = nil
+	dashboardRevisions = nil
+	revisionsList.Clear()
+	revisionsDetail.Clear()
 }
 
 // DashboardShortcuts sets the shortcuts for the dashboard.

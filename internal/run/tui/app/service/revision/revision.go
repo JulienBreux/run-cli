@@ -52,6 +52,16 @@ func NewListComponent(app *tview.Application) *ListComponent {
 	}
 }
 
+// Clear clears the list component.
+func (c *ListComponent) Clear() {
+	c.Table.Table.Clear()
+	c.SetHeadersWithExpansions(
+		[]string{"NAME", "TRAFFIC", "DEPLOYED", "REVISION TAGS"},
+		[]int{2, 1, 1, 2},
+	)
+	c.Table.Table.SetTitle(" Revisions (0) ")
+}
+
 // NewDetailComponent creates a new revision detail component.
 func NewDetailComponent() *DetailComponent {
 	tv := tview.NewTextView().
@@ -181,4 +191,9 @@ func (c *DetailComponent) Update(rev model_revision.Revision) {
 	}
 
 	c.SetText(sb.String())
+}
+
+// Clear clears the detail component.
+func (c *DetailComponent) Clear() {
+	c.SetText("")
 }

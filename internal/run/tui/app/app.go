@@ -483,6 +483,10 @@ func showError(err error) {
 }
 
 func switchTo(pageID string) {
+	if currentPageID == service.DASHBOARD_PAGE_ID && pageID != service.DASHBOARD_PAGE_ID {
+		service.DashboardClear()
+	}
+
 	previousPageID = currentPageID
 	currentPageID = pageID
 	pages.SwitchToPage(pageID)

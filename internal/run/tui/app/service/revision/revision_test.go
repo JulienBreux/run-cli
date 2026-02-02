@@ -56,3 +56,26 @@ func TestDetailComponent_Update(t *testing.T) {
 	assert.Contains(t, comp.GetText(true), "rev1")
 	assert.Contains(t, comp.GetText(true), "user@example.com")
 }
+
+func TestListComponent_Clear(t *testing.T) {
+	app := tview.NewApplication()
+	comp := NewListComponent(app)
+	svc := &model_service.Service{Name: "s1"}
+	revs := []model_revision.Revision{{Name: "rev1"}}
+
+	comp.Update(svc, revs)
+	assert.Equal(t, 2, comp.Table.Table.GetRowCount())
+
+	comp.Clear()
+	assert.Equal(t, 1, comp.Table.Table.GetRowCount()) // Header only
+}
+
+func TestDetailComponent_Clear(t *testing.T) {
+	comp := NewDetailComponent()
+	rev := model_revision.Revision{Name: "rev1"}
+	comp.Update(rev)
+	assert.Contains(t, comp.GetText(true), "rev1")
+
+	comp.Clear()
+	assert.Equal(t, "", comp.GetText(true))
+}

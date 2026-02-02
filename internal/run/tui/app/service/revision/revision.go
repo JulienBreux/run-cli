@@ -24,6 +24,7 @@ import (
 	model_revision "github.com/JulienBreux/run-cli/internal/run/model/service/revision"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/table"
 	"github.com/dustin/go-humanize"
+	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
@@ -42,35 +43,43 @@ type DetailComponent struct {
 func NewListComponent(app *tview.Application) *ListComponent {
 	t := table.New(" Revisions ")
 	t.SetHeadersWithExpansions(
-		[]string{"NAME", "TRAFFIC", "DEPLOYED", "REVISION TAGS"},
-		[]int{2, 1, 1, 2},
+		[]string{"", "NAME", "TRAFFIC", "DEPLOYED", "REVISION TAGS"},
+		[]int{1, 2, 1, 1, 2},
 	)
 
-	return &ListComponent{
+	c := &ListComponent{
 		Table: t,
 		app:   app,
 	}
+
+	c.Table.Table.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Rune() == ' ' {
+			row, _ := c.Table.Table.GetSelection()
+			c.Table.ToggleSelection(row)
+			c.updateMark(row)
+			return nil
+		}
+		return event
+	})
+
+	return c
 }
 
-// NewDetailComponent creates a new revision detail component.
-func NewDetailComponent() *DetailComponent {
-	tv := tview.NewTextView().
-		SetDynamicColors(true).
-		SetScrollable(true).
-		SetWrap(true)
-	tv.SetBorder(true).SetTitle(" Revision Details ")
-
-	return &DetailComponent{
-		TextView: tv,
+func (c *ListComponent) updateMark(row int) {
+	mark := ""
+	if c.Table.SelectedRows[row] {
+		mark = "[yellow]●[white]"
 	}
+	c.Table.Table.SetCell(row, 0, tview.NewTableCell(mark).SetSelectable(false))
 }
 
 // Update updates the list component with revisions.
 func (c *ListComponent) Update(service *model_service.Service, revisions []model_revision.Revision) {
 	c.Table.Table.Clear()
+	c.Table.ClearSelection()
 	c.SetHeadersWithExpansions(
-		[]string{"NAME", "TRAFFIC", "DEPLOYED", "REVISION TAGS"},
-		[]int{2, 1, 1, 2},
+		[]string{"", "NAME", "TRAFFIC", "DEPLOYED", "REVISION TAGS"},
+		[]int{1, 2, 1, 1, 2},
 	)
 
 	for i, rev := range revisions {
@@ -98,13 +107,38 @@ func (c *ListComponent) Update(service *model_service.Service, revisions []model
 			}
 		}
 
-		c.Table.Table.SetCell(row, 0, tview.NewTableCell(rev.Name))
-		c.Table.Table.SetCell(row, 1, tview.NewTableCell(traffic))
-		c.Table.Table.SetCell(row, 2, tview.NewTableCell(humanize.Time(rev.CreateTime)))
-		c.Table.Table.SetCell(row, 3, tview.NewTableCell(tags))
+		c.Table.Table.SetCell(row, 0, tview.NewTableCell("").SetSelectable(false))
+		c.Table.Table.SetCell(row, 1, tview.NewTableCell(rev.Name))
+		c.Table.Table.SetCell(row, 2, tview.NewTableCell(traffic))
+		c.Table.Table.SetCell(row, 3, tview.NewTableCell(humanize.Time(rev.CreateTime)))
+		c.Table.Table.SetCell(row, 4, tview.NewTableCell(tags))
 	}
 
 	c.Table.Table.SetTitle(fmt.Sprintf(" Revisions (%d) ", len(revisions)))
+}
+
+// GetSelectedRevisions returns the selected revisions.
+func (c *ListComponent) GetSelectedRevisions(revisions []model_revision.Revision) []model_revision.Revision {
+	var selected []model_revision.Revision
+	for row, isSelected := range c.Table.SelectedRows {
+		if isSelected && row > 0 && row <= len(revisions) {
+			selected = append(selected, revisions[row-1])
+		}
+	}
+	return selected
+}
+
+// NewDetailComponent creates a new revision detail component.
+func NewDetailComponent() *DetailComponent {
+	tv := tview.NewTextView().
+		SetDynamicColors(true).
+		SetScrollable(true).
+		SetWrap(true)
+	tv.SetBorder(true).SetTitle(" Revision Details ")
+
+	return &DetailComponent{
+		TextView: tv,
+	}
 }
 
 // Update updates the detail component with a revision.

@@ -24,9 +24,10 @@ import (
 
 // Table represents a Table.
 type Table struct {
-	Title string
-	Table *tview.Table
-	View  tview.Primitive
+	Title        string
+	Table        *tview.Table
+	View         tview.Primitive
+	SelectedRows map[int]bool
 }
 
 // BorderWrapper wraps tview.Table to provide dynamic border styles.
@@ -93,10 +94,35 @@ func New(title string) *Table {
 	}
 
 	return &Table{
-		Title: title,
-		Table: table,
-		View:  wrapper,
+		Title:        title,
+		Table:        table,
+		View:         wrapper,
+		SelectedRows: make(map[int]bool),
 	}
+}
+
+// ToggleSelection toggles the selection of a row.
+func (t *Table) ToggleSelection(row int) {
+	if row < 1 { // Skip header
+		return
+	}
+	t.SelectedRows[row] = !t.SelectedRows[row]
+}
+
+// GetSelectedRows returns the indices of selected rows.
+func (t *Table) GetSelectedRows() []int {
+	var rows []int
+	for row, selected := range t.SelectedRows {
+		if selected {
+			rows = append(rows, row)
+		}
+	}
+	return rows
+}
+
+// ClearSelection clears all selected rows.
+func (t *Table) ClearSelection() {
+	t.SelectedRows = make(map[int]bool)
 }
 
 // SetHeaders sets the table headers.

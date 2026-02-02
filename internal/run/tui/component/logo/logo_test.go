@@ -29,6 +29,20 @@ func TestString(t *testing.T) {
 	if !strings.Contains(s, "___ _   _ _  _") {
 		t.Errorf("logo.String() should contain the logo art")
 	}
+	if !strings.Contains(s, "Julien Breux") {
+		t.Errorf("logo.String() should contain the attribution")
+	}
+}
+
+func TestStringSimple(t *testing.T) {
+	s := logo.StringSimple()
+
+	if !strings.Contains(s, "___ _   _ _  _") {
+		t.Errorf("logo.StringSimple() should contain the logo art")
+	}
+	if strings.Contains(s, "Julien Breux") {
+		t.Errorf("logo.StringSimple() should NOT contain the attribution")
+	}
 }
 
 func TestNew(t *testing.T) {

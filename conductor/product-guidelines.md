@@ -5,6 +5,7 @@
 
 ## Visual Identity & UI Design
 - **Clarity & Information Density:** The TUI layout should be optimized to present the maximum amount of relevant data clearly. Avoid unnecessary whitespace or decorative elements that do not serve an informational purpose.
+- **Professional Branding:** Maintain a clean and professional appearance by avoiding personal attributions in persistent UI elements like the header. Personal recognition is reserved for dedicated sections like the Credits modal.
 - **High Contrast & Accessibility:** Use standard terminal colors to ensure high contrast and legibility across various terminal themes. Prioritize accessibility by avoiding color-only indicators where possible.
 
 ## User Interaction

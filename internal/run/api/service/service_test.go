@@ -25,6 +25,7 @@ import (
 	"cloud.google.com/go/run/apiv2/runpb"
 	"github.com/JulienBreux/run-cli/internal/run/api/client"
 	api_region "github.com/JulienBreux/run-cli/internal/run/api/region"
+	model_traffic "github.com/JulienBreux/run-cli/internal/run/model/service/traffic"
 	"github.com/googleapis/gax-go/v2"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2/google"
@@ -226,6 +227,49 @@ func TestList_Error(t *testing.T) {
 	services, err := List("p", "r")
 	assert.Error(t, err)
 	assert.Nil(t, services)
+}
+
+func TestUpdateTraffic(t *testing.T) {
+	originalClient := apiClient
+	defer func() { apiClient = originalClient }()
+
+	mock := &MockClient{}
+	apiClient = mock
+
+	// Setup GetService mock
+	mock.GetServiceFunc = func(ctx context.Context, name string) (*runpb.Service, error) {
+		return &runpb.Service{
+			Name: name,
+			Traffic: []*runpb.TrafficTarget{
+				{
+					Type:    runpb.TrafficTargetAllocationType_TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST,
+					Percent: 100,
+				},
+			},
+		}, nil
+	}
+
+	// Setup UpdateService mock
+	mock.UpdateServiceFunc = func(ctx context.Context, service *runpb.Service) (*runpb.Service, error) {
+		// Assert that traffic was updated correctly
+		assert.Len(t, service.Traffic, 2)
+		assert.Equal(t, int32(80), service.Traffic[0].Percent)
+		assert.Equal(t, "rev1", service.Traffic[0].Revision)
+		assert.Equal(t, int32(20), service.Traffic[1].Percent)
+		assert.Equal(t, "rev2", service.Traffic[1].Revision)
+		return service, nil
+	}
+
+	targets := []model_traffic.TrafficTarget{
+		{Revision: "rev1", Percent: 80},
+		{Revision: "rev2", Percent: 20},
+	}
+
+	result, err := UpdateTraffic(context.Background(), "p", "r", "s1", targets)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, "s1", result.Name)
 }
 
 func TestUpdateScaling_Error(t *testing.T) {

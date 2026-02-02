@@ -20,6 +20,14 @@ const (
 	TrafficTargetAllocationTypeLatest = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
 )
 
+// TrafficTarget represents a traffic target allocation.
+type TrafficTarget struct {
+	Type     string `json:"type,omitempty"`
+	Revision string `json:"revision,omitempty"`
+	Percent  int32  `json:"percent"`
+	Tag      string `json:"tag,omitempty"`
+}
+
 // TrafficTargetStatus represents the actual traffic allocated to a revision.
 type TrafficTargetStatus struct {
 	Type     string `json:"type,omitempty"`

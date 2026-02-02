@@ -244,6 +244,60 @@ func UpdateAuthentication(ctx context.Context, project, region, serviceName stri
 	return &s, nil
 }
 
+// UpdateTraffic updates the traffic split for a service.
+func UpdateTraffic(ctx context.Context, project, region, serviceName string, targets []model_traffic.TrafficTarget) (*model.Service, error) {
+	fullServiceName := fmt.Sprintf("projects/%s/locations/%s/services/%s", project, region, serviceName)
+
+	service, err := apiClient.GetService(ctx, fullServiceName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get service: %w", err)
+	}
+
+	var pbTargets []*runpb.TrafficTarget
+	for _, t := range targets {
+		pbTarget := &runpb.TrafficTarget{
+			Percent:  t.Percent,
+			Revision: t.Revision,
+			Tag:      t.Tag,
+		}
+		if t.Type != "" {
+			if val, ok := runpb.TrafficTargetAllocationType_value[t.Type]; ok {
+				pbTarget.Type = runpb.TrafficTargetAllocationType(val)
+			}
+		} else if t.Revision == "" {
+			pbTarget.Type = runpb.TrafficTargetAllocationType_TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST
+		} else {
+			pbTarget.Type = runpb.TrafficTargetAllocationType_TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION
+		}
+		pbTargets = append(pbTargets, pbTarget)
+	}
+
+	service.Traffic = pbTargets
+
+	// Clean up output-only fields before update
+	service.Uid = ""
+	service.Generation = 0
+	service.CreateTime = nil
+	service.UpdateTime = nil
+	service.DeleteTime = nil
+	service.ExpireTime = nil
+	service.Creator = ""
+	service.LastModifier = ""
+	service.Reconciling = false
+	service.ObservedGeneration = 0
+	service.TerminalCondition = nil
+	service.Conditions = nil
+
+	// Update the service
+	resp, err := apiClient.UpdateService(ctx, service)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update service: %w", err)
+	}
+
+	s := mapService(resp, project, region)
+	return &s, nil
+}
+
 func listAllRegions(project string) ([]model.Service, error) {
 	var (
 		mu       sync.Mutex

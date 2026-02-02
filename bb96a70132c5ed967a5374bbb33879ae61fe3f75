@@ -1,0 +1,1 @@
+Task: Integrate the new Revision views into the Service Dashboard.\n\nSummary:\n- Refactored dashboard.go to use the new revision package components.\n- Removed over 100 lines of redundant UI logic from dashboard.go.\n- Updated tests to reflect component structure changes.\n\nFiles:\n- internal/run/tui/app/service/dashboard.go\n- internal/run/tui/app/service/dashboard_test.go

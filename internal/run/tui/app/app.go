@@ -353,6 +353,29 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 			}
 			return nil
 		}
+		if event.Rune() == 't' {
+			if s := service.GetSelectedServiceFull(); s != nil {
+				// For the list view, we don't have revisions pre-loaded in a dashboard.
+				// We need to fetch them or pass nil and let the modal handle it?
+				// Better to fetch them here or make the modal fetch them if nil.
+				// However, our modal signature requires []model_revision.Revision.
+				
+				// Let's keep it simple: Show loading, fetch revisions, then open modal.
+				showLoading()
+				go func() {
+					revs, err := service.FetchRevisions(currentInfo.Project, s.Region, s.Name)
+					app.QueueUpdateDraw(func() {
+						hideLoading()
+						if err != nil {
+							showError(err)
+						} else {
+							openServiceTrafficSplitModal(s, revs)
+						}
+					})
+				}()
+			}
+			return nil
+		}
 		if result := service.HandleShortcuts(event); result == nil {
 			return nil
 		}

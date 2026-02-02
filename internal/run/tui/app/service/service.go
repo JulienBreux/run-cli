@@ -26,6 +26,7 @@ import (
 	api_service "github.com/JulienBreux/run-cli/internal/run/api/service"
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
 	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
+	model_revision "github.com/JulienBreux/run-cli/internal/run/model/service/revision"
 	"github.com/JulienBreux/run-cli/internal/run/proxy"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/footer"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/table"
@@ -74,6 +75,11 @@ var listServicesFunc = api_service.List
 // Fetch retrieves the list of services from the API.
 func Fetch(projectID, region string) ([]model_service.Service, error) {
 	return listServicesFunc(projectID, region)
+}
+
+// FetchRevisions retrieves the list of revisions for a service.
+func FetchRevisions(projectID, region, serviceName string) ([]model_revision.Revision, error) {
+	return listRevisionsFunc(projectID, region, serviceName)
 }
 
 // List returns a list of services.
@@ -296,7 +302,7 @@ func Shortcuts() {
 		return
 	}
 
-	shortcuts := `[dodgerblue]<r> [white]Refresh  [dodgerblue]<d> [white]Describe  [dodgerblue]<l> [white]Logs [dodgerblue]<s> [white]Scale [dodgerblue]<a> [white]Auth [dodgerblue]<o> [white]Open URL  [dodgerblue]<enter> [white]Details`
+	shortcuts := `[dodgerblue]<r> [white]Refresh  [dodgerblue]<d> [white]Describe  [dodgerblue]<l> [white]Logs [dodgerblue]<s> [white]Scale [dodgerblue]<a> [white]Auth [dodgerblue]<t> [white]Traffic [dodgerblue]<o> [white]Open URL  [dodgerblue]<enter> [white]Details`
 
 	// Check selected service proxy status
 	svc := GetSelectedServiceFull()

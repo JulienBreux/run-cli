@@ -126,8 +126,14 @@ func Modal(app *tview.Application, service *model_service.Service, allRevisions 
 
 	// Initial Population based on current traffic
 	for _, ts := range service.TrafficStatuses {
-		if ts.Percent > 0 && ts.Revision != "" {
-			addRow(ts.Revision, strconv.Itoa(int(ts.Percent)))
+		if ts.Percent > 0 {
+			revName := ts.Revision
+			if ts.Type == model_traffic.TrafficTargetAllocationTypeLatest {
+				revName = service.LatestReadyRevision
+			}
+			if revName != "" {
+				addRow(revName, strconv.Itoa(int(ts.Percent)))
+			}
 		}
 	}
 	

@@ -1,0 +1,1 @@
+Task: Refactor Traffic Split Modal to use dynamic Dropdown selectors.\n\nSummary:\n- Updated Modal signature to accept all revisions.\n- Implemented dynamic form logic to add rows via 'Add Revision' button.\n- Replaced static inputs with Dropdowns for revision selection.\n- Retained validation logic.\n\nFiles:\n- internal/run/tui/app/service/traffic/split.go

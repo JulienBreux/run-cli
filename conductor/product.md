@@ -11,7 +11,7 @@ Run CLI is an interactive CLI to manage your Google Cloud Run resources with pan
 
 ## Key Features
 - **Unified Interactive Dashboard:** A centralized, interactive terminal interface for the comprehensive management of Cloud Run Services, Jobs, and Worker Pools.
-- **Detailed Revision Management:** Advanced views for service revision history, traffic allocation analysis, and granular configuration inspection.
+- **Detailed Revision Management:** Advanced views for service revision history, traffic allocation analysis (including dynamic split updates), and granular configuration inspection.
 
 ## Unique Value Proposition
 - **Visual Resource Management:** Offers a sophisticated visual representation of cloud resources using interactive tables and dashboards, providing superior clarity over standard flat CLI output.

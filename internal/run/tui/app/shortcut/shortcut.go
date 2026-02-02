@@ -48,35 +48,32 @@ const (
 
 var Registry = []Shortcut{
 	// Global
-	{Key: "Ctrl+S", TCellKey: tcell.KeyCtrlS, Description: "Services List", Category: CategoryGlobal},
-	{Key: "Ctrl+J", TCellKey: tcell.KeyCtrlJ, Description: "Jobs List", Category: CategoryGlobal},
-	{Key: "Ctrl+W", TCellKey: tcell.KeyCtrlW, Description: "Worker Pools List", Category: CategoryGlobal},
-	{Key: "Ctrl+D", TCellKey: tcell.KeyCtrlD, Description: "Domain Mappings List", Category: CategoryGlobal},
-	{Key: "?", Rune: '?', Description: "Help Page", Category: CategoryGlobal},
-	{Key: "Ctrl+P", TCellKey: tcell.KeyCtrlP, Description: "Project Selection", Category: CategoryGlobal},
-	{Key: "Ctrl+R", TCellKey: tcell.KeyCtrlR, Description: "Region Selection", Category: CategoryGlobal},
-	{Key: "Ctrl+Z", TCellKey: tcell.KeyCtrlZ, Description: "Console", Category: CategoryGlobal},
-	{Key: "Ctrl+L", TCellKey: tcell.KeyCtrlL, Description: "Releases", Category: CategoryGlobal},
+	{Key: "ctrl+s", TCellKey: tcell.KeyCtrlS, Description: "Services", Category: CategoryGlobal},
+	{Key: "ctrl+j", TCellKey: tcell.KeyCtrlJ, Description: "Jobs", Category: CategoryGlobal},
+	{Key: "ctrl+w", TCellKey: tcell.KeyCtrlW, Description: "Worker Pools", Category: CategoryGlobal},
+	{Key: "ctrl+d", TCellKey: tcell.KeyCtrlD, Description: "Domain Mappings", Category: CategoryGlobal},
+	{Key: "ctrl+p", TCellKey: tcell.KeyCtrlP, Description: "Project", Category: CategoryGlobal},
+	{Key: "ctrl+r", TCellKey: tcell.KeyCtrlR, Description: "Region", Category: CategoryGlobal},
+	{Key: "ctrl+z", TCellKey: tcell.KeyCtrlZ, Description: "Console", Category: CategoryGlobal},
+	{Key: "ctrl+l", TCellKey: tcell.KeyCtrlL, Description: "Releases", Category: CategoryGlobal},
 	{Key: "Esc", TCellKey: tcell.KeyEscape, Description: "Back / Close Modal", Category: CategoryGlobal},
 
 	// Service List
-	{Key: "r", Rune: 'r', Description: "Refresh List", Category: CategoryServiceList},
-	{Key: "d", Rune: 'd', Description: "Describe Service", Category: CategoryServiceList},
+	{Key: "r", Rune: 'r', Description: "Refresh", Category: CategoryServiceList},
+	{Key: "d", Rune: 'd', Description: "Describe", Category: CategoryServiceList},
 	{Key: "l", Rune: 'l', Description: "Logs", Category: CategoryServiceList},
 	{Key: "s", Rune: 's', Description: "Scale", Category: CategoryServiceList},
 	{Key: "a", Rune: 'a', Description: "Auth", Category: CategoryServiceList},
 	{Key: "t", Rune: 't', Description: "Traffic", Category: CategoryServiceList},
 	{Key: "o", Rune: 'o', Description: "Open URL", Category: CategoryServiceList},
-	{Key: "p", Rune: 'p', Description: "Toggle Proxy", Category: CategoryServiceList},
+	{Key: "p", Rune: 'p', Description: "Proxy", Category: CategoryServiceList},
 	{Key: "enter", TCellKey: tcell.KeyEnter, Description: "Details", Category: CategoryServiceList},
-	{Key: "?", Rune: '?', Description: "Help", Category: CategoryServiceList},
 
 	// Service Dashboard
 	{Key: "esc", TCellKey: tcell.KeyEscape, Description: "Back", Category: CategoryServiceDashboard},
 	{Key: "tab", TCellKey: tcell.KeyTab, Description: "Next Tab", Category: CategoryServiceDashboard},
 	{Key: "shift-tab", TCellKey: tcell.KeyBacktab, Description: "Prev Tab", Category: CategoryServiceDashboard},
 	{Key: "t", Rune: 't', Description: "Traffic Split", Category: CategoryServiceDashboard},
-	{Key: "?", Rune: '?', Description: "Help", Category: CategoryServiceDashboard},
 
 	// Job List
 	{Key: "r", Rune: 'r', Description: "Refresh", Category: CategoryJobList},
@@ -84,19 +81,16 @@ var Registry = []Shortcut{
 	{Key: "l", Rune: 'l', Description: "Logs", Category: CategoryJobList},
 	{Key: "x", Rune: 'x', Description: "Execute", Category: CategoryJobList},
 	{Key: "enter", TCellKey: tcell.KeyEnter, Description: "Details", Category: CategoryJobList},
-	{Key: "?", Rune: '?', Description: "Help", Category: CategoryJobList},
 
 	// Worker List
 	{Key: "r", Rune: 'r', Description: "Refresh", Category: CategoryWorkerList},
 	{Key: "d", Rune: 'd', Description: "Describe", Category: CategoryWorkerList},
 	{Key: "s", Rune: 's', Description: "Scale", Category: CategoryWorkerList},
-	{Key: "?", Rune: '?', Description: "Help", Category: CategoryWorkerList},
 
 	// Domain Mapping
 	{Key: "r", Rune: 'r', Description: "Refresh", Category: CategoryDomainMapping},
 	{Key: "o", Rune: 'o', Description: "Open URL", Category: CategoryDomainMapping},
 	{Key: "enter", TCellKey: tcell.KeyEnter, Description: "Info", Category: CategoryDomainMapping},
-	{Key: "?", Rune: '?', Description: "Help", Category: CategoryDomainMapping},
 }
 
 // GetByCategory returns shortcuts for a given category.

@@ -27,6 +27,7 @@ import (
 	model_revision "github.com/JulienBreux/run-cli/internal/run/model/service/revision"
 	model_traffic "github.com/JulienBreux/run-cli/internal/run/model/service/traffic"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/spinner"
+	"github.com/JulienBreux/run-cli/pkg/dropdown"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
@@ -35,8 +36,8 @@ const (
 	MODAL_PAGE_ID = "traffic-split"
 )
 
-// Modal returns a modal primitive for traffic splitting.
-func Modal(app *tview.Application, service *model_service.Service, revisions []model_revision.Revision, onCompletion func(refresh bool)) tview.Primitive {
+// Modal returns a modal primitive for traffic splitting using dropdowns.
+func Modal(app *tview.Application, service *model_service.Service, allRevisions []model_revision.Revision, onCompletion func(refresh bool)) tview.Primitive {
 	// --- Styles ---
 	fieldBackgroundColor := tcell.ColorBlack
 	fieldTextColor := tcell.ColorWhite
@@ -46,11 +47,11 @@ func Modal(app *tview.Application, service *model_service.Service, revisions []m
 
 	// --- Components ---
 
-	// Spinner for feedback and status
+	// Spinner
 	statusSpinner := spinner.New(app, 1)
 	statusSpinner.SetTextAlign(tview.AlignCenter)
 
-	// Container for Form + Status
+	// Main Flex Container
 	container := tview.NewFlex().SetDirection(tview.FlexRow)
 	container.SetBorder(true).
 		SetTitle(" Traffic Split ").
@@ -65,36 +66,120 @@ func Modal(app *tview.Application, service *model_service.Service, revisions []m
 	form.SetButtonBackgroundColor(buttonBgColor)
 	form.SetButtonTextColor(buttonTextColor)
 
-	// Fields
-	fields := make(map[string]*tview.InputField)
-	for _, rev := range revisions {
-		initialPercent := "0"
-		for _, ts := range service.TrafficStatuses {
-			if ts.Revision == rev.Name {
-				initialPercent = strconv.Itoa(int(ts.Percent))
+	// Prepare Revision Options for Dropdown
+	revOptions := []string{}
+	for _, r := range allRevisions {
+		revOptions = append(revOptions, r.Name)
+	}
+
+	// State to track rows
+	type rowStruct struct {
+		dropdown *dropdown.DropDown
+		input    *tview.InputField
+	}
+	var rows []*rowStruct
+
+	// Helper to add a row
+	addRow := func(initialRev string, initialPercent string) {
+		r := &rowStruct{}
+
+		// Dropdown
+		dd := dropdown.New()
+		dd.SetLabel("Revision")
+		dd.SetOptions(revOptions, nil)
+		dd.SetFieldBackgroundColor(fieldBackgroundColor)
+		dd.SetListStyles(
+			tcell.StyleDefault.Background(tcell.ColorDarkGray),
+			tcell.StyleDefault.Background(tcell.ColorLightCyan).Foreground(tcell.ColorBlack),
+		)
+		
+		// Set initial selection
+		foundIndex := -1
+		for i, opt := range revOptions {
+			if opt == initialRev {
+				foundIndex = i
 				break
 			}
 		}
+		if foundIndex >= 0 {
+			dd.SetCurrentOption(foundIndex)
+		} else if len(revOptions) > 0 {
+			dd.SetCurrentOption(0)
+		}
 
-		field := tview.NewInputField().
-			SetLabel(rev.Name).
+		// Input
+		inp := tview.NewInputField().
+			SetLabel("Percent").
 			SetFieldWidth(5).
 			SetText(initialPercent)
-		form.AddFormItem(field)
-		fields[rev.Name] = field
+		inp.SetFieldBackgroundColor(fieldBackgroundColor)
+		inp.SetFieldTextColor(fieldTextColor)
+
+		r.dropdown = dd
+		r.input = inp
+		rows = append(rows, r)
+
+		// Add to form
+		form.AddFormItem(dd)
+		form.AddFormItem(inp)
 	}
 
-	// Buttons
+	// Initial Population based on current traffic
+	for _, ts := range service.TrafficStatuses {
+		if ts.Percent > 0 && ts.Revision != "" {
+			addRow(ts.Revision, strconv.Itoa(int(ts.Percent)))
+		}
+	}
+	
+	// Ensure at least one row if empty (though usually traffic is 100%)
+	if len(rows) == 0 {
+		// Default to latest ready revision if possible, else first available
+		defaultRev := service.LatestReadyRevision
+		if defaultRev == "" && len(allRevisions) > 0 {
+			defaultRev = allRevisions[0].Name
+		}
+		addRow(defaultRev, "100")
+	}
+
+	// Add Button (Dynamic Adding not easily supported by tview.Form structure in one pass, 
+	// typically requires rebuilding the form or using a custom layout. 
+	// For simplicity in this iteration, we will just allow editing existing splits.
+	// OR we can add a "Add Split" button that rebuilds the form? 
+	// tview.Form doesn't expose InsertItem easily.
+	
+	// Let's rely on a simpler approach: 
+	// We list *all* revisions? No, that's too many.
+	// We need to allow adding.
+	
+	// Let's try to add a "Add Revision" button *at the end*?
+	// The standard Form AddButton adds to the bottom bar.
+	
+	form.AddButton("Add Revision", func() {
+		// We can't dynamically insert form items easily into the *middle* of the rendered form list 
+		// without rebuilding or hacking internals.
+		// However, we can just append to the form items list.
+		if len(allRevisions) > 0 {
+			addRow(allRevisions[0].Name, "0")
+			// We need to re-setup navigation or redraw?
+			// tview handles redraw on next cycle.
+		}
+	})
+
 	form.AddButton("Save", func() {
 		var params []string
 		var targets []model_traffic.TrafficTarget
-		for _, rev := range revisions {
-			text := fields[rev.Name].GetText()
-			params = append(params, text)
+		
+		// Collect data
+		// Iterate through our rows struct which holds references
+		for _, r := range rows {
+			_, rev := r.dropdown.GetCurrentOption()
+			percentText := r.input.GetText()
 			
-			percent, _ := strconv.ParseInt(text, 10, 32)
+			params = append(params, percentText)
+			
+			percent, _ := strconv.ParseInt(percentText, 10, 32)
 			targets = append(targets, model_traffic.TrafficTarget{
-				Revision: rev.Name,
+				Revision: rev,
 				Percent:  int32(percent),
 			})
 		}
@@ -127,8 +212,10 @@ func Modal(app *tview.Application, service *model_service.Service, revisions []m
 
 	// Style Buttons
 	if form.GetButtonCount() >= 2 {
-		form.GetButton(0).SetBackgroundColor(tcell.ColorDarkGreen)
-		form.GetButton(1).SetBackgroundColor(tcell.ColorDarkRed)
+		// 0: Add, 1: Save, 2: Cancel
+		form.GetButton(0).SetBackgroundColor(tcell.ColorDarkBlue)
+		form.GetButton(1).SetBackgroundColor(tcell.ColorDarkGreen)
+		form.GetButton(2).SetBackgroundColor(tcell.ColorDarkRed)
 	}
 
 	// --- Layout ---
@@ -138,7 +225,7 @@ func Modal(app *tview.Application, service *model_service.Service, revisions []m
 	// Global Grid wrapper for centering
 	grid := tview.NewGrid().
 		SetColumns(0, 60, 0).
-		SetRows(0, 4+(len(revisions)*2), 0).
+		SetRows(0, 20, 0). // Fixed height for now, scrolling handled by Form if needed? Form scrolls? 
 		AddItem(container, 1, 1, 1, 1, 0, 0, true)
 
 	// Escape to Close

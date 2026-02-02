@@ -7,14 +7,14 @@
     - [x] Update API client in internal/run/api/service/revision.
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Models and API Client' (Protocol in workflow.md) 4560608
 
-## Phase 2: TUI Components
+## Phase 2: TUI Components [checkpoint: e863d9d]
 - [x] Task: Create a dedicated Revision list component with traffic allocation visualization. 98ae517
     - [x] Write unit tests for Revision list component rendering logic.
     - [x] Implement the Revision list table in internal/run/tui/app/service/revision.
 - [x] Task: Create a Revision detail view showing configuration and status. a144f5d
     - [x] Write unit tests for Revision detail component logic.
     - [x] Implement the detail view component.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: TUI Components' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: TUI Components' (Protocol in workflow.md) e863d9d
 
 ## Phase 3: Integration and Navigation
 - [ ] Task: Integrate the new Revision views into the Service Dashboard.

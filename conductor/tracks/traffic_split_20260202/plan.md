@@ -14,7 +14,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Traffic Split Modal (Refactor)' (Protocol in workflow.md) e51ddd2
 
 ## Phase 3: Integration
-- [ ] Task: Connect the Service Dashboard to the new Traffic Split modal.
-    - [ ] Add `t` shortcut to trigger the modal (passing full service and revision list).
-    - [ ] Remove any previous selection logic if present.
+- [x] Task: Connect the Service Dashboard to the new Traffic Split modal. a5458a9
+    - [x] Add `t` shortcut to trigger the modal (passing full service and revision list).
+    - [x] Remove any previous selection logic if present.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Integration' (Protocol in workflow.md)

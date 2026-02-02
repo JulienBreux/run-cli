@@ -130,7 +130,7 @@ func TestDashboardReload(t *testing.T) {
 		assert.True(t, called)
 		// The callback runs AFTER update. So table should be populated.
 		// Header row + 1 item = 2 rows
-		assert.Equal(t, 2, revisionsTable.Table.GetRowCount())
+		assert.Equal(t, 2, revisionsList.Table.Table.GetRowCount())
 	case <-time.After(2 * time.Second):
 		t.Fatal("Timeout waiting for DashboardReload")
 	}

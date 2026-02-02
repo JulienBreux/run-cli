@@ -1,11 +1,11 @@
 # Implementation Plan - Service Revision View
 
-## Phase 1: Models and API Client
+## Phase 1: Models and API Client [checkpoint: 4560608]
 - [x] Task: Update Revision models and client to ensure all necessary fields for traffic and history are captured. 7ecda3e
     - [x] Write unit tests for Revision model parsing and client data retrieval.
     - [x] Implement/Update Revision model in internal/run/model/service/revision.
     - [x] Update API client in internal/run/api/service/revision.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Models and API Client' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Models and API Client' (Protocol in workflow.md) 4560608
 
 ## Phase 2: TUI Components
 - [ ] Task: Create a dedicated Revision list component with traffic allocation visualization.

@@ -257,6 +257,21 @@ func updateRevisionDetail(row int) {
 	revisionsDetail.Update(dashboardRevisions[row-1])
 }
 
+// GetSelectedServiceFull returns the full service object for the selected row.
+// func GetSelectedServiceFull() *model_service.Service {
+// This function doesn't exist in dashboard.go but in service.go (the list view).
+// dashboard.go manages the Detail view of a service.
+
+// GetAllRevisions returns all revisions for the current dashboard.
+func GetAllRevisions() []model_revision.Revision {
+	return dashboardRevisions
+}
+
+// GetDashboardService returns the current dashboard service.
+func GetDashboardService() *model_service.Service {
+	return dashboardService
+}
+
 // DashboardReload reloads the dashboard for a specific service.
 func DashboardReload(app *tview.Application, currentInfo info.Info, service *model_service.Service, onResult func(error)) {
 	dashboardService = service

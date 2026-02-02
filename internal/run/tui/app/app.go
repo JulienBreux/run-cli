@@ -299,6 +299,25 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 		}
 	}
 
+	if currentPageID == service.DASHBOARD_PAGE_ID {
+		if event.Rune() == 't' {
+			s := service.GetSelectedServiceFull()
+			// If not in LIST view (where GetSelectedServiceFull works), we check dashboardService
+			if s == nil {
+				// We assume dashboard logic handles state
+				// But we need access to the current dashboard service from here or service package.
+				// Since we can't easily access private dashboardService, let's use the new getter
+				s = service.GetDashboardService()
+			}
+			
+			if s != nil {
+				revs := service.GetAllRevisions()
+				openServiceTrafficSplitModal(s, revs)
+			}
+			return nil
+		}
+	}
+
 	// Open URL for Service list
 	if currentPageID == service.LIST_PAGE_ID {
 		if event.Key() == tcell.KeyEnter {

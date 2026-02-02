@@ -1,0 +1,1 @@
+Task: Fix shortcut restoration logic for Traffic Split modal.\n\nSummary:\n- Updated modal callback to check previousPageID.\n- Restores Service List shortcuts if triggered from list.\n- Restores Dashboard shortcuts if triggered from dashboard.\n- Updated dashboard shortcut format to <t>.\n\nFiles:\n- internal/run/tui/app/modal.go\n- internal/run/tui/app/service/dashboard.go

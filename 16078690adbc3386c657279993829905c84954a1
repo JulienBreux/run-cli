@@ -1,0 +1,1 @@
+Task: Fix regression where attribution was removed from startup screen.\n\nSummary:\n- Refactored logo component to support StringSimple() for header usage.\n- Restored String() with attribution for loader usage.\n- Verified tests for both cases.\n\nFiles:\n- internal/run/tui/component/logo/logo.go

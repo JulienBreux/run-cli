@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Enhance the TUI with a dedicated view for Cloud Run Service Revisions including traffic allocation and deployment history.**
+- [x] **Track: Enhance the TUI with a dedicated view for Cloud Run Service Revisions including traffic allocation and deployment history.**
   *Link: [./tracks/revision_view_20260202/](./tracks/revision_view_20260202/)*

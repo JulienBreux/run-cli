@@ -1,10 +1,10 @@
 # Implementation Plan - Update Traffic Split
 
-## Phase 1: API Client Enhancements
+## Phase 1: API Client Enhancements [checkpoint: caaadf2]
 - [x] Task: Update the Service API client to support updating traffic splits. 061e4ab
     - [x] Write unit tests for the traffic update mapping logic and client execution.
     - [x] Implement `UpdateTraffic` method in `internal/run/api/service/service.go`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: API Client Enhancements' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: API Client Enhancements' (Protocol in workflow.md) caaadf2
 
 ## Phase 2: Traffic Split Modal
 - [ ] Task: Create a new TUI modal for entering traffic split percentages.

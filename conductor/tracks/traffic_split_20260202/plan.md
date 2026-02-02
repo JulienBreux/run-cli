@@ -6,12 +6,12 @@
     - [x] Implement `UpdateTraffic` method in `internal/run/api/service/service.go`.
 - [x] Task: Conductor - User Manual Verification 'Phase 1: API Client Enhancements' (Protocol in workflow.md) caaadf2
 
-## Phase 2: Traffic Split Modal
+## Phase 2: Traffic Split Modal [checkpoint: 0870cff]
 - [x] Task: Create a new TUI modal for entering traffic split percentages. a855d3c
     - [x] Write unit tests for percentage validation logic (must sum to 100).
     - [x] Implement the modal component in `internal/run/tui/app/service/traffic/split.go`.
     - [x] Ensure the modal dynamically lists selected revisions and provides input fields.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Traffic Split Modal' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Traffic Split Modal' (Protocol in workflow.md) 0870cff
 
 ## Phase 3: Integration and Selection
 - [ ] Task: Implement multi-selection logic for the Revisions table.

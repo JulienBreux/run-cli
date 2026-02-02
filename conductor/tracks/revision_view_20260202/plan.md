@@ -8,12 +8,12 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Models and API Client' (Protocol in workflow.md) 4560608
 
 ## Phase 2: TUI Components
-- [ ] Task: Create a dedicated Revision list component with traffic allocation visualization.
-    - [ ] Write unit tests for Revision list component rendering logic.
-    - [ ] Implement the Revision list table in internal/run/tui/app/service/revision.
-- [ ] Task: Create a Revision detail view showing configuration and status.
-    - [ ] Write unit tests for Revision detail component logic.
-    - [ ] Implement the detail view component.
+- [x] Task: Create a dedicated Revision list component with traffic allocation visualization. 98ae517
+    - [x] Write unit tests for Revision list component rendering logic.
+    - [x] Implement the Revision list table in internal/run/tui/app/service/revision.
+- [x] Task: Create a Revision detail view showing configuration and status. a144f5d
+    - [x] Write unit tests for Revision detail component logic.
+    - [x] Implement the detail view component.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: TUI Components' (Protocol in workflow.md)
 
 ## Phase 3: Integration and Navigation

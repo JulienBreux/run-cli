@@ -161,7 +161,7 @@ func Shortcuts() {
 		return
 	}
 
-	shortcuts := `[dodgerblue]<r> [white]Refresh  [dodgerblue]<o> [white]Open URL  [dodgerblue]<enter> [white]Info  [dodgerblue]<?> [white]Help`
+	shortcuts := `[dodgerblue]<r> [white]Refresh  [dodgerblue]<o> [white]Open URL  [dodgerblue]<enter> [white]Info`
 	footer.ContextShortcutView.SetText(shortcuts)
 }
 

@@ -175,6 +175,6 @@ func Shortcuts() {
 		return
 	}
 
-	shortcuts := `[dodgerblue]<r> [white]Refresh  [dodgerblue]<d> [white]Describe  [dodgerblue]<s> [white]Scale  [dodgerblue]<?> [white]Help`
+	shortcuts := `[dodgerblue]<r> [white]Refresh  [dodgerblue]<d> [white]Describe  [dodgerblue]<s> [white]Scale`
 	footer.ContextShortcutView.SetText(shortcuts)
 }

@@ -69,6 +69,7 @@ func columnShortcuts() *tview.Flex {
 	_, _ = fmt.Fprintf(col2, "[dodgerblue]<ctrl-j> [white]Jobs\n")
 	_, _ = fmt.Fprintf(col2, "[dodgerblue]<ctrl-w> [white]Worker Pools\n")
 	_, _ = fmt.Fprintf(col2, "[dodgerblue]<ctrl-d> [white]Domain Mappings\n")
+	_, _ = fmt.Fprintf(col2, "[dodgerblue]<?>\t    [white]Help\n")
 
 	return tview.NewFlex().
 		AddItem(col1, 20, 1, false).

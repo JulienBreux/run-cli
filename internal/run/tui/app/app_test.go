@@ -38,6 +38,10 @@ import (
 
 func setupTestApp() {
 	app = tview.NewApplication()
+	screen := tcell.NewSimulationScreen("UTF-8")
+	_ = screen.Init()
+	app.SetScreen(screen)
+
 	rootPages = tview.NewPages()
 	pages = tview.NewPages()
 	mainLoader = loader.New(app)
@@ -166,11 +170,6 @@ func TestShortcuts_OpenConsole(t *testing.T) {
 func TestInitializeApp(t *testing.T) {
 	setupTestApp()
 	
-	// Mock App with Simulation Screen
-	screen := tcell.NewSimulationScreen("UTF-8")
-	_ = screen.Init()
-	app.SetScreen(screen)
-	
 	go func() {
 		_ = app.Run()
 	}()
@@ -207,10 +206,6 @@ func TestSwitchTo(t *testing.T) {
 	setupTestApp()
 	buildLayout() // Inits footerPages, footerSpinner
 	
-	// Use Simulation Screen to handle QueueUpdateDraw called by ListReload
-	screen := tcell.NewSimulationScreen("UTF-8")
-	_ = screen.Init()
-	app.SetScreen(screen)
 	go func() { _ = app.Run() }()
 	defer app.Stop()
 
@@ -400,9 +395,6 @@ func TestShortcuts_Modals(t *testing.T) {
 func TestRun(t *testing.T) {
 	setupTestApp()
 	
-	// Simulation Screen
-	screen := tcell.NewSimulationScreen("UTF-8")
-	_ = screen.Init()
 	// We need to inject this screen into the app created by Run
 	// But Run creates a NEW app using tview.NewApplication().
 	// We can't inject screen into Run() directly.

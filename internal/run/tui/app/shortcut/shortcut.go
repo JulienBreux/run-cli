@@ -30,11 +30,12 @@ type Shortcut struct {
 	Rune        rune
 	Description string
 	Category    string
+	Space       int
 }
 
 // Format returns the formatted string for the shortcut.
 func (s Shortcut) Format() string {
-	return fmt.Sprintf("[dodgerblue]<%s> [white]%s", s.Key, s.Description)
+	return fmt.Sprintf("[dodgerblue]<%s> [white]%s%s", s.Key, strings.Repeat(" ", s.Space), s.Description)
 }
 
 const (
@@ -57,6 +58,7 @@ var Registry = []Shortcut{
 	{Key: "ctrl+z", TCellKey: tcell.KeyCtrlZ, Description: "Console", Category: CategoryGlobal},
 	{Key: "ctrl+l", TCellKey: tcell.KeyCtrlL, Description: "Releases", Category: CategoryGlobal},
 	{Key: "Esc", TCellKey: tcell.KeyEscape, Description: "Back / Close Modal", Category: CategoryGlobal},
+	{Key: "?", Rune: '?', Description: "Help", Category: CategoryGlobal, Space: 5},
 
 	// Service List
 	{Key: "r", Rune: 'r', Description: "Refresh", Category: CategoryServiceList},

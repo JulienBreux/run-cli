@@ -50,6 +50,7 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
+      - "^chore(conductor):"
   groups:
     - title: Features
       regexp: "^.*feat[(\\w)]*:+.*$"

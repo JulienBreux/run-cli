@@ -12,9 +12,9 @@ Goal: Identify current coverage gaps and ensure reporting is accurate.
 ## Phase 2: Core Logic and Models (`internal/run/model`)
 Goal: Increase coverage for the foundational data structures and business logic.
 
-- [ ] Task: Write Tests: Add unit tests for `internal/run/model/common/...`.
-- [ ] Task: Implement: Ensure all core model logic is verified.
-- [ ] Task: Write Tests: Add unit tests for `internal/run/model/service/...`, `job/...`, and `workerpool/...`.
+- [x] Task: Write Tests: Add unit tests for `internal/run/model/common/...`. 6cae097
+- [x] Task: Implement: Ensure all core model logic is verified. 6cae097
+- [~] Task: Write Tests: Add unit tests for `internal/run/model/service/...`, `job/...`, and `workerpool/...`.
 - [ ] Task: Implement: Enhance coverage for service, job, and workerpool models.
 - [ ] Task: Conductor - User Manual Verification 'Core Logic and Models' (Protocol in workflow.md)
 

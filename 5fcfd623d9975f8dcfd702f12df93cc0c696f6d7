@@ -1,0 +1,4 @@
+Task: Write Tests: Enhance test coverage for internal/run/api/service
+Summary: Added TestUpdateAuthentication and TestUpdateAuthentication_Error to verify service authentication updates and error handling. This brings the package coverage to 88.5%.
+Files: internal/run/api/service/service_test.go
+Why: To meet the >80% coverage requirement.

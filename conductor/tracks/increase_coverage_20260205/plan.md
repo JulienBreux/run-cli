@@ -5,13 +5,9 @@ This plan outlines the steps to identify low-coverage areas and systematically i
 ## Phase 1: Assessment and Tooling Configuration
 Goal: Identify current coverage gaps and ensure reporting is accurate.
 
-<<<<<<< HEAD
-- [ ] Task: Identify current coverage for all packages using `make test`.
-=======
-- [~] Task: Identify current coverage for all packages using `make test`.
->>>>>>> e252a58 (chore(conductor): restore track files and add coverage report)
-- [ ] Task: Document the packages and files with coverage below 80%.
-- [ ] Task: Conductor - User Manual Verification 'Assessment and Tooling Configuration' (Protocol in workflow.md)
+- [x] Task: Identify current coverage for all packages using `make test`. e252a58
+- [x] Task: Document the packages and files with coverage below 80%. e252a58
+- [~] Task: Conductor - User Manual Verification 'Assessment and Tooling Configuration' (Protocol in workflow.md)
 
 ## Phase 2: Core Logic and Models (`internal/run/model`)
 Goal: Increase coverage for the foundational data structures and business logic.

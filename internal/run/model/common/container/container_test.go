@@ -45,12 +45,12 @@ func TestContainer(t *testing.T) {
 					{Name: "X-Header", Value: "Value"},
 				},
 			},
-		},
-		Exec: &ExecAction{
-			Command: []string{"ls"},
-		},
-		TCPSocket: &TCPSocketAction{
-			Port: 8080,
+			Exec: &ExecAction{
+				Command: []string{"ls"},
+			},
+			TCPSocket: &TCPSocketAction{
+				Port: 8080,
+			},
 		},
 		VolumeMounts: []*VolumeMount{
 			{Name: "vol", MountPath: "/mnt"},
@@ -65,8 +65,8 @@ func TestContainer(t *testing.T) {
 	assert.NotNil(t, c.LivenessProbe.HTTPGet)
 	assert.Equal(t, "/health", c.LivenessProbe.HTTPGet.Path)
 	assert.Len(t, c.LivenessProbe.HTTPGet.HTTPHeaders, 1)
-	assert.NotNil(t, c.Exec)
-	assert.NotNil(t, c.TCPSocket)
+	assert.NotNil(t, c.LivenessProbe.Exec)
+	assert.NotNil(t, c.LivenessProbe.TCPSocket)
 	assert.Len(t, c.VolumeMounts, 1)
 }
 

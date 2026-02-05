@@ -14,9 +14,9 @@ Goal: Increase coverage for the foundational data structures and business logic.
 
 - [x] Task: Write Tests: Add unit tests for `internal/run/model/common/...`. 6cae097
 - [x] Task: Implement: Ensure all core model logic is verified. 6cae097
-- [~] Task: Write Tests: Add unit tests for `internal/run/model/service/...`, `job/...`, and `workerpool/...`.
-- [ ] Task: Implement: Enhance coverage for service, job, and workerpool models.
-- [ ] Task: Conductor - User Manual Verification 'Core Logic and Models' (Protocol in workflow.md)
+- [x] Task: Write Tests: Add unit tests for `internal/run/model/service/...`, `job/...`, and `workerpool/...`. 7901ea2
+- [x] Task: Implement: Enhance coverage for service, job, and workerpool models. 7901ea2
+- [~] Task: Conductor - User Manual Verification 'Core Logic and Models' (Protocol in workflow.md)
 
 ## Phase 3: API Clients (`internal/run/api`)
 Goal: Ensure robust interactions with Google Cloud APIs through mocking.

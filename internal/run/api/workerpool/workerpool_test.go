@@ -326,6 +326,19 @@ func TestGCPClient_ListWorkerPools(t *testing.T) {
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "authentication failed")
 	})
+
+	t.Run("Client Creation Error", func(t *testing.T) {
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+			return &google.Credentials{}, nil
+		}
+		createWorkerPoolsClient = func(ctx context.Context, opts ...option.ClientOption) (WorkerPoolsClientWrapper, error) {
+			return nil, errors.New("client creation error")
+		}
+		client := &GCPClient{}
+		_, err := client.ListWorkerPools(context.Background(), "p", "r")
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "client creation error")
+	})
 }
 
 func TestGCPClient_GetWorkerPool(t *testing.T) {
@@ -369,6 +382,17 @@ func TestGCPClient_GetWorkerPool(t *testing.T) {
 		client := &GCPClient{}
 		_, err := client.GetWorkerPool(context.Background(), "pool1")
 		assert.Error(t, err)
+	})
+
+	t.Run("Client Creation Error", func(t *testing.T) {
+		createWorkerPoolsClient = func(ctx context.Context, opts ...option.ClientOption) (WorkerPoolsClientWrapper, error) {
+			return nil, errors.New("client creation error")
+		}
+		
+		client := &GCPClient{}
+		_, err := client.GetWorkerPool(context.Background(), "pool1")
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "client creation error")
 	})
 }
 
@@ -417,6 +441,37 @@ func TestGCPClient_UpdateWorkerPool(t *testing.T) {
 		client := &GCPClient{}
 		_, err := client.UpdateWorkerPool(context.Background(), &runpb.WorkerPool{Name: "pool1"})
 		assert.Error(t, err)
+	})
+
+	t.Run("Client Creation Error", func(t *testing.T) {
+		createWorkerPoolsClient = func(ctx context.Context, opts ...option.ClientOption) (WorkerPoolsClientWrapper, error) {
+			return nil, errors.New("client creation error")
+		}
+		
+		client := &GCPClient{}
+		_, err := client.UpdateWorkerPool(context.Background(), &runpb.WorkerPool{Name: "pool1"})
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "client creation error")
+	})
+
+	t.Run("Wait Error", func(t *testing.T) {
+		createWorkerPoolsClient = func(ctx context.Context, opts ...option.ClientOption) (WorkerPoolsClientWrapper, error) {
+			return &MockWorkerPoolsClientWrapper{
+				UpdateWorkerPoolFunc: func(ctx context.Context, req *runpb.UpdateWorkerPoolRequest, opts ...gax.CallOption) (UpdateWorkerPoolOperationWrapper, error) {
+					return &MockUpdateWorkerPoolOperationWrapper{
+						WaitFunc: func(ctx context.Context, opts ...gax.CallOption) (*runpb.WorkerPool, error) {
+							return nil, errors.New("wait error")
+						},
+					}, nil
+				},
+				CloseFunc: func() error { return nil },
+			}, nil
+		}
+		
+		client := &GCPClient{}
+		_, err := client.UpdateWorkerPool(context.Background(), &runpb.WorkerPool{Name: "pool1"})
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "wait error")
 	})
 }
 

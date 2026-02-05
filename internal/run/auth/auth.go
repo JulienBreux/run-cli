@@ -25,6 +25,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	api_region "github.com/JulienBreux/run-cli/internal/run/api/region"
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
 	"golang.org/x/oauth2/google"
 )
@@ -119,7 +120,7 @@ func parseConfig(path string) (info.Info, error) {
 	}
 
 	if region == "" {
-		region = "us-central1"
+		region = api_region.ALL
 	}
 
 	return info.Info{

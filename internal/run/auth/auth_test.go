@@ -20,6 +20,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	api_region "github.com/JulienBreux/run-cli/internal/run/api/region"
 )
 
 func TestGetInfo(t *testing.T) {
@@ -127,7 +129,7 @@ func TestGetInfo_Defaults(t *testing.T) {
 		t.Fatalf("GetInfo failed: %v", err)
 	}
 
-	if info.Region != "us-central1" {
-		t.Errorf("Expected default Region 'us-central1', got '%s'", info.Region)
+	if info.Region != api_region.ALL {
+		t.Errorf("Expected default Region 'all', got '%s'", info.Region)
 	}
 }

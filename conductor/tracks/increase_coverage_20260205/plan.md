@@ -22,7 +22,7 @@ Goal: Increase coverage for the foundational data structures and business logic.
 Goal: Ensure robust interactions with Google Cloud APIs through mocking.
 
 - [x] Task: Write Tests: Enhance test coverage for `internal/run/api/service`. 5fcfd62
-- [ ] Task: Implement: Add mocks for GCP Service API and verify error handling.
+- [x] Task: Implement: Add mocks for GCP Service API and verify error handling. 102c436
 - [ ] Task: Write Tests: Enhance test coverage for `internal/run/api/job` and `internal/run/api/workerpool`.
 - [ ] Task: Implement: Add mocks and fixtures for Job and Workerpool APIs.
 - [ ] Task: Write Tests: Enhance test coverage for `internal/run/api/project` and `internal/run/api/region`.

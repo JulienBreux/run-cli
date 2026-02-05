@@ -4,7 +4,9 @@
   <a href="https://github.com/JulienBreux/run-cli" target="_blank"><img src="docs/assets/run.gif" /></a>
 </p>
 
-**Run CLI** is an interactive CLI to manage your Google Cloud Run resources with panache!
+**Run CLI** is an interactive CLI to manage your Google Cloud Run resources in a visual way.
+
+The idea is to establish a high-performance, terminal-based alternative to the Google Cloud Console for executing daily operational tasks.
 
 [![Go version](https://img.shields.io/github/go-mod/go-version/JulienBreux/run-cli)](https://go.dev/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/JulienBreux/run-cli)](https://goreportcard.com/report/github.com/JulienBreux/run-cli)
@@ -13,6 +15,13 @@
 [![LICENSE](https://img.shields.io/github/license/JulienBreux/run-cli)](https://github.com/JulienBreux/run-cli/blob/main/LICENSE)
 
 </div>
+
+## ⭐️ Value Proposition
+
+- **Visual Resource Management:** Offers a sophisticated visual representation of cloud resources using interactive tables and dashboards, providing superior clarity over standard flat CLI output.
+- **Interactive Discoverability:** Simplifies the management of complex settings through intuitive interactive menus, eliminating the need to memorize extensive and complex command-line flags.
+- **Rapid Context Switching:** Enables instantaneous switching between different Google Cloud projects and regions within a single, continuous terminal session.
+
 
 ## ✨ Features
 

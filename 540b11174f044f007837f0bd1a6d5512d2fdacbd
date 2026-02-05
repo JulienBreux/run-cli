@@ -1,0 +1,4 @@
+Task: Write Tests: Enhance test coverage for internal/run/api/job and internal/run/api/workerpool.
+Summary: Added Client Creation Error and Wait Error test cases to workerpool tests. Verified high coverage for job and workerpool packages (95.7%).
+Files: internal/run/api/workerpool/workerpool_test.go
+Why: To meet >80% coverage requirement.

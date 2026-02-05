@@ -23,8 +23,8 @@ Goal: Ensure robust interactions with Google Cloud APIs through mocking.
 
 - [x] Task: Write Tests: Enhance test coverage for `internal/run/api/service`. 5fcfd62
 - [x] Task: Implement: Add mocks for GCP Service API and verify error handling. 102c436
-- [ ] Task: Write Tests: Enhance test coverage for `internal/run/api/job` and `internal/run/api/workerpool`.
-- [ ] Task: Implement: Add mocks and fixtures for Job and Workerpool APIs.
+- [x] Task: Write Tests: Enhance test coverage for `internal/run/api/job` and `internal/run/api/workerpool`. 540b111
+- [x] Task: Implement: Add mocks and fixtures for Job and Workerpool APIs. 540b111
 - [ ] Task: Write Tests: Enhance test coverage for `internal/run/api/project` and `internal/run/api/region`.
 - [ ] Task: Implement: Verify discovery logic for projects and regions.
 - [ ] Task: Conductor - User Manual Verification 'API Clients' (Protocol in workflow.md)

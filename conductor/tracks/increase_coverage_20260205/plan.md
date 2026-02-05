@@ -21,7 +21,7 @@ Goal: Increase coverage for the foundational data structures and business logic.
 ## Phase 3: API Clients (`internal/run/api`)
 Goal: Ensure robust interactions with Google Cloud APIs through mocking.
 
-- [ ] Task: Write Tests: Enhance test coverage for `internal/run/api/service`.
+- [x] Task: Write Tests: Enhance test coverage for `internal/run/api/service`. 5fcfd62
 - [ ] Task: Implement: Add mocks for GCP Service API and verify error handling.
 - [ ] Task: Write Tests: Enhance test coverage for `internal/run/api/job` and `internal/run/api/workerpool`.
 - [ ] Task: Implement: Add mocks and fixtures for Job and Workerpool APIs.

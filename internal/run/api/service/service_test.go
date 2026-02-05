@@ -564,6 +564,64 @@ func TestWrappers_Delegation(t *testing.T) {
 	
 	t.Run("GCPUpdateServiceOperationWrapper", func(t *testing.T) {
 		op := &GCPUpdateServiceOperationWrapper{op: nil}
-		assert.Panics(t, func() { _, _ = op.Wait(context.Background()) })
-	})
-}
+				assert.Panics(t, func() { _, _ = op.Wait(context.Background()) })
+			})
+		}
+		
+		func TestUpdateAuthentication(t *testing.T) {
+			originalClient := apiClient
+			defer func() { apiClient = originalClient }()
+		
+			mock := &MockClient{}
+			apiClient = mock
+		
+			// Setup GetService mock
+			mock.GetServiceFunc = func(ctx context.Context, name string) (*runpb.Service, error) {
+				return &runpb.Service{
+					Name:               name,
+					InvokerIamDisabled: false,
+				}, nil
+			}
+		
+			// Setup UpdateService mock
+			mock.UpdateServiceFunc = func(ctx context.Context, service *runpb.Service) (*runpb.Service, error) {
+				// Assert that auth was updated correctly
+				assert.True(t, service.InvokerIamDisabled)
+				return service, nil
+			}
+		
+			result, err := UpdateAuthentication(context.Background(), "p", "r", "s1", true)
+		
+			assert.NoError(t, err)
+			assert.NotNil(t, result)
+			assert.Equal(t, "s1", result.Name)
+			assert.True(t, result.Security.InvokerIAMDisabled)
+		}
+		
+		func TestUpdateAuthentication_Error(t *testing.T) {
+			originalClient := apiClient
+			defer func() { apiClient = originalClient }()
+		
+			mock := &MockClient{}
+			apiClient = mock
+		
+			// Test GetService Error
+			mock.GetServiceFunc = func(ctx context.Context, name string) (*runpb.Service, error) {
+				return nil, assert.AnError
+			}
+			_, err := UpdateAuthentication(context.Background(), "p", "r", "s", true)
+			assert.Error(t, err)
+			assert.Contains(t, err.Error(), "failed to get service")
+		
+			// Test UpdateService Error
+			mock.GetServiceFunc = func(ctx context.Context, name string) (*runpb.Service, error) {
+				return &runpb.Service{Name: name}, nil
+			}
+			mock.UpdateServiceFunc = func(ctx context.Context, service *runpb.Service) (*runpb.Service, error) {
+				return nil, assert.AnError
+			}
+			_, err = UpdateAuthentication(context.Background(), "p", "r", "s", true)
+			assert.Error(t, err)
+			assert.Contains(t, err.Error(), "failed to update service")
+		}
+		

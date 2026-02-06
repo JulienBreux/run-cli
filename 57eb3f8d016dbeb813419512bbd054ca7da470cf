@@ -1,0 +1,4 @@
+Task: Add unit tests for internal/run/command logic.
+Summary: Refactored internal/run/command/command.go to allow injecting dependencies for config loading and app running. Added internal/run/command/run_test.go with comprehensive tests for the root command's RunE logic.
+Files: internal/run/command/command.go, internal/run/command/run_test.go
+Why: To increase test coverage and ensure the main entry point is correctly handled.

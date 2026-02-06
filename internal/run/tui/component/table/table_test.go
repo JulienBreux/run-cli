@@ -18,6 +18,10 @@ package table
 
 import (
 	"testing"
+
+	"github.com/gdamore/tcell/v2"
+	"github.com/rivo/tview"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNew(t *testing.T) {
@@ -40,11 +44,6 @@ func TestSetHeadersWithExpansions(t *testing.T) {
 
 	tbl.SetHeadersWithExpansions(headers, expansions)
 
-	// Since we cannot easily inspect the internal state of tview.Table via public API (cells),
-	// we rely on the fact that no panic occurred and basic property checks.
-	// tview.Table doesn't expose a way to get cell content easily without SetCell.
-	// Wait, GetCell exists.
-	
 	cell := tbl.Table.GetCell(0, 0)
 	if cell.Text != "Col1" {
 		t.Errorf("Expected header 1 'Col1', got '%s'", cell.Text)
@@ -67,4 +66,22 @@ func TestSetHeaders(t *testing.T) {
 	if cell.Text != "A" {
 		t.Errorf("Expected header 'A', got '%s'", cell.Text)
 	}
+}
+
+func TestBorderWrapper_Draw(t *testing.T) {
+	title := "Test Table"
+	tbl := New(title)
+	wrapper := tbl.View.(*BorderWrapper)
+
+	// Test with focus
+	wrapper.Table.Focus(func(p tview.Primitive) {})
+	assert.True(t, wrapper.HasFocus())
+
+	// Test Draw with simulation screen
+	screen := tcell.NewSimulationScreen("")
+	err := screen.Init()
+	assert.NoError(t, err)
+	defer screen.Fini()
+
+	wrapper.Draw(screen)
 }

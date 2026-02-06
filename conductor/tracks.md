@@ -4,10 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: Increase test coverage to >80%**
+- [x] **Track: Increase test coverage to >80%**
 *Link: [./tracks/increase_coverage_20260205/](./tracks/increase_coverage_20260205/)*
-
-
-
-
-

@@ -1,0 +1,4 @@
+Task: Implement: Ensure command flag parsing and basic execution flows are tested.
+Summary: Expanded internal/run/command/version/version_test.go to include tests for different output formats (json, yaml), ensuring the --output flag is correctly parsed and handled.
+Files: internal/run/command/version/version_test.go
+Why: To verify that CLI command flags are correctly processed and produce the expected output formats.

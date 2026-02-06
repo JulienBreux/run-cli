@@ -53,4 +53,22 @@ func TestNewCmdVersion(t *testing.T) {
 	// Verify output contains version info
 	// Note: exact content depends on pkg/version globals, but we expect at least "Version:"
 	assert.Contains(t, out.String(), "Version:")
+
+	t.Run("JSONOutput", func(t *testing.T) {
+		outJSON := &bytes.Buffer{}
+		cmdJSON := version.NewCmdVersion(in, outJSON, err)
+		cmdJSON.SetArgs([]string{"--output", "json"})
+		execErr := cmdJSON.Execute()
+		assert.NoError(t, execErr)
+		assert.Contains(t, outJSON.String(), "\"version\":")
+	})
+
+	t.Run("YAMLOutput", func(t *testing.T) {
+		outYAML := &bytes.Buffer{}
+		cmdYAML := version.NewCmdVersion(in, outYAML, err)
+		cmdYAML.SetArgs([]string{"--output", "yaml"})
+		execErr := cmdYAML.Execute()
+		assert.NoError(t, execErr)
+		assert.Contains(t, outYAML.String(), "version:")
+	})
 }

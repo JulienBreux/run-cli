@@ -1,0 +1,4 @@
+Task: Implement: Verify rendering and interaction logic for key UI elements.
+Summary: Expanded tests for traffic split modal, revision detail component, and app modals (Help, Credits). Total project coverage increased to 80.5%.
+Files: internal/run/tui/app/service/traffic/split_test.go, internal/run/tui/app/service/revision/revision_test.go, internal/run/tui/app/modal_test.go
+Why: To meet the project requirement of >80% code coverage and ensure critical UI components are verified.

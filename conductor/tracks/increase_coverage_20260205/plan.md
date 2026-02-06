@@ -32,13 +32,13 @@ Goal: Ensure robust interactions with Google Cloud APIs through mocking.
 ## Phase 4: CLI Commands and TUI Components (`internal/run/command`, `internal/run/tui`)
 Goal: Verify the user interface and command-line entry points.
 
-- [ ] Task: Write Tests: Add unit tests for `internal/run/command` logic.
-- [ ] Task: Implement: Ensure command flag parsing and basic execution flows are tested.
-- [ ] Task: Write Tests: Increase coverage for TUI components in `internal/run/tui/component`.
-- [ ] Task: Implement: Verify rendering and interaction logic for key UI elements.
-- [ ] Task: Write Tests: Increase coverage for TUI application pages in `internal/run/tui/app`.
-- [ ] Task: Implement: Test page transitions and data display.
-- [ ] Task: Conductor - User Manual Verification 'CLI Commands and TUI Components' (Protocol in workflow.md)
+- [x] Task: Write Tests: Add unit tests for `internal/run/command` logic. [57eb3f8]
+- [x] Task: Implement: Ensure command flag parsing and basic execution flows are tested. [af176d3]
+- [x] Task: Write Tests: Increase coverage for TUI components in `internal/run/tui/component`. [90361ad]
+- [x] Task: Implement: Verify rendering and interaction logic for key UI elements. [853bf09]
+- [x] Task: Write Tests: Increase coverage for TUI application pages in `internal/run/tui/app`. [853bf09]
+- [x] Task: Implement: Test page transitions and data display. [853bf09]
+- [~] Task: Conductor - User Manual Verification 'CLI Commands and TUI Components' (Protocol in workflow.md)
 
 ## Phase 5: Final Verification and Reporting
 Goal: Confirm the overall project coverage meets the goal.

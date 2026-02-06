@@ -15,7 +15,7 @@ lint: ## Lint code
 test: ## Test packages
 	go test -count=1 -failfast -cover -coverprofile=coverage.txt -v ./...
 
-coverage: ## Test coverage with default output
+coverage: test ## Test coverage with default output
 	go tool cover -func=coverage.txt
 
 coverage-total: coverage # Get the total number of lines covered by tests

@@ -1,0 +1,10 @@
+mode: set
+github.com/JulienBreux/run-cli/internal/run/command/command.go:34.65,38.55 1 1
+github.com/JulienBreux/run-cli/internal/run/command/command.go:38.55,40.18 2 1
+github.com/JulienBreux/run-cli/internal/run/command/command.go:40.18,42.5 1 1
+github.com/JulienBreux/run-cli/internal/run/command/command.go:43.4,43.22 1 1
+github.com/JulienBreux/run-cli/internal/run/command/command.go:47.2,49.8 2 1
+github.com/JulienBreux/run-cli/internal/run/command/error.go:25.47,28.2 2 1
+github.com/JulienBreux/run-cli/internal/run/command/version/version.go:29.75,40.2 3 1
+github.com/JulienBreux/run-cli/internal/run/command/version/version.go:43.65,44.49 1 1
+github.com/JulienBreux/run-cli/internal/run/command/version/version.go:44.49,46.3 1 1

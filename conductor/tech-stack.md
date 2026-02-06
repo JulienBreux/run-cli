@@ -17,6 +17,7 @@
 ## Development & Testing
 - **Testing Framework:** [testify](https://github.com/stretchr/testify) - Used for assertions and mocking in unit tests.
 - **Testing:** `make tests` - Runs unit tests and benchmarks.
+- **Test coverage:** `make coverage-total` - Get the total number of lines covered by tests.
 - **Linting:** `golangci-lint` - Enforces code quality and style standards.
 - **Build System:** `Makefile` - Orchestrates build, test, and linting tasks.
 

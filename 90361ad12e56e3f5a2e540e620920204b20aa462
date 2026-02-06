@@ -1,0 +1,4 @@
+Task: Write Tests: Increase coverage for TUI components in internal/run/tui/component.
+Summary: Created footer_test.go for the footer component and expanded table_test.go to cover BorderWrapper.Draw and focus logic. Coverage for internal/run/tui/component reached 98.4%.
+Files: internal/run/tui/component/footer/footer_test.go, internal/run/tui/component/table/table_test.go
+Why: To ensure that basic UI building blocks are correctly functioning and verified by tests.

@@ -18,7 +18,7 @@ Goal: Increase coverage for the foundational data structures and business logic.
 - [x] Task: Implement: Enhance coverage for service, job, and workerpool models. 7901ea2
 - [~] Task: Conductor - User Manual Verification 'Core Logic and Models' (Protocol in workflow.md)
 
-## Phase 3: API Clients (`internal/run/api`)
+## Phase 3: API Clients (`internal/run/api`) [checkpoint: dc8df22]
 Goal: Ensure robust interactions with Google Cloud APIs through mocking.
 
 - [x] Task: Write Tests: Enhance test coverage for `internal/run/api/service`. 5fcfd62
@@ -27,7 +27,7 @@ Goal: Ensure robust interactions with Google Cloud APIs through mocking.
 - [x] Task: Implement: Add mocks and fixtures for Job and Workerpool APIs. 540b111
 - [x] Task: Write Tests: Enhance test coverage for `internal/run/api/project` and `internal/run/api/region`. 0f8f3bb
 - [x] Task: Implement: Verify discovery logic for projects and regions. 0f8f3bb
-- [~] Task: Conductor - User Manual Verification 'API Clients' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'API Clients' (Protocol in workflow.md) dc8df22
 
 ## Phase 4: CLI Commands and TUI Components (`internal/run/command`, `internal/run/tui`)
 Goal: Verify the user interface and command-line entry points.

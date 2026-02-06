@@ -18,6 +18,9 @@ test: ## Test packages
 coverage: ## Test coverage with default output
 	go tool cover -func=coverage.txt
 
+coverage-total: coverage # Get the total number of lines covered by tests
+	go tool cover -func=coverage.txt | fgrep total | awk '{print substr($$3, 1, length($$3)-1)}'
+
 coverage-html: ## Test coverage with html output
 	go tool cover -html=coverage.html
 
@@ -47,4 +50,4 @@ demo-to-gif: ## Demo to gif
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: generate lint test coverage coverage-html clean build build-image run run-container demo-record demo-to-gif help
+.PHONY: generate lint test coverage coverage-total coverage-html clean build build-image run run-container demo-record demo-to-gif help

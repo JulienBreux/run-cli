@@ -1,0 +1,9 @@
+Phase: Phase 4: CLI Commands and TUI Components
+Automated test command: make test
+Manual Verification Steps:
+1. Verify CLI Root Command: Run make run and confirm the TUI starts without errors.
+2. Verify Version Command: Execute ./bin/run version and ./bin/run version -o json to confirm flag parsing works.
+3. Verify TUI Modals: Press ? to open Help modal. Verify Credits animation.
+4. Verify Traffic Split Modal: Select a service, press t and verify modal content.
+5. Confirm Total Coverage: Run make coverage-total and verify >80.0%.
+User confirmation: I confirm

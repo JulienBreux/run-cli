@@ -1,0 +1,4 @@
+Task: Fix make lint error
+Summary: Simplified wrapper.Table.Focus to wrapper.Focus in internal/run/tui/component/table/table_test.go as reported by staticcheck (QF1008), since Table is an embedded field in BorderWrapper.
+Files: internal/run/tui/component/table/table_test.go
+Why: To maintain code quality and pass lint checks.

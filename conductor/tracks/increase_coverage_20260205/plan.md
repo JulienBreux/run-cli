@@ -9,14 +9,14 @@ Goal: Identify current coverage gaps and ensure reporting is accurate.
 - [x] Task: Document the packages and files with coverage below 80%. e252a58
 - [x] Task: Conductor - User Manual Verification 'Assessment and Tooling Configuration' (Protocol in workflow.md) 15b3ebb
 
-## Phase 2: Core Logic and Models (`internal/run/model`)
+## Phase 2: Core Logic and Models (`internal/run/model`) [checkpoint: 7901ea2]
 Goal: Increase coverage for the foundational data structures and business logic.
 
 - [x] Task: Write Tests: Add unit tests for `internal/run/model/common/...`. 6cae097
 - [x] Task: Implement: Ensure all core model logic is verified. 6cae097
 - [x] Task: Write Tests: Add unit tests for `internal/run/model/service/...`, `job/...`, and `workerpool/...`. 7901ea2
 - [x] Task: Implement: Enhance coverage for service, job, and workerpool models. 7901ea2
-- [~] Task: Conductor - User Manual Verification 'Core Logic and Models' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Core Logic and Models' (Protocol in workflow.md) [7901ea2]
 
 ## Phase 3: API Clients (`internal/run/api`) [checkpoint: dc8df22]
 Goal: Ensure robust interactions with Google Cloud APIs through mocking.
@@ -40,10 +40,10 @@ Goal: Verify the user interface and command-line entry points.
 - [x] Task: Implement: Test page transitions and data display. [853bf09]
 - [x] Task: Conductor - User Manual Verification 'CLI Commands and TUI Components' (Protocol in workflow.md) [5fcafd7]
 
-## Phase 5: Final Verification and Reporting
+## Phase 5: Final Verification and Reporting [checkpoint: cbd4ece]
 Goal: Confirm the overall project coverage meets the goal.
 
-- [~] Task: Run final coverage report using `make test`.
-- [ ] Task: Verify that the overall project coverage is >80%.
-- [ ] Task: Update `README.md` or documentation if coverage requirements changed.
-- [ ] Task: Conductor - User Manual Verification 'Final Verification and Reporting' (Protocol in workflow.md)
+- [x] Task: Run final coverage report using `make test`. [cbd4ece]
+- [x] Task: Verify that the overall project coverage is >80%. [cbd4ece]
+- [x] Task: Update `README.md` or documentation if coverage requirements changed. [cbd4ece]
+- [x] Task: Conductor - User Manual Verification 'Final Verification and Reporting' (Protocol in workflow.md) [cbd4ece]

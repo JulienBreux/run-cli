@@ -29,7 +29,7 @@ Goal: Ensure robust interactions with Google Cloud APIs through mocking.
 - [x] Task: Implement: Verify discovery logic for projects and regions. 0f8f3bb
 - [x] Task: Conductor - User Manual Verification 'API Clients' (Protocol in workflow.md) dc8df22
 
-## Phase 4: CLI Commands and TUI Components (`internal/run/command`, `internal/run/tui`)
+## Phase 4: CLI Commands and TUI Components (`internal/run/command`, `internal/run/tui`) [checkpoint: e227089]
 Goal: Verify the user interface and command-line entry points.
 
 - [x] Task: Write Tests: Add unit tests for `internal/run/command` logic. [57eb3f8]
@@ -38,12 +38,12 @@ Goal: Verify the user interface and command-line entry points.
 - [x] Task: Implement: Verify rendering and interaction logic for key UI elements. [853bf09]
 - [x] Task: Write Tests: Increase coverage for TUI application pages in `internal/run/tui/app`. [853bf09]
 - [x] Task: Implement: Test page transitions and data display. [853bf09]
-- [~] Task: Conductor - User Manual Verification 'CLI Commands and TUI Components' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'CLI Commands and TUI Components' (Protocol in workflow.md) [e227089]
 
 ## Phase 5: Final Verification and Reporting
 Goal: Confirm the overall project coverage meets the goal.
 
-- [ ] Task: Run final coverage report using `make test`.
+- [~] Task: Run final coverage report using `make test`.
 - [ ] Task: Verify that the overall project coverage is >80%.
 - [ ] Task: Update `README.md` or documentation if coverage requirements changed.
 - [ ] Task: Conductor - User Manual Verification 'Final Verification and Reporting' (Protocol in workflow.md)

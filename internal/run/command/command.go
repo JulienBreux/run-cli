@@ -25,17 +25,22 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	configLoad = config.Load
+	appRun     = app.Run
+)
+
 // New returns the root of CLI.
 func New(in io.Reader, out, err io.Writer) (cmd *cobra.Command) {
 	cmd = &cobra.Command{
 		Use:   "run",
 		Short: "Run is a CLI to play with Google Cloud Run interactively.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cfg, err := config.Load()
+			cfg, err := configLoad()
 			if err != nil {
 				return err
 			}
-			return app.Run(cfg)
+			return appRun(cfg)
 		},
 	}
 

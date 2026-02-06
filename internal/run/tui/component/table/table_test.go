@@ -74,7 +74,7 @@ func TestBorderWrapper_Draw(t *testing.T) {
 	wrapper := tbl.View.(*BorderWrapper)
 
 	// Test with focus
-	wrapper.Table.Focus(func(p tview.Primitive) {})
+	wrapper.Focus(func(p tview.Primitive) {})
 	assert.True(t, wrapper.HasFocus())
 
 	// Test Draw with simulation screen

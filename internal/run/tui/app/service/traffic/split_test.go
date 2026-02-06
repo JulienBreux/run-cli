@@ -19,6 +19,10 @@ package traffic
 import (
 	"testing"
 
+	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
+	model_revision "github.com/JulienBreux/run-cli/internal/run/model/service/revision"
+	model_traffic "github.com/JulienBreux/run-cli/internal/run/model/service/traffic"
+	"github.com/rivo/tview"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -65,4 +69,23 @@ func TestValidateTrafficParams(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestModal(t *testing.T) {
+	app := tview.NewApplication()
+	service := &model_service.Service{
+		Name:                "test-service",
+		LatestReadyRevision: "rev-2",
+		TrafficStatuses: []*model_traffic.TrafficTargetStatus{
+			{Revision: "rev-1", Percent: 100},
+		},
+	}
+	revisions := []model_revision.Revision{
+		{Name: "rev-1"},
+		{Name: "rev-2"},
+	}
+
+	modal := Modal(app, service, revisions, func(refresh bool) {})
+
+	assert.NotNil(t, modal)
 }

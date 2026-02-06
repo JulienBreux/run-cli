@@ -23,7 +23,9 @@ import (
 	model_project "github.com/JulienBreux/run-cli/internal/run/model/common/project"
 	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
 	model_workerpool "github.com/JulienBreux/run-cli/internal/run/model/workerpool"
+	"github.com/JulienBreux/run-cli/internal/run/tui/app/credits"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/describe"
+	"github.com/JulienBreux/run-cli/internal/run/tui/app/help"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/log"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/project"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/region"
@@ -122,4 +124,22 @@ func TestOpenWorkerPoolScaleModal(t *testing.T) {
 	openWorkerPoolScaleModal(wp)
 
 	assert.Equal(t, workerpool_scale.MODAL_PAGE_ID, currentPageID)
+}
+
+func TestOpenHelpModal(t *testing.T) {
+	setupTestApp()
+	buildLayout()
+
+	openHelpModal()
+
+	assert.Equal(t, help.MODAL_PAGE_ID, currentPageID)
+}
+
+func TestOpenCreditsModal(t *testing.T) {
+	setupTestApp()
+	buildLayout()
+
+	openCreditsModal()
+
+	assert.Equal(t, credits.MODAL_PAGE_ID, currentPageID)
 }

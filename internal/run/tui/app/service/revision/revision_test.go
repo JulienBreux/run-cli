@@ -18,9 +18,12 @@ package revision
 
 import (
 	"testing"
+	"time"
 
 	model_revision "github.com/JulienBreux/run-cli/internal/run/model/service/revision"
 	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
+	model_container "github.com/JulienBreux/run-cli/internal/run/model/common/container"
+	model_resources "github.com/JulienBreux/run-cli/internal/run/model/common/resources"
 	"github.com/rivo/tview"
 	"github.com/stretchr/testify/assert"
 )
@@ -50,11 +53,44 @@ func TestListComponent_Update(t *testing.T) {
 
 func TestDetailComponent_Update(t *testing.T) {
 	comp := NewDetailComponent()
-	rev := model_revision.Revision{Name: "rev1", Author: "user@example.com"}
+	
+	rev := model_revision.Revision{
+		Name: "rev1", 
+		Author: "user@example.com",
+		CreateTime: time.Now(),
+		CpuIdle: true,
+		StartupCpuBoost: true,
+		MaxInstanceRequestConcurrency: 80,
+		Timeout: 300 * time.Second,
+		ExecutionEnvironment: "EXECUTION_ENVIRONMENT_GEN2",
+		Containers: []*model_container.Container{
+			{
+				Name: "c1",
+				Image: "image1",
+				Ports: []*model_container.Port{{ContainerPort: 8080}},
+				Resources: &model_resources.Resources{
+					Limits: map[string]string{
+						"memory": "512Mi",
+						"cpu": "1",
+					},
+				},
+			},
+		},
+	}
 
 	comp.Update(rev)
-	assert.Contains(t, comp.GetText(true), "rev1")
-	assert.Contains(t, comp.GetText(true), "user@example.com")
+	text := comp.GetText(true)
+	assert.Contains(t, text, "rev1")
+	assert.Contains(t, text, "user@example.com")
+	assert.Contains(t, text, "CPU is only allocated")
+	assert.Contains(t, text, "Enabled")
+	assert.Contains(t, text, "80")
+	assert.Contains(t, text, "5m0s")
+	assert.Contains(t, text, "Second Generation")
+	assert.Contains(t, text, "c1")
+	assert.Contains(t, text, "image1")
+	assert.Contains(t, text, "8080")
+	assert.Contains(t, text, "512Mi Memory, 1 CPU")
 }
 
 func TestListComponent_Clear(t *testing.T) {

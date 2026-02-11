@@ -70,14 +70,14 @@ func TestListAndLoad(t *testing.T) {
 	// Header is row 0.
 	assert.Equal(t, 3, tbl.Table.GetRowCount()) // 1 header + 2 rows
 
-	// Row 1 (service-1)
-	assert.Equal(t, "service-1", tbl.Table.GetCell(1, 1).Text)
-	assert.Equal(t, "us-central1", tbl.Table.GetCell(1, 2).Text)
-	assert.Contains(t, tbl.Table.GetCell(1, 3).Text, "Auto: min 1, max 5")
+	// Row 2 (service-1)
+	assert.Equal(t, "service-1", tbl.Table.GetCell(1, 2).Text)
+	assert.Equal(t, "us-central1", tbl.Table.GetCell(1, 3).Text)
+	assert.Contains(t, tbl.Table.GetCell(1, 4).Text, "Auto: min 1, max 5")
 
 	// Row 2 (service-2)
-	assert.Equal(t, "service-2", tbl.Table.GetCell(2, 1).Text)
-	assert.Contains(t, tbl.Table.GetCell(2, 3).Text, "Manual: 2")
+	assert.Equal(t, "service-2", tbl.Table.GetCell(2, 2).Text)
+	assert.Contains(t, tbl.Table.GetCell(2, 4).Text, "Manual: 2")
 }
 
 func TestGetSelectedService(t *testing.T) {
@@ -261,7 +261,7 @@ func TestRender(t *testing.T) {
 	render(svcs)
 
 	assert.Equal(t, 2, listTable.Table.GetRowCount())
-	assert.Equal(t, "s1", listTable.Table.GetCell(1, 1).Text)
+	assert.Equal(t, "s1", listTable.Table.GetCell(1, 2).Text)
 }
 
 func TestFetch(t *testing.T) {
@@ -311,7 +311,7 @@ func TestListReload(t *testing.T) {
 		// Verify Render was called (Table should have data)
 		// Header + 1 Item = 2 Rows
 		assert.Equal(t, 2, listTable.Table.GetRowCount())
-		assert.Equal(t, "s1", listTable.Table.GetCell(1, 1).Text)
+		assert.Equal(t, "s1", listTable.Table.GetCell(1, 2).Text)
 	case <-time.After(2 * time.Second):
 		t.Fatal("Timeout waiting for ListReload")
 	}
@@ -367,5 +367,5 @@ func TestRender_ScalingManual(t *testing.T) {
 	render(svcs)
 
 	assert.Equal(t, 2, listTable.Table.GetRowCount())
-	assert.Contains(t, listTable.Table.GetCell(1, 3).Text, "Manual: 5")
+	assert.Contains(t, listTable.Table.GetCell(1, 4).Text, "Manual: 5")
 }

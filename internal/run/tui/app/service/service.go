@@ -40,20 +40,20 @@ import (
 var (
 	listHeaders = []string{
 		"",
+		"AUTH",
 		"SERVICE",
 		"REGION",
 		"SCALING",
-		"AUTH",
 		"URL",
 		"LAST DEPLOYED BY",
 		"LAST DEPLOYED AT"}
 
 	listExpansions = []int{
 		1, // PROXY
+		1, // AUTH
 		2, // SERVICE
 		1, // REGION
 		1, // SCALING
-		1, // AUTH
 		4, // URL
 		2, // LAST DEPLOYED BY
 		1, // LAST DEPLOYED AT
@@ -184,10 +184,10 @@ func render(svc []model_service.Service) {
 		}
 
 		listTable.Table.SetCell(row, 0, tview.NewTableCell(proxyStatus))
-		listTable.Table.SetCell(row, 1, tview.NewTableCell(s.Name))
-		listTable.Table.SetCell(row, 2, tview.NewTableCell(s.Region))
-		listTable.Table.SetCell(row, 3, tview.NewTableCell(scaling))
-		listTable.Table.SetCell(row, 4, tview.NewTableCell(authStatus))
+		listTable.Table.SetCell(row, 1, tview.NewTableCell(authStatus))
+		listTable.Table.SetCell(row, 2, tview.NewTableCell(s.Name))
+		listTable.Table.SetCell(row, 3, tview.NewTableCell(s.Region))
+		listTable.Table.SetCell(row, 4, tview.NewTableCell(scaling))
 		listTable.Table.SetCell(row, 5, tview.NewTableCell(s.URI))
 		listTable.Table.SetCell(row, 6, tview.NewTableCell(s.LastModifier))
 		listTable.Table.SetCell(row, 7, tview.NewTableCell(humanize.Time(s.UpdateTime)))
@@ -210,7 +210,7 @@ func GetSelectedServiceURL() string {
 	if row == 0 { // Header row
 		return ""
 	}
-	// URL is now at index 5 (0: Proxy, 1: Service, 2: Region, 3: Scaling, 4: Auth, 5: URL)
+	// URL is now at index 5 (0: Proxy, 1: Auth 2: Service, 3: Region, 4: Scaling, 5: URL)
 	cell := listTable.Table.GetCell(row, 5)
 	return cell.Text
 }
@@ -221,9 +221,9 @@ func GetSelectedService() (string, string) {
 	if row < 1 { // Header row or no selection
 		return "", ""
 	}
-	// 1: Service, 2: Region
-	name := listTable.Table.GetCell(row, 1).Text
-	region := listTable.Table.GetCell(row, 2).Text
+	// 2: Service, 3: Region
+	name := listTable.Table.GetCell(row, 2).Text
+	region := listTable.Table.GetCell(row, 3).Text
 	return name, region
 }
 

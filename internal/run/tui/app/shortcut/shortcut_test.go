@@ -53,7 +53,7 @@ func TestFormatByCategory(t *testing.T) {
 	// Test basic formatting
 	// We assume Service List has "r" for Refresh
 	s := FormatByCategory(CategoryServiceList, nil)
-	assert.Contains(t, s, "[dodgerblue]<r> [white]Refresh")
+	assert.Contains(t, s, "[white:black] r [-][black:darkcyan] Refresh [-]")
 
 	// Test formatting with overrides
 	// Assume we override "r" to "Reload" (just as an example, though typically we override description based on key)
@@ -62,8 +62,8 @@ func TestFormatByCategory(t *testing.T) {
 		"r": "Reload",
 	}
 	s2 := FormatByCategory(CategoryServiceList, overrides)
-	assert.Contains(t, s2, "[dodgerblue]<r> [white]Reload")
-	assert.NotContains(t, s2, "[dodgerblue]<r> [white]Refresh")
+	assert.Contains(t, s2, "[white:black] r [-][black:darkcyan] Reload [-]")
+	assert.NotContains(t, s2, "Refresh")
 }
 
 func TestFormat(t *testing.T) {

@@ -116,9 +116,9 @@ func FormatByCategory(category string, overrides map[string]string) string {
 		if val, ok := overrides[s.Key]; ok {
 			desc = val
 		}
-		// Use local struct to format with override
-		temp := Shortcut{Key: s.Key, Description: desc}
-		formatted = append(formatted, temp.Format())
+		// Footer specific format: [white:black] Key [-][black:#bd93f9] Description [-]
+		f := fmt.Sprintf("[white:black] %s [-][black:darkcyan] %s%s [-]", s.Key, desc, strings.Repeat(" ", s.Space))
+		formatted = append(formatted, f)
 	}
-	return strings.Join(formatted, "  ")
+	return strings.Join(formatted, " ")
 }

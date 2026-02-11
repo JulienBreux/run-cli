@@ -30,7 +30,7 @@ var (
 func New() *tview.Flex {
 	ContextShortcutView = tview.NewTextView().
 		SetDynamicColors(true).
-		SetTextAlign(tview.AlignCenter)
+		SetTextAlign(tview.AlignLeft)
 
 	return tview.NewFlex().
 		AddItem(ContextShortcutView, 0, 1, false)

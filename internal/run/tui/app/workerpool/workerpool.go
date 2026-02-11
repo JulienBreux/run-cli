@@ -80,9 +80,7 @@ func Load(newWorkers []model_workerpool.WorkerPool) {
 }
 
 func ListReload(app *tview.Application, currentInfo info.Info, onResult func(error)) {
-	listTable.Table.Clear()
-	listTable.SetHeadersWithExpansions(listHeaders, listExpansions)
-	listTable.Table.SetTitle(fmt.Sprintf(" %s loading ", LIST_PAGE_TITLE))
+	listTable.Table.SetTitle(fmt.Sprintf(" %s loading... ", LIST_PAGE_TITLE))
 
 	// Clear shortcuts
 	if footer.ContextShortcutView != nil {

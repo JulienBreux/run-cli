@@ -21,7 +21,6 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"time"
 
 	api_job "github.com/JulienBreux/run-cli/internal/run/api/job"
 	"github.com/JulienBreux/run-cli/internal/run/auth"
@@ -113,10 +112,6 @@ func Run(cfg *config.Config) error {
 }
 
 func initializeApp(cfg *config.Config) {
-	// Simulate a small delay or just wait for heavy lifting
-	// This helps the UI render the loader first
-	time.Sleep(100 * time.Millisecond)
-
 	// 1. Load Auth/Info (Potentially slow)
 	if realInfo, err := auth.GetInfo(); err == nil {
 		currentInfo.User = realInfo.User
@@ -313,7 +308,7 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 				// Since we can't easily access private dashboardService, let's use the new getter
 				s = service.GetDashboardService()
 			}
-			
+
 			if s != nil {
 				revs := service.GetAllRevisions()
 				openServiceTrafficSplitModal(s, revs)
@@ -363,7 +358,7 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 				// We need to fetch them or pass nil and let the modal handle it?
 				// Better to fetch them here or make the modal fetch them if nil.
 				// However, our modal signature requires []model_revision.Revision.
-				
+
 				// Let's keep it simple: Show loading, fetch revisions, then open modal.
 				showLoading()
 				go func() {

@@ -72,17 +72,15 @@ func (m *Manager) Start(ctx context.Context, serviceName, targetURL string) (*In
 	port := listener.Addr().(*net.TCPAddr).Port
 
 	// Create reverse proxy
-	proxy := httputil.NewSingleHostReverseProxy(target)
-	originalDirector := proxy.Director
-
-	proxy.Director = func(req *http.Request) {
-		originalDirector(req)
-		req.Host = target.Host
-		token, err := auth.GetIDToken(context.Background())
-		if err == nil {
-			req.Header.Set("Authorization", "Bearer "+token)
-		}
-
+	proxy := &httputil.ReverseProxy{
+		Rewrite: func(pr *httputil.ProxyRequest) {
+			pr.SetURL(target)
+			pr.Out.Host = target.Host
+			token, err := auth.GetIDToken(context.Background())
+			if err == nil {
+				pr.Out.Header.Set("Authorization", "Bearer "+token)
+			}
+		},
 	}
 
 	server := &http.Server{

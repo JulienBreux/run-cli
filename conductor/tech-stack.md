@@ -1,7 +1,7 @@
 # Tech Stack
 
 ## Core Technologies
-- **Programming Language:** [Go (Golang)](https://go.dev/) (Version 1.25+) - The primary language for its performance, concurrency support, and strong ecosystem for CLI tools.
+- **Programming Language:** [Go (Golang)](https://go.dev/) (Version 1.26+) - The primary language for its performance, concurrency support, and strong ecosystem for CLI tools.
 
 ## Frameworks & Libraries
 - **CLI Framework:** [Cobra](https://github.com/spf13/cobra) - Used for building the CLI command structure, flag parsing, and help generation.

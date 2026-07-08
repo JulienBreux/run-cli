@@ -583,11 +583,10 @@ func TestWrappers_Delegation(t *testing.T) {
 	
 	t.Run("GCPUpdateServiceOperationWrapper", func(t *testing.T) {
 		op := &GCPUpdateServiceOperationWrapper{op: nil}
-				assert.Panics(t, func() { _, _ = op.Wait(context.Background()) })
-			})
-		}
-		
-		func TestUpdateAuthentication(t *testing.T) {
+		assert.Panics(t, func() { _, _ = op.Wait(context.Background()) })
+	})
+}
+func TestUpdateAuthentication(t *testing.T) {
 			originalClient := apiClient
 			defer func() { apiClient = originalClient }()
 		
@@ -617,7 +616,7 @@ func TestWrappers_Delegation(t *testing.T) {
 			assert.True(t, result.Security.InvokerIAMDisabled)
 		}
 		
-		func TestUpdateAuthentication_Error(t *testing.T) {
+func TestUpdateAuthentication_Error(t *testing.T) {
 			originalClient := apiClient
 			defer func() { apiClient = originalClient }()
 		

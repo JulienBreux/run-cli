@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"github.com/JulienBreux/run-cli/internal/run/config"
+	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
 	model_job "github.com/JulienBreux/run-cli/internal/run/model/job"
 	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
 	model_workerpool "github.com/JulienBreux/run-cli/internal/run/model/workerpool"
@@ -46,6 +47,16 @@ func setupTestApp() {
 	pages = tview.NewPages()
 	mainLoader = loader.New(app)
 	currentConfig = &config.Config{Project: "test-project", Region: "us-central1"}
+
+	// Reset global state to avoid interference between tests
+	previousPageID = ""
+	currentPageID = ""
+	konamiBuffer = nil
+	currentInfo = info.Info{
+		User:    "Guest",
+		Project: "None",
+		Region:  "all",
+	}
 }
 
 func TestBuildLayout(t *testing.T) {

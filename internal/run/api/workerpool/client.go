@@ -19,6 +19,7 @@ package workerpool
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	run "cloud.google.com/go/run/apiv2"
 	"cloud.google.com/go/run/apiv2/runpb"
@@ -104,10 +105,19 @@ type Client interface {
 var _ Client = (*GCPClient)(nil)
 
 // GCPClient is the Google Cloud Platform implementation of Client.
-type GCPClient struct{}
+type GCPClient struct {
+	mu     sync.Mutex
+	client WorkerPoolsClientWrapper
+}
 
-// ListWorkerPools lists worker pools for a project and region.
-func (c *GCPClient) ListWorkerPools(ctx context.Context, project, region string) ([]*runpb.WorkerPool, error) {
+func (c *GCPClient) getClient(ctx context.Context) (WorkerPoolsClientWrapper, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.client != nil {
+		return c.client, nil
+	}
+
 	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
@@ -117,9 +127,16 @@ func (c *GCPClient) ListWorkerPools(ctx context.Context, project, region string)
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		_ = cClient.Close()
-	}()
+	c.client = cClient
+	return c.client, nil
+}
+
+// ListWorkerPools lists worker pools for a project and region.
+func (c *GCPClient) ListWorkerPools(ctx context.Context, project, region string) ([]*runpb.WorkerPool, error) {
+	cClient, err := c.getClient(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	req := &runpb.ListWorkerPoolsRequest{
 		Parent: fmt.Sprintf("projects/%s/locations/%s", project, region),
@@ -143,36 +160,20 @@ func (c *GCPClient) ListWorkerPools(ctx context.Context, project, region string)
 
 // GetWorkerPool gets a worker pool.
 func (c *GCPClient) GetWorkerPool(ctx context.Context, name string) (*runpb.WorkerPool, error) {
-	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
-	if err != nil {
-		return nil, fmt.Errorf("failed to find default credentials: %w", err)
-	}
-
-	cClient, err := createWorkerPoolsClient(ctx, option.WithCredentials(creds))
+	cClient, err := c.getClient(ctx)
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		_ = cClient.Close()
-	}()
 
 	return cClient.GetWorkerPool(ctx, &runpb.GetWorkerPoolRequest{Name: name})
 }
 
 // UpdateWorkerPool updates a worker pool.
 func (c *GCPClient) UpdateWorkerPool(ctx context.Context, workerPool *runpb.WorkerPool) (*runpb.WorkerPool, error) {
-	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
-	if err != nil {
-		return nil, fmt.Errorf("failed to find default credentials: %w", err)
-	}
-
-	cClient, err := createWorkerPoolsClient(ctx, option.WithCredentials(creds))
+	cClient, err := c.getClient(ctx)
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		_ = cClient.Close()
-	}()
 
 	op, err := cClient.UpdateWorkerPool(ctx, &runpb.UpdateWorkerPoolRequest{WorkerPool: workerPool})
 	if err != nil {

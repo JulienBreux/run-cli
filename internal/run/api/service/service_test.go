@@ -544,6 +544,25 @@ func TestGCPClient_UpdateService(t *testing.T) {
 		_, err := client.UpdateService(context.Background(), &runpb.Service{Name: "s1"})
 		assert.Error(t, err)
 	})
+
+	t.Run("Client Reuse", func(t *testing.T) {
+		callCount := 0
+		createServicesClient = func(ctx context.Context, opts ...option.ClientOption) (ServicesClientWrapper, error) {
+			callCount++
+			return &MockServicesClientWrapper{
+				ListServicesFunc: func(ctx context.Context, req *runpb.ListServicesRequest, opts ...gax.CallOption) ServiceIteratorWrapper {
+					return &MockServiceIteratorWrapper{}
+				},
+				CloseFunc: func() error { return nil },
+			}, nil
+		}
+
+		gcpClient := &GCPClient{}
+		_, _ = gcpClient.ListServices(context.Background(), "p", "r1")
+		_, _ = gcpClient.ListServices(context.Background(), "p", "r2")
+
+		assert.Equal(t, 1, callCount, "Expected createServicesClient to be called exactly once")
+	})
 }
 
 func TestWrappers_Delegation(t *testing.T) {

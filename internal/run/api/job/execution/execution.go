@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 
 	run "cloud.google.com/go/run/apiv2"
 	"cloud.google.com/go/run/apiv2/runpb"
@@ -99,10 +100,21 @@ type Client interface {
 }
 
 // GCPClient is the Google Cloud Platform implementation of Client.
-type GCPClient struct{}
+type GCPClient struct {
+	mu           sync.Mutex
+	cachedClient ExecutionsClientWrapper // Optimization: Cache client to reuse gRPC connections
+}
 
-// ListExecutions lists executions for a project, region and job.
-func (c *GCPClient) ListExecutions(ctx context.Context, project, region, jobName string) ([]*runpb.Execution, error) {
+// getOrCreateClient returns a cached client or creates a new one if it doesn't exist.
+// This reduces latency by avoiding repeated authentication and connection overhead.
+func (c *GCPClient) getOrCreateClient(ctx context.Context) (ExecutionsClientWrapper, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.cachedClient != nil {
+		return c.cachedClient, nil
+	}
+
 	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
@@ -112,9 +124,17 @@ func (c *GCPClient) ListExecutions(ctx context.Context, project, region, jobName
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		_ = cClient.Close()
-	}()
+
+	c.cachedClient = cClient
+	return c.cachedClient, nil
+}
+
+// ListExecutions lists executions for a project, region and job.
+func (c *GCPClient) ListExecutions(ctx context.Context, project, region, jobName string) ([]*runpb.Execution, error) {
+	cClient, err := c.getOrCreateClient(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	// Filter by job name
 	// The parent is the location. We filter by label or just iterate and filter?

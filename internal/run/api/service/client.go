@@ -19,6 +19,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	run "cloud.google.com/go/run/apiv2"
 	"cloud.google.com/go/run/apiv2/runpb"
@@ -105,10 +106,21 @@ type Client interface {
 var _ Client = (*GCPClient)(nil)
 
 // GCPClient is the Google Cloud Platform implementation of Client.
-type GCPClient struct{}
+type GCPClient struct {
+	mu           sync.Mutex
+	cachedClient ServicesClientWrapper // Optimization: Cache client to reuse gRPC connections
+}
 
-// ListServices lists services for a project and region.
-func (c *GCPClient) ListServices(ctx context.Context, project, region string) ([]*runpb.Service, error) {
+// getOrCreateClient returns a cached client or creates a new one if it doesn't exist.
+// This reduces latency by avoiding repeated authentication and connection overhead.
+func (c *GCPClient) getOrCreateClient(ctx context.Context) (ServicesClientWrapper, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.cachedClient != nil {
+		return c.cachedClient, nil
+	}
+
 	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
@@ -118,9 +130,17 @@ func (c *GCPClient) ListServices(ctx context.Context, project, region string) ([
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		_ = cClient.Close()
-	}()
+
+	c.cachedClient = cClient
+	return c.cachedClient, nil
+}
+
+// ListServices lists services for a project and region.
+func (c *GCPClient) ListServices(ctx context.Context, project, region string) ([]*runpb.Service, error) {
+	cClient, err := c.getOrCreateClient(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	req := &runpb.ListServicesRequest{
 		Parent: fmt.Sprintf("projects/%s/locations/%s", project, region),
@@ -144,36 +164,20 @@ func (c *GCPClient) ListServices(ctx context.Context, project, region string) ([
 
 // GetService gets a single service.
 func (c *GCPClient) GetService(ctx context.Context, name string) (*runpb.Service, error) {
-	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
-	if err != nil {
-		return nil, fmt.Errorf("failed to find default credentials: %w", err)
-	}
-
-	cClient, err := createServicesClient(ctx, option.WithCredentials(creds))
+	cClient, err := c.getOrCreateClient(ctx)
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		_ = cClient.Close()
-	}()
 
 	return cClient.GetService(ctx, &runpb.GetServiceRequest{Name: name})
 }
 
 // UpdateService updates a service.
 func (c *GCPClient) UpdateService(ctx context.Context, service *runpb.Service) (*runpb.Service, error) {
-	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
-	if err != nil {
-		return nil, fmt.Errorf("failed to find default credentials: %w", err)
-	}
-
-	cClient, err := createServicesClient(ctx, option.WithCredentials(creds))
+	cClient, err := c.getOrCreateClient(ctx)
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		_ = cClient.Close()
-	}()
 
 	op, err := cClient.UpdateService(ctx, &runpb.UpdateServiceRequest{Service: service})
 	if err != nil {

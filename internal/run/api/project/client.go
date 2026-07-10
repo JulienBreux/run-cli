@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync"
 
 	resourcemanager "cloud.google.com/go/resourcemanager/apiv3"
 	resourcemanagerpb "cloud.google.com/go/resourcemanager/apiv3/resourcemanagerpb"
@@ -79,10 +80,19 @@ type Client interface {
 var _ Client = (*GCPClient)(nil)
 
 // GCPClient is the Google Cloud Platform implementation of Client.
-type GCPClient struct{}
+type GCPClient struct {
+	mu     sync.Mutex
+	client ProjectsClientWrapper
+}
 
-// ListProjects lists projects for the current user.
-func (c *GCPClient) ListProjects(ctx context.Context) ([]model.Project, error) {
+func (c *GCPClient) getProjectsClient(ctx context.Context) (ProjectsClientWrapper, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.client != nil {
+		return c.client, nil
+	}
+
 	// Explicitly find default credentials
 	creds, err := client.FindDefaultCredentials(ctx, resourcemanager.DefaultAuthScopes()...)
 	if err != nil {
@@ -93,9 +103,18 @@ func (c *GCPClient) ListProjects(ctx context.Context) ([]model.Project, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		_ = cClient.Close()
-	}()
+
+	c.client = cClient
+
+	return c.client, nil
+}
+
+// ListProjects lists projects for the current user.
+func (c *GCPClient) ListProjects(ctx context.Context) ([]model.Project, error) {
+	cClient, err := c.getProjectsClient(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	req := &resourcemanagerpb.SearchProjectsRequest{
 		// Query: "", // Empty query lists all projects

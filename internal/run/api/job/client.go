@@ -19,6 +19,7 @@ package job
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	run "cloud.google.com/go/run/apiv2"
 	"cloud.google.com/go/run/apiv2/runpb"
@@ -98,10 +99,23 @@ type Client interface {
 var _ Client = (*GCPClient)(nil)
 
 // GCPClient is the Google Cloud Platform implementation of Client.
-type GCPClient struct{}
+type GCPClient struct {
+	mu     sync.Mutex
+	client JobsClientWrapper
+}
 
-// ListJobs lists jobs for a project and region.
-func (c *GCPClient) ListJobs(ctx context.Context, project, region string) ([]*runpb.Job, error) {
+// getInternalClient provides lazy-initialization and caching for the Jobs client.
+// This significantly improves performance during multi-region operations or concurrent requests
+// by reusing the gRPC/REST connection and credentials, avoiding redundant authentication
+// and handshake overhead.
+func (c *GCPClient) getInternalClient(ctx context.Context) (JobsClientWrapper, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.client != nil {
+		return c.client, nil
+	}
+
 	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
@@ -111,9 +125,17 @@ func (c *GCPClient) ListJobs(ctx context.Context, project, region string) ([]*ru
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		_ = cClient.Close()
-	}()
+	c.client = cClient
+
+	return c.client, nil
+}
+
+// ListJobs lists jobs for a project and region.
+func (c *GCPClient) ListJobs(ctx context.Context, project, region string) ([]*runpb.Job, error) {
+	cClient, err := c.getInternalClient(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	req := &runpb.ListJobsRequest{
 		Parent: fmt.Sprintf("projects/%s/locations/%s", project, region),
@@ -137,18 +159,10 @@ func (c *GCPClient) ListJobs(ctx context.Context, project, region string) ([]*ru
 
 // RunJob runs a job.
 func (c *GCPClient) RunJob(ctx context.Context, name string) (*runpb.Execution, error) {
-	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
-	if err != nil {
-		return nil, fmt.Errorf("failed to find default credentials: %w", err)
-	}
-
-	cClient, err := createJobsClient(ctx, option.WithCredentials(creds))
+	cClient, err := c.getInternalClient(ctx)
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		_ = cClient.Close()
-	}()
 
 	op, err := cClient.RunJob(ctx, &runpb.RunJobRequest{Name: name})
 	if err != nil {

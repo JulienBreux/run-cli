@@ -19,6 +19,7 @@ package revision
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	run "cloud.google.com/go/run/apiv2"
 	"cloud.google.com/go/run/apiv2/runpb"
@@ -76,10 +77,23 @@ type Client interface {
 var apiClient Client = &GCPClient{}
 
 // GCPClient is the Google Cloud Platform implementation of Client.
-type GCPClient struct{}
+type GCPClient struct {
+	mu     sync.Mutex
+	client RevisionsClientWrapper
+}
 
-// ListRevisions lists revisions for a service.
-func (c *GCPClient) ListRevisions(ctx context.Context, project, region, service string) ([]*runpb.Revision, error) {
+// getInternalClient provides lazy-initialization and caching for the Revisions client.
+// This significantly improves performance during multi-region operations or concurrent requests
+// by reusing the gRPC/REST connection and credentials, avoiding redundant authentication
+// and handshake overhead.
+func (c *GCPClient) getInternalClient(ctx context.Context) (RevisionsClientWrapper, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.client != nil {
+		return c.client, nil
+	}
+
 	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
@@ -89,7 +103,17 @@ func (c *GCPClient) ListRevisions(ctx context.Context, project, region, service 
 	if err != nil {
 		return nil, err
 	}
-	defer func() { _ = cClient.Close() }()
+	c.client = cClient
+
+	return c.client, nil
+}
+
+// ListRevisions lists revisions for a service.
+func (c *GCPClient) ListRevisions(ctx context.Context, project, region, service string) ([]*runpb.Revision, error) {
+	cClient, err := c.getInternalClient(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	req := &runpb.ListRevisionsRequest{
 		Parent: fmt.Sprintf("projects/%s/locations/%s/services/%s", project, region, service),

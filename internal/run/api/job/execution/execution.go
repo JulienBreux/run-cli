@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 
 	run "cloud.google.com/go/run/apiv2"
 	"cloud.google.com/go/run/apiv2/runpb"
@@ -99,10 +100,23 @@ type Client interface {
 }
 
 // GCPClient is the Google Cloud Platform implementation of Client.
-type GCPClient struct{}
+type GCPClient struct {
+	mu     sync.Mutex
+	client ExecutionsClientWrapper
+}
 
-// ListExecutions lists executions for a project, region and job.
-func (c *GCPClient) ListExecutions(ctx context.Context, project, region, jobName string) ([]*runpb.Execution, error) {
+// getInternalClient provides lazy-initialization and caching for the Executions client.
+// This significantly improves performance during multi-region operations or concurrent requests
+// by reusing the gRPC/REST connection and credentials, avoiding redundant authentication
+// and handshake overhead.
+func (c *GCPClient) getInternalClient(ctx context.Context) (ExecutionsClientWrapper, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.client != nil {
+		return c.client, nil
+	}
+
 	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
@@ -112,9 +126,17 @@ func (c *GCPClient) ListExecutions(ctx context.Context, project, region, jobName
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		_ = cClient.Close()
-	}()
+	c.client = cClient
+
+	return c.client, nil
+}
+
+// ListExecutions lists executions for a project, region and job.
+func (c *GCPClient) ListExecutions(ctx context.Context, project, region, jobName string) ([]*runpb.Execution, error) {
+	cClient, err := c.getInternalClient(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	// Filter by job name
 	// The parent is the location. We filter by label or just iterate and filter?

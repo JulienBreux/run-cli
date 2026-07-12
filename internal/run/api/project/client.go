@@ -21,12 +21,14 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync"
 
 	resourcemanager "cloud.google.com/go/resourcemanager/apiv3"
 	resourcemanagerpb "cloud.google.com/go/resourcemanager/apiv3/resourcemanagerpb"
 	"github.com/JulienBreux/run-cli/internal/run/api/client"
 	model "github.com/JulienBreux/run-cli/internal/run/model/common/project"
 	"github.com/googleapis/gax-go/v2"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
@@ -79,23 +81,43 @@ type Client interface {
 var _ Client = (*GCPClient)(nil)
 
 // GCPClient is the Google Cloud Platform implementation of Client.
-type GCPClient struct{}
+type GCPClient struct {
+	mu     sync.Mutex
+	creds  *google.Credentials
+	client ProjectsClientWrapper
+}
 
-// ListProjects lists projects for the current user.
-func (c *GCPClient) ListProjects(ctx context.Context) ([]model.Project, error) {
-	// Explicitly find default credentials
-	creds, err := client.FindDefaultCredentials(ctx, resourcemanager.DefaultAuthScopes()...)
-	if err != nil {
-		return nil, fmt.Errorf("failed to find default credentials: %w. Tip: Try running 'gcloud auth application-default login' to authenticate the Go client", err)
+func (c *GCPClient) getClient(ctx context.Context) (ProjectsClientWrapper, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.client != nil {
+		return c.client, nil
 	}
 
-	cClient, err := createProjectsClient(ctx, option.WithCredentials(creds))
+	if c.creds == nil {
+		creds, err := client.FindDefaultCredentials(ctx, resourcemanager.DefaultAuthScopes()...)
+		if err != nil {
+			return nil, fmt.Errorf("failed to find default credentials: %w. Tip: Try running 'gcloud auth application-default login' to authenticate the Go client", err)
+		}
+		c.creds = creds
+	}
+
+	cClient, err := createProjectsClient(ctx, option.WithCredentials(c.creds))
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		_ = cClient.Close()
-	}()
+	c.client = cClient
+
+	return c.client, nil
+}
+
+// ListProjects lists projects for the current user.
+func (c *GCPClient) ListProjects(ctx context.Context) ([]model.Project, error) {
+	cClient, err := c.getClient(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	req := &resourcemanagerpb.SearchProjectsRequest{
 		// Query: "", // Empty query lists all projects

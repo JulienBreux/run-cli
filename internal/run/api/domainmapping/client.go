@@ -19,6 +19,7 @@ package domainmapping
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/JulienBreux/run-cli/internal/run/api/client"
 	"golang.org/x/oauth2/google"
@@ -59,18 +60,42 @@ type Client interface {
 }
 
 // GCPClient is the Google Cloud Platform implementation of the Client interface.
-type GCPClient struct{}
+type GCPClient struct {
+	mu     sync.Mutex
+	creds  *google.Credentials
+	client DomainMappingsClientWrapper
+}
+
+func (c *GCPClient) getClient(ctx context.Context) (DomainMappingsClientWrapper, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.client != nil {
+		return c.client, nil
+	}
+
+	if c.creds == nil {
+		creds, err := client.FindDefaultCredentials(ctx, run.CloudPlatformScope)
+		if err != nil {
+			return nil, fmt.Errorf("failed to find default credentials: %w", err)
+		}
+		c.creds = creds
+	}
+
+	dmClient, err := createClient(ctx, c.creds)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create domain mappings client: %w", err)
+	}
+	c.client = dmClient
+
+	return c.client, nil
+}
 
 // ListDomainMappings lists domain mappings for a given project and region.
 func (c *GCPClient) ListDomainMappings(ctx context.Context, project, region string) ([]*run.DomainMapping, error) {
-	creds, err := client.FindDefaultCredentials(ctx, run.CloudPlatformScope)
+	dmClient, err := c.getClient(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to find default credentials: %w", err)
-	}
-
-	dmClient, err := createClient(ctx, creds)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create domain mappings client: %w", err)
+		return nil, err
 	}
 
 	parent := fmt.Sprintf("projects/%s/locations/%s", project, region)

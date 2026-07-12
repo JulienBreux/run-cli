@@ -1,0 +1,3 @@
+## 2026-05-22 - API Client Connection Pooling/Caching
+**Learning:** Initializing Google Cloud API clients (credential lookup + gRPC dialing) for every request is a major performance bottleneck in CLI tools, especially when fan-out operations (like listing resources across 24 regions) are performed concurrently. This leads to redundant TCP/TLS handshakes and increased latency.
+**Action:** Implement lazy-initialization and caching for gRPC/REST clients and credentials using `sync.Mutex` at the `GCPClient` level. Reusing the client across multiple requests within the same process execution significantly reduces total operation time.

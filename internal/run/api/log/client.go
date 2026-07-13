@@ -19,10 +19,12 @@ package log
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"cloud.google.com/go/logging"
 	"cloud.google.com/go/logging/logadmin"
 	"github.com/JulienBreux/run-cli/internal/run/api/client"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 )
 
@@ -70,6 +72,12 @@ func (w *RealLogAdminClient) Close() error {
 	return w.client.Close()
 }
 
+var (
+	logClientMu    sync.Mutex
+	logClients     = make(map[string]LogAdminClientWrapper)
+	logClientCreds *google.Credentials
+)
+
 // GCPClient is the Google Cloud Platform implementation of Client.
 type GCPClient struct {
 	client LogAdminClientWrapper
@@ -77,16 +85,31 @@ type GCPClient struct {
 
 // NewGCPClient creates a new GCPClient.
 func NewGCPClient(ctx context.Context, projectID string) (Client, error) {
-	creds, err := client.FindDefaultCredentials(ctx, logging.ReadScope)
-	if err != nil {
-		return nil, fmt.Errorf("failed to find default credentials: %w", err)
+	logClientMu.Lock()
+	defer logClientMu.Unlock()
+
+	// Reuse credentials across all projects
+	if logClientCreds == nil {
+		initCtx := context.Background()
+		creds, err := client.FindDefaultCredentials(initCtx, logging.ReadScope)
+		if err != nil {
+			return nil, fmt.Errorf("failed to find default credentials: %w", err)
+		}
+		logClientCreds = creds
 	}
 
-	c, err := createLogAdminClient(ctx, projectID, option.WithCredentials(creds))
+	// Reuse client per projectID
+	if c, ok := logClients[projectID]; ok {
+		return &GCPClient{client: c}, nil
+	}
+
+	initCtx := context.Background()
+	c, err := createLogAdminClient(initCtx, projectID, option.WithCredentials(logClientCreds))
 	if err != nil {
 		return nil, err
 	}
 
+	logClients[projectID] = c
 	return &GCPClient{client: c}, nil
 }
 
@@ -101,7 +124,9 @@ func (c *GCPClient) Entries(ctx context.Context, opts ...interface{}) EntryItera
 }
 
 func (c *GCPClient) Close() error {
-	return c.client.Close()
+	// Do not close the internal client as it is shared across the application.
+	// The gRPC connections will be closed when the process exits.
+	return nil
 }
 
 // GCPEntryIterator wraps logadmin.EntryIterator.

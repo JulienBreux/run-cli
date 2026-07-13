@@ -19,6 +19,7 @@ package revision
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	run "cloud.google.com/go/run/apiv2"
 	"cloud.google.com/go/run/apiv2/runpb"
@@ -76,20 +77,41 @@ type Client interface {
 var apiClient Client = &GCPClient{}
 
 // GCPClient is the Google Cloud Platform implementation of Client.
-type GCPClient struct{}
+type GCPClient struct {
+	mu     sync.Mutex
+	client RevisionsClientWrapper
+}
 
-// ListRevisions lists revisions for a service.
-func (c *GCPClient) ListRevisions(ctx context.Context, project, region, service string) ([]*runpb.Revision, error) {
-	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
+func (c *GCPClient) getClient(ctx context.Context) (RevisionsClientWrapper, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.client != nil {
+		return c.client, nil
+	}
+
+	initCtx := context.Background()
+
+	creds, err := client.FindDefaultCredentials(initCtx, run.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
 	}
 
-	cClient, err := createRevisionsClient(ctx, option.WithCredentials(creds))
+	cClient, err := createRevisionsClient(initCtx, option.WithCredentials(creds))
 	if err != nil {
 		return nil, err
 	}
-	defer func() { _ = cClient.Close() }()
+
+	c.client = cClient
+	return c.client, nil
+}
+
+// ListRevisions lists revisions for a service.
+func (c *GCPClient) ListRevisions(ctx context.Context, project, region, service string) ([]*runpb.Revision, error) {
+	cClient, err := c.getClient(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	req := &runpb.ListRevisionsRequest{
 		Parent: fmt.Sprintf("projects/%s/locations/%s/services/%s", project, region, service),

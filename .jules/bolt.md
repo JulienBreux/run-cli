@@ -1,0 +1,3 @@
+## 2026-05-26 - GCP Client Caching & Lifecycle
+**Learning:** Shared GCP clients in a multi-package architecture need careful lifecycle management. Closing a shared client (e.g., Logging) can cause cascading failures for all subsequent calls. Lazy initialization with `sync.Mutex` effectively eliminates the ~100-200ms overhead of credential discovery and gRPC connection setup.
+**Action:** When caching clients, ensure the `Close()` method is handled safely (e.g., as a no-op if shared globally) and use `context.Background()` for initialization to avoid tying the client lifecycle to a single request's context.

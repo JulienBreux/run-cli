@@ -250,13 +250,22 @@ func TestGCPClient(t *testing.T) {
 	defer func() {
 		client.FindDefaultCredentials = origFindCreds
 		createLogAdminClient = origCreateClient
+
+		logClientMu.Lock()
+		logClients = make(map[string]LogAdminClientWrapper)
+		logClientCreds = nil
+		logClientMu.Unlock()
 	}()
 
-	client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
-		return &google.Credentials{}, nil
-	}
-
 	t.Run("NewGCPClient_Success", func(t *testing.T) {
+		logClientMu.Lock()
+		logClients = make(map[string]LogAdminClientWrapper)
+		logClientCreds = nil
+		logClientMu.Unlock()
+
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+			return &google.Credentials{}, nil
+		}
 		createLogAdminClient = func(ctx context.Context, projectID string, opts ...option.ClientOption) (LogAdminClientWrapper, error) {
 			return &MockLogAdminClientWrapper{
 				EntriesFunc: func(ctx context.Context, opts ...logadmin.EntriesOption) EntryIterator {
@@ -280,16 +289,26 @@ func TestGCPClient(t *testing.T) {
 	})
 
 	t.Run("NewGCPClient_AuthError", func(t *testing.T) {
+		logClientMu.Lock()
+		logClients = make(map[string]LogAdminClientWrapper)
+		logClientCreds = nil
+		logClientMu.Unlock()
+
 		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return nil, errors.New("auth failed")
 		}
-		
+
 		_, err := NewGCPClient(context.Background(), "project")
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "failed to find default credentials")
 	})
 
 	t.Run("NewGCPClient_ClientCreationError", func(t *testing.T) {
+		logClientMu.Lock()
+		logClients = make(map[string]LogAdminClientWrapper)
+		logClientCreds = nil
+		logClientMu.Unlock()
+
 		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return &google.Credentials{}, nil
 		}

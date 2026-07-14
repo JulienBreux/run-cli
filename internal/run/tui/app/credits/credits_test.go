@@ -105,6 +105,7 @@ func TestUpdate(t *testing.T) {
 
 	// Force update with simulated rect
 	c.SetRect(0, 0, 100, 100)
+	c.lastUpdate = time.Now() // Reset to ensure small dt
 	c.update()
 
 	// Check if particles were spawned

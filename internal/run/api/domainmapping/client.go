@@ -75,14 +75,14 @@ func (c *GCPClient) getClient(ctx context.Context) (DomainMappingsClientWrapper,
 	}
 
 	if c.creds == nil {
-		creds, err := client.FindDefaultCredentials(ctx, run.CloudPlatformScope)
+		creds, err := client.FindDefaultCredentials(context.Background(), run.CloudPlatformScope)
 		if err != nil {
 			return nil, fmt.Errorf("failed to find default credentials: %w", err)
 		}
 		c.creds = creds
 	}
 
-	dmClient, err := createClient(ctx, c.creds)
+	dmClient, err := createClient(context.Background(), c.creds)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create domain mappings client: %w", err)
 	}

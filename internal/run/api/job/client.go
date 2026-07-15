@@ -115,14 +115,14 @@ func (c *GCPClient) getClient(ctx context.Context) (JobsClientWrapper, error) {
 	}
 
 	if c.creds == nil {
-		creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
+		creds, err := client.FindDefaultCredentials(context.Background(), run.DefaultAuthScopes()...)
 		if err != nil {
 			return nil, fmt.Errorf("failed to find default credentials: %w", err)
 		}
 		c.creds = creds
 	}
 
-	cClient, err := createJobsClient(ctx, option.WithCredentials(c.creds))
+	cClient, err := createJobsClient(context.Background(), option.WithCredentials(c.creds))
 	if err != nil {
 		return nil, err
 	}

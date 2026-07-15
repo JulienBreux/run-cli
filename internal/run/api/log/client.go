@@ -93,14 +93,14 @@ func NewGCPClient(ctx context.Context, projectID string) (Client, error) {
 	}
 
 	if logClientCreds == nil {
-		creds, err := client.FindDefaultCredentials(ctx, logging.ReadScope)
+		creds, err := client.FindDefaultCredentials(context.Background(), logging.ReadScope)
 		if err != nil {
 			return nil, fmt.Errorf("failed to find default credentials: %w", err)
 		}
 		logClientCreds = creds
 	}
 
-	c, err := createLogAdminClient(ctx, projectID, option.WithCredentials(logClientCreds))
+	c, err := createLogAdminClient(context.Background(), projectID, option.WithCredentials(logClientCreds))
 	if err != nil {
 		return nil, err
 	}

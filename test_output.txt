@@ -1,0 +1,823 @@
+go test -count=1 -failfast -cover -coverprofile=coverage.txt -v ./...
+	github.com/JulienBreux/run-cli/cmd/run		coverage: 0.0% of statements
+=== RUN   TestWrapError
+=== RUN   TestWrapError/Unauthenticated_Error
+=== RUN   TestWrapError/PermissionDenied_Error
+=== RUN   TestWrapError/Other_Error
+--- PASS: TestWrapError (0.00s)
+    --- PASS: TestWrapError/Unauthenticated_Error (0.00s)
+    --- PASS: TestWrapError/PermissionDenied_Error (0.00s)
+    --- PASS: TestWrapError/Other_Error (0.00s)
+PASS
+coverage: 100.0% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/api/client	0.012s	coverage: 100.0% of statements
+=== RUN   TestMapDomainMapping
+--- PASS: TestMapDomainMapping (0.00s)
+=== RUN   TestList
+--- PASS: TestList (0.00s)
+=== RUN   TestList_Error
+--- PASS: TestList_Error (0.00s)
+=== RUN   TestList_AllRegions
+--- PASS: TestList_AllRegions (0.00s)
+=== RUN   TestGCPClient_ListDomainMappings
+=== RUN   TestGCPClient_ListDomainMappings/Success
+=== RUN   TestGCPClient_ListDomainMappings/Pagination
+=== RUN   TestGCPClient_ListDomainMappings/AuthError
+=== RUN   TestGCPClient_ListDomainMappings/ClientCreationError
+=== RUN   TestGCPClient_ListDomainMappings/ListError
+--- PASS: TestGCPClient_ListDomainMappings (0.00s)
+    --- PASS: TestGCPClient_ListDomainMappings/Success (0.00s)
+    --- PASS: TestGCPClient_ListDomainMappings/Pagination (0.00s)
+    --- PASS: TestGCPClient_ListDomainMappings/AuthError (0.00s)
+    --- PASS: TestGCPClient_ListDomainMappings/ClientCreationError (0.00s)
+    --- PASS: TestGCPClient_ListDomainMappings/ListError (0.00s)
+PASS
+coverage: 89.2% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/api/domainmapping	0.013s	coverage: 89.2% of statements
+=== RUN   TestMapJob
+--- PASS: TestMapJob (0.00s)
+=== RUN   TestMapJob_NilFields
+--- PASS: TestMapJob_NilFields (0.00s)
+=== RUN   TestList
+--- PASS: TestList (0.00s)
+=== RUN   TestList_Error
+--- PASS: TestList_Error (0.00s)
+=== RUN   TestExecute
+--- PASS: TestExecute (0.00s)
+=== RUN   TestExecute_Error
+--- PASS: TestExecute_Error (0.00s)
+=== RUN   TestList_AllRegions
+--- PASS: TestList_AllRegions (0.00s)
+=== RUN   TestGCPClient_ListJobs
+=== RUN   TestGCPClient_ListJobs/Success
+=== RUN   TestGCPClient_ListJobs/Auth_Error
+=== RUN   TestGCPClient_ListJobs/Client_Creation_Error
+=== RUN   TestGCPClient_ListJobs/Iterator_Error
+=== RUN   TestGCPClient_ListJobs/Iterator_Auth_Error
+--- PASS: TestGCPClient_ListJobs (0.00s)
+    --- PASS: TestGCPClient_ListJobs/Success (0.00s)
+    --- PASS: TestGCPClient_ListJobs/Auth_Error (0.00s)
+    --- PASS: TestGCPClient_ListJobs/Client_Creation_Error (0.00s)
+    --- PASS: TestGCPClient_ListJobs/Iterator_Error (0.00s)
+    --- PASS: TestGCPClient_ListJobs/Iterator_Auth_Error (0.00s)
+=== RUN   TestGCPClient_RunJob
+=== RUN   TestGCPClient_RunJob/Success
+=== RUN   TestGCPClient_RunJob/Run_Error
+=== RUN   TestGCPClient_RunJob/Client_Creation_Error
+--- PASS: TestGCPClient_RunJob (0.00s)
+    --- PASS: TestGCPClient_RunJob/Success (0.00s)
+    --- PASS: TestGCPClient_RunJob/Run_Error (0.00s)
+    --- PASS: TestGCPClient_RunJob/Client_Creation_Error (0.00s)
+=== RUN   TestWrappers_Delegation
+=== RUN   TestWrappers_Delegation/GCPJobsClientWrapper
+=== RUN   TestWrappers_Delegation/GCPJobIteratorWrapper
+=== RUN   TestWrappers_Delegation/GCPRunJobOperationWrapper
+--- PASS: TestWrappers_Delegation (0.00s)
+    --- PASS: TestWrappers_Delegation/GCPJobsClientWrapper (0.00s)
+    --- PASS: TestWrappers_Delegation/GCPJobIteratorWrapper (0.00s)
+    --- PASS: TestWrappers_Delegation/GCPRunJobOperationWrapper (0.00s)
+PASS
+coverage: 91.0% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/api/job	0.024s	coverage: 91.0% of statements
+	github.com/JulienBreux/run-cli/internal/run/api/job/execution		coverage: 0.0% of statements
+=== RUN   TestFormatEntry
+--- PASS: TestFormatEntry (0.00s)
+=== RUN   TestStreamLogs
+=== RUN   TestStreamLogs/Backlog_and_Polling
+=== RUN   TestStreamLogs/Client_Creation_Error
+--- PASS: TestStreamLogs (0.10s)
+    --- PASS: TestStreamLogs/Backlog_and_Polling (0.10s)
+    --- PASS: TestStreamLogs/Client_Creation_Error (0.00s)
+=== RUN   TestStreamLogs_PollingError
+--- PASS: TestStreamLogs_PollingError (0.10s)
+=== RUN   TestGCPClient
+=== RUN   TestGCPClient/NewGCPClient_Success
+=== RUN   TestGCPClient/NewGCPClient_AuthError
+=== RUN   TestGCPClient/NewGCPClient_ClientCreationError
+--- PASS: TestGCPClient (0.00s)
+    --- PASS: TestGCPClient/NewGCPClient_Success (0.00s)
+    --- PASS: TestGCPClient/NewGCPClient_AuthError (0.00s)
+    --- PASS: TestGCPClient/NewGCPClient_ClientCreationError (0.00s)
+=== RUN   TestWrappers_Delegation
+=== RUN   TestWrappers_Delegation/RealLogAdminClient
+=== RUN   TestWrappers_Delegation/GCPEntryIterator
+--- PASS: TestWrappers_Delegation (0.00s)
+    --- PASS: TestWrappers_Delegation/RealLogAdminClient (0.00s)
+    --- PASS: TestWrappers_Delegation/GCPEntryIterator (0.00s)
+PASS
+coverage: 87.0% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/api/log	0.239s	coverage: 87.0% of statements
+=== RUN   TestList
+=== RUN   TestList/success
+=== RUN   TestList/error
+--- PASS: TestList (0.00s)
+    --- PASS: TestList/success (0.00s)
+    --- PASS: TestList/error (0.00s)
+=== RUN   TestGCPClient_ListProjects
+=== RUN   TestGCPClient_ListProjects/Success
+=== RUN   TestGCPClient_ListProjects/Auth_Error
+=== RUN   TestGCPClient_ListProjects/Client_Creation_Error
+=== RUN   TestGCPClient_ListProjects/Iterator_Error
+=== RUN   TestGCPClient_ListProjects/Auth_Error_In_Loop
+--- PASS: TestGCPClient_ListProjects (0.00s)
+    --- PASS: TestGCPClient_ListProjects/Success (0.00s)
+    --- PASS: TestGCPClient_ListProjects/Auth_Error (0.00s)
+    --- PASS: TestGCPClient_ListProjects/Client_Creation_Error (0.00s)
+    --- PASS: TestGCPClient_ListProjects/Iterator_Error (0.00s)
+    --- PASS: TestGCPClient_ListProjects/Auth_Error_In_Loop (0.00s)
+=== RUN   TestMapProject
+--- PASS: TestMapProject (0.00s)
+=== RUN   TestWrappers_Delegation
+=== RUN   TestWrappers_Delegation/GCPProjectsClientWrapper
+=== RUN   TestWrappers_Delegation/GCPProjectIteratorWrapper
+--- PASS: TestWrappers_Delegation (0.00s)
+    --- PASS: TestWrappers_Delegation/GCPProjectsClientWrapper (0.00s)
+    --- PASS: TestWrappers_Delegation/GCPProjectIteratorWrapper (0.00s)
+PASS
+coverage: 87.5% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/api/project	0.012s	coverage: 87.5% of statements
+=== RUN   TestList
+--- PASS: TestList (0.00s)
+PASS
+coverage: 100.0% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/api/region	0.011s	coverage: 100.0% of statements
+=== RUN   TestMapService
+--- PASS: TestMapService (0.00s)
+=== RUN   TestMapService_Complex
+--- PASS: TestMapService_Complex (0.00s)
+=== RUN   TestList
+--- PASS: TestList (0.00s)
+=== RUN   TestUpdateScaling
+--- PASS: TestUpdateScaling (0.00s)
+=== RUN   TestList_Error
+--- PASS: TestList_Error (0.00s)
+=== RUN   TestUpdateTraffic
+--- PASS: TestUpdateTraffic (0.00s)
+=== RUN   TestUpdateScaling_Error
+--- PASS: TestUpdateScaling_Error (0.00s)
+=== RUN   TestList_AllRegions
+--- PASS: TestList_AllRegions (0.00s)
+=== RUN   TestGCPClient_ListServices
+=== RUN   TestGCPClient_ListServices/Success
+=== RUN   TestGCPClient_ListServices/Auth_Error
+=== RUN   TestGCPClient_ListServices/Iterator_Auth_Error
+--- PASS: TestGCPClient_ListServices (0.00s)
+    --- PASS: TestGCPClient_ListServices/Success (0.00s)
+    --- PASS: TestGCPClient_ListServices/Auth_Error (0.00s)
+    --- PASS: TestGCPClient_ListServices/Iterator_Auth_Error (0.00s)
+=== RUN   TestGCPClient_GetService
+=== RUN   TestGCPClient_GetService/Success
+=== RUN   TestGCPClient_GetService/Get_Error
+--- PASS: TestGCPClient_GetService (0.00s)
+    --- PASS: TestGCPClient_GetService/Success (0.00s)
+    --- PASS: TestGCPClient_GetService/Get_Error (0.00s)
+=== RUN   TestGCPClient_UpdateService
+=== RUN   TestGCPClient_UpdateService/Success
+=== RUN   TestGCPClient_UpdateService/Update_Start_Error
+--- PASS: TestGCPClient_UpdateService (0.00s)
+    --- PASS: TestGCPClient_UpdateService/Success (0.00s)
+    --- PASS: TestGCPClient_UpdateService/Update_Start_Error (0.00s)
+=== RUN   TestWrappers_Delegation
+=== RUN   TestWrappers_Delegation/GCPServicesClientWrapper
+=== RUN   TestWrappers_Delegation/GCPServiceIteratorWrapper
+=== RUN   TestWrappers_Delegation/GCPUpdateServiceOperationWrapper
+--- PASS: TestWrappers_Delegation (0.00s)
+    --- PASS: TestWrappers_Delegation/GCPServicesClientWrapper (0.00s)
+    --- PASS: TestWrappers_Delegation/GCPServiceIteratorWrapper (0.00s)
+    --- PASS: TestWrappers_Delegation/GCPUpdateServiceOperationWrapper (0.00s)
+=== RUN   TestUpdateAuthentication
+--- PASS: TestUpdateAuthentication (0.00s)
+=== RUN   TestUpdateAuthentication_Error
+--- PASS: TestUpdateAuthentication_Error (0.00s)
+PASS
+coverage: 87.2% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/api/service	0.015s	coverage: 87.2% of statements
+=== RUN   TestList
+--- PASS: TestList (0.00s)
+=== RUN   TestList_Error
+--- PASS: TestList_Error (0.00s)
+=== RUN   TestMapRevision
+--- PASS: TestMapRevision (0.00s)
+=== RUN   TestMapRevision_NilFields
+--- PASS: TestMapRevision_NilFields (0.00s)
+=== RUN   TestGCPClient_ListRevisions
+=== RUN   TestGCPClient_ListRevisions/Success
+=== RUN   TestGCPClient_ListRevisions/AuthError
+=== RUN   TestGCPClient_ListRevisions/ClientCreationError
+=== RUN   TestGCPClient_ListRevisions/IteratorError
+--- PASS: TestGCPClient_ListRevisions (0.00s)
+    --- PASS: TestGCPClient_ListRevisions/Success (0.00s)
+    --- PASS: TestGCPClient_ListRevisions/AuthError (0.00s)
+    --- PASS: TestGCPClient_ListRevisions/ClientCreationError (0.00s)
+    --- PASS: TestGCPClient_ListRevisions/IteratorError (0.00s)
+=== RUN   TestWrappers_Delegation
+=== RUN   TestWrappers_Delegation/GCPRevisionsClientWrapper
+=== RUN   TestWrappers_Delegation/GCPRevisionIteratorWrapper
+--- PASS: TestWrappers_Delegation (0.00s)
+    --- PASS: TestWrappers_Delegation/GCPRevisionsClientWrapper (0.00s)
+    --- PASS: TestWrappers_Delegation/GCPRevisionIteratorWrapper (0.00s)
+PASS
+coverage: 92.3% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/api/service/revision	0.024s	coverage: 92.3% of statements
+=== RUN   TestMapWorkerPool
+--- PASS: TestMapWorkerPool (0.00s)
+=== RUN   TestList
+--- PASS: TestList (0.00s)
+=== RUN   TestList_Error
+--- PASS: TestList_Error (0.00s)
+=== RUN   TestList_AllRegions
+--- PASS: TestList_AllRegions (0.00s)
+=== RUN   TestUpdateScaling
+--- PASS: TestUpdateScaling (0.00s)
+=== RUN   TestUpdateScaling_GetError
+--- PASS: TestUpdateScaling_GetError (0.00s)
+=== RUN   TestUpdateScaling_UpdateError
+--- PASS: TestUpdateScaling_UpdateError (0.00s)
+=== RUN   TestGCPClient_ListWorkerPools
+=== RUN   TestGCPClient_ListWorkerPools/Success
+=== RUN   TestGCPClient_ListWorkerPools/Auth_Error
+=== RUN   TestGCPClient_ListWorkerPools/Iterator_Auth_Error
+=== RUN   TestGCPClient_ListWorkerPools/Client_Creation_Error
+--- PASS: TestGCPClient_ListWorkerPools (0.00s)
+    --- PASS: TestGCPClient_ListWorkerPools/Success (0.00s)
+    --- PASS: TestGCPClient_ListWorkerPools/Auth_Error (0.00s)
+    --- PASS: TestGCPClient_ListWorkerPools/Iterator_Auth_Error (0.00s)
+    --- PASS: TestGCPClient_ListWorkerPools/Client_Creation_Error (0.00s)
+=== RUN   TestGCPClient_GetWorkerPool
+=== RUN   TestGCPClient_GetWorkerPool/Success
+=== RUN   TestGCPClient_GetWorkerPool/Get_Error
+=== RUN   TestGCPClient_GetWorkerPool/Client_Creation_Error
+--- PASS: TestGCPClient_GetWorkerPool (0.00s)
+    --- PASS: TestGCPClient_GetWorkerPool/Success (0.00s)
+    --- PASS: TestGCPClient_GetWorkerPool/Get_Error (0.00s)
+    --- PASS: TestGCPClient_GetWorkerPool/Client_Creation_Error (0.00s)
+=== RUN   TestGCPClient_UpdateWorkerPool
+=== RUN   TestGCPClient_UpdateWorkerPool/Success
+=== RUN   TestGCPClient_UpdateWorkerPool/Update_Op_Start_Error
+=== RUN   TestGCPClient_UpdateWorkerPool/Client_Creation_Error
+=== RUN   TestGCPClient_UpdateWorkerPool/Wait_Error
+--- PASS: TestGCPClient_UpdateWorkerPool (0.00s)
+    --- PASS: TestGCPClient_UpdateWorkerPool/Success (0.00s)
+    --- PASS: TestGCPClient_UpdateWorkerPool/Update_Op_Start_Error (0.00s)
+    --- PASS: TestGCPClient_UpdateWorkerPool/Client_Creation_Error (0.00s)
+    --- PASS: TestGCPClient_UpdateWorkerPool/Wait_Error (0.00s)
+=== RUN   TestWrappers_Delegation
+=== RUN   TestWrappers_Delegation/GCPWorkerPoolsClientWrapper
+=== RUN   TestWrappers_Delegation/GCPWorkerPoolIteratorWrapper
+=== RUN   TestWrappers_Delegation/GCPUpdateWorkerPoolOperationWrapper
+--- PASS: TestWrappers_Delegation (0.00s)
+    --- PASS: TestWrappers_Delegation/GCPWorkerPoolsClientWrapper (0.00s)
+    --- PASS: TestWrappers_Delegation/GCPWorkerPoolIteratorWrapper (0.00s)
+    --- PASS: TestWrappers_Delegation/GCPUpdateWorkerPoolOperationWrapper (0.00s)
+PASS
+coverage: 92.7% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/api/workerpool	0.016s	coverage: 92.7% of statements
+=== RUN   TestGetInfo
+--- PASS: TestGetInfo (0.00s)
+=== RUN   TestGetInfo_Defaults
+--- PASS: TestGetInfo_Defaults (0.00s)
+PASS
+coverage: 69.1% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/auth	0.014s	coverage: 69.1% of statements
+=== RUN   TestRunE
+=== RUN   TestRunE/Success
+=== RUN   TestRunE/ConfigLoadError
+=== RUN   TestRunE/AppRunError
+--- PASS: TestRunE (0.00s)
+    --- PASS: TestRunE/Success (0.00s)
+    --- PASS: TestRunE/ConfigLoadError (0.00s)
+    --- PASS: TestRunE/AppRunError (0.00s)
+=== RUN   TestNew
+--- PASS: TestNew (0.00s)
+=== RUN   TestPrintError
+--- PASS: TestPrintError (0.00s)
+PASS
+coverage: 100.0% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/command	0.050s	coverage: 100.0% of statements
+=== RUN   TestNewCmdVersion
+=== RUN   TestNewCmdVersion/JSONOutput
+=== RUN   TestNewCmdVersion/YAMLOutput
+--- PASS: TestNewCmdVersion (0.00s)
+    --- PASS: TestNewCmdVersion/JSONOutput (0.00s)
+    --- PASS: TestNewCmdVersion/YAMLOutput (0.00s)
+PASS
+coverage: 100.0% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/command/version	0.010s	coverage: 100.0% of statements
+=== RUN   TestLoadSave
+--- PASS: TestLoadSave (0.00s)
+=== RUN   TestGetConfigPath
+--- PASS: TestGetConfigPath (0.00s)
+=== RUN   TestCorruptedConfig
+--- PASS: TestCorruptedConfig (0.00s)
+=== RUN   TestSaveCreatesDir
+--- PASS: TestSaveCreatesDir (0.00s)
+=== RUN   TestGetConfigPath_Error
+--- PASS: TestGetConfigPath_Error (0.00s)
+=== RUN   TestLoad_HomeDirError
+--- PASS: TestLoad_HomeDirError (0.00s)
+=== RUN   TestLoad_ReadError
+--- PASS: TestLoad_ReadError (0.00s)
+=== RUN   TestSave_WriteError
+--- PASS: TestSave_WriteError (0.00s)
+=== RUN   TestSave_MkdirError
+--- PASS: TestSave_MkdirError (0.00s)
+PASS
+coverage: 93.1% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/config	0.013s	coverage: 93.1% of statements
+=== RUN   TestCondition
+--- PASS: TestCondition (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/JulienBreux/run-cli/internal/run/model/common/condition	0.011s	coverage: [no statements]
+=== RUN   TestContainer
+--- PASS: TestContainer (0.00s)
+=== RUN   TestProbe
+--- PASS: TestProbe (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/JulienBreux/run-cli/internal/run/model/common/container	0.011s	coverage: [no statements]
+=== RUN   TestEnvVar
+--- PASS: TestEnvVar (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/JulienBreux/run-cli/internal/run/model/common/env	0.007s	coverage: [no statements]
+=== RUN   TestInfo
+--- PASS: TestInfo (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/JulienBreux/run-cli/internal/run/model/common/info	0.009s	coverage: [no statements]
+=== RUN   TestKeyToPath
+--- PASS: TestKeyToPath (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/JulienBreux/run-cli/internal/run/model/common/keytopath	0.008s	coverage: [no statements]
+=== RUN   TestProject
+--- PASS: TestProject (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/JulienBreux/run-cli/internal/run/model/common/project	0.009s	coverage: [no statements]
+=== RUN   TestResources
+--- PASS: TestResources (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/JulienBreux/run-cli/internal/run/model/common/resources	0.016s	coverage: [no statements]
+=== RUN   TestSecret
+--- PASS: TestSecret (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/JulienBreux/run-cli/internal/run/model/common/secret	0.013s	coverage: [no statements]
+=== RUN   TestVolume
+--- PASS: TestVolume (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/JulienBreux/run-cli/internal/run/model/common/volume	0.009s	coverage: [no statements]
+=== RUN   TestDomainMapping
+--- PASS: TestDomainMapping (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/JulienBreux/run-cli/internal/run/model/domainmapping	0.008s	coverage: [no statements]
+=== RUN   TestJob
+--- PASS: TestJob (0.00s)
+=== RUN   TestBinaryAuthorization
+--- PASS: TestBinaryAuthorization (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/JulienBreux/run-cli/internal/run/model/job	0.024s	coverage: [no statements]
+=== RUN   TestExecution
+--- PASS: TestExecution (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/JulienBreux/run-cli/internal/run/model/job/execution	0.008s	coverage: [no statements]
+=== RUN   TestService
+--- PASS: TestService (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/JulienBreux/run-cli/internal/run/model/service	0.006s	coverage: [no statements]
+=== RUN   TestNetworking
+--- PASS: TestNetworking (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/JulienBreux/run-cli/internal/run/model/service/networking	0.009s	coverage: [no statements]
+=== RUN   TestRevision_NewFields
+--- PASS: TestRevision_NewFields (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/JulienBreux/run-cli/internal/run/model/service/revision	0.016s	coverage: [no statements]
+=== RUN   TestScaling
+--- PASS: TestScaling (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/JulienBreux/run-cli/internal/run/model/service/scaling	0.006s	coverage: [no statements]
+=== RUN   TestSecurity
+--- PASS: TestSecurity (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/JulienBreux/run-cli/internal/run/model/service/security	0.011s	coverage: [no statements]
+=== RUN   TestTraffic
+--- PASS: TestTraffic (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/JulienBreux/run-cli/internal/run/model/service/traffic	0.007s	coverage: [no statements]
+=== RUN   TestWorkerPool
+--- PASS: TestWorkerPool (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/JulienBreux/run-cli/internal/run/model/workerpool	0.012s	coverage: [no statements]
+=== RUN   TestScaling
+--- PASS: TestScaling (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/JulienBreux/run-cli/internal/run/model/workerpool/scaling	0.008s	coverage: [no statements]
+=== RUN   TestManager_StartStop
+--- PASS: TestManager_StartStop (0.11s)
+=== RUN   TestManager_Director
+--- PASS: TestManager_Director (0.00s)
+PASS
+coverage: 92.1% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/proxy	0.117s	coverage: 92.1% of statements
+=== RUN   TestBuildLayout
+--- PASS: TestBuildLayout (0.00s)
+=== RUN   TestShortcuts_LoaderActive
+--- PASS: TestShortcuts_LoaderActive (0.01s)
+=== RUN   TestShortcuts_Navigation
+=== RUN   TestShortcuts_Navigation/To_Service_List
+=== RUN   TestShortcuts_Navigation/To_Job_List
+=== RUN   TestShortcuts_Navigation/To_WorkerPool_List
+--- PASS: TestShortcuts_Navigation (0.00s)
+    --- PASS: TestShortcuts_Navigation/To_Service_List (0.00s)
+    --- PASS: TestShortcuts_Navigation/To_Job_List (0.00s)
+    --- PASS: TestShortcuts_Navigation/To_WorkerPool_List (0.00s)
+=== RUN   TestShortcuts_Escape
+--- PASS: TestShortcuts_Escape (0.00s)
+=== RUN   TestShortcuts_OpenConsole
+--- PASS: TestShortcuts_OpenConsole (0.00s)
+=== RUN   TestInitializeApp
+--- PASS: TestInitializeApp (0.00s)
+=== RUN   TestSwitchTo
+--- PASS: TestSwitchTo (0.00s)
+=== RUN   TestShortcuts_Detailed
+--- PASS: TestShortcuts_Detailed (0.01s)
+=== RUN   TestShortcuts_Modals
+--- PASS: TestShortcuts_Modals (0.02s)
+=== RUN   TestRun
+--- PASS: TestRun (0.00s)
+=== RUN   TestOpenProjectModal
+--- PASS: TestOpenProjectModal (0.00s)
+=== RUN   TestOpenRegionModal
+--- PASS: TestOpenRegionModal (0.00s)
+=== RUN   TestModalCallbacks
+--- PASS: TestModalCallbacks (0.00s)
+=== RUN   TestOpenLogModal
+--- PASS: TestOpenLogModal (0.00s)
+=== RUN   TestOpenDescribeModal
+--- PASS: TestOpenDescribeModal (0.00s)
+=== RUN   TestOpenServiceScaleModal
+--- PASS: TestOpenServiceScaleModal (0.00s)
+=== RUN   TestOpenWorkerPoolScaleModal
+--- PASS: TestOpenWorkerPoolScaleModal (0.00s)
+=== RUN   TestOpenHelpModal
+--- PASS: TestOpenHelpModal (0.00s)
+=== RUN   TestOpenCreditsModal
+--- PASS: TestOpenCreditsModal (0.00s)
+PASS
+coverage: 57.0% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/app	0.120s	coverage: 57.0% of statements
+=== RUN   TestNew
+--- PASS: TestNew (0.00s)
+=== RUN   TestAnimationControl
+--- PASS: TestAnimationControl (0.05s)
+=== RUN   TestInputHandler
+--- PASS: TestInputHandler (0.00s)
+=== RUN   TestUpdate
+--- PASS: TestUpdate (0.01s)
+=== RUN   TestDraw
+--- PASS: TestDraw (0.00s)
+PASS
+coverage: 91.5% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/app/credits	0.074s	coverage: 91.5% of statements
+=== RUN   TestDescribeModal
+--- PASS: TestDescribeModal (0.00s)
+=== RUN   TestDescriber_Content
+--- PASS: TestDescriber_Content (0.00s)
+=== RUN   TestDescriber_InputCapture
+--- PASS: TestDescriber_InputCapture (0.00s)
+=== RUN   TestDescriber_InputCapture_NonClosing
+--- PASS: TestDescriber_InputCapture_NonClosing (0.00s)
+PASS
+coverage: 93.8% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/app/describe	0.039s	coverage: 93.8% of statements
+=== RUN   TestList
+--- PASS: TestList (0.00s)
+=== RUN   TestLoad
+--- PASS: TestLoad (0.00s)
+=== RUN   TestListReload
+--- PASS: TestListReload (0.00s)
+=== RUN   TestListReload_Error
+--- PASS: TestListReload_Error (0.00s)
+=== RUN   TestGetSelectedDomainMappingFull
+--- PASS: TestGetSelectedDomainMappingFull (0.00s)
+=== RUN   TestGetSelectedDomainURL
+--- PASS: TestGetSelectedDomainURL (0.00s)
+=== RUN   TestGetSelectedDomainMappingFull_Empty
+--- PASS: TestGetSelectedDomainMappingFull_Empty (0.00s)
+=== RUN   TestShortcuts
+--- PASS: TestShortcuts (0.00s)
+=== RUN   TestRender
+--- PASS: TestRender (0.00s)
+=== RUN   TestDomainMappingInfoModal
+--- PASS: TestDomainMappingInfoModal (0.00s)
+PASS
+coverage: 89.0% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/app/domainmapping	0.012s	coverage: 89.0% of statements
+=== RUN   TestHelpModal
+--- PASS: TestHelpModal (0.00s)
+PASS
+coverage: 95.2% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/app/help	0.011s	coverage: 95.2% of statements
+=== RUN   TestDashboard
+--- PASS: TestDashboard (0.00s)
+=== RUN   TestDashboardReload
+--- PASS: TestDashboardReload (0.00s)
+=== RUN   TestDashboardShortcuts
+--- PASS: TestDashboardShortcuts (0.00s)
+=== RUN   TestList
+--- PASS: TestList (0.00s)
+=== RUN   TestLoad
+--- PASS: TestLoad (0.00s)
+=== RUN   TestListReload
+--- PASS: TestListReload (0.00s)
+=== RUN   TestListReload_Error
+--- PASS: TestListReload_Error (0.00s)
+=== RUN   TestGetSelectedJob
+--- PASS: TestGetSelectedJob (0.00s)
+=== RUN   TestGetSelectedJobFull_Empty
+--- PASS: TestGetSelectedJobFull_Empty (0.00s)
+=== RUN   TestShortcuts
+--- PASS: TestShortcuts (0.00s)
+=== RUN   TestRender
+--- PASS: TestRender (0.00s)
+PASS
+coverage: 94.1% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/app/job	0.025s	coverage: 94.1% of statements
+=== RUN   TestLogModal
+--- PASS: TestLogModal (0.00s)
+=== RUN   TestLogModal_Streaming
+--- PASS: TestLogModal_Streaming (0.10s)
+=== RUN   TestLogModal_Error
+--- PASS: TestLogModal_Error (0.10s)
+=== RUN   TestLogModal_InputCapture
+--- PASS: TestLogModal_InputCapture (0.00s)
+PASS
+coverage: 96.4% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/app/log	0.233s	coverage: 96.4% of statements
+=== RUN   TestProjectModal
+--- PASS: TestProjectModal (0.00s)
+=== RUN   TestProjectModal_Filtering
+--- PASS: TestProjectModal_Filtering (0.00s)
+=== RUN   TestProjectModal_Selection
+--- PASS: TestProjectModal_Selection (0.00s)
+=== RUN   TestInputCapture
+--- PASS: TestInputCapture (0.00s)
+PASS
+coverage: 85.7% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/app/project	0.018s	coverage: 85.7% of statements
+=== RUN   TestRegionModal_Init
+--- PASS: TestRegionModal_Init (0.00s)
+=== RUN   TestRegionModal_Filtering
+--- PASS: TestRegionModal_Filtering (0.00s)
+=== RUN   TestRegionModal_Selection
+--- PASS: TestRegionModal_Selection (0.00s)
+=== RUN   TestInputCapture
+--- PASS: TestInputCapture (0.00s)
+PASS
+coverage: 89.8% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/app/region	0.015s	coverage: 89.8% of statements
+=== RUN   TestDashboard
+--- PASS: TestDashboard (0.00s)
+=== RUN   TestDashboardShortcuts
+--- PASS: TestDashboardShortcuts (0.00s)
+=== RUN   TestUpdateTabs
+--- PASS: TestUpdateTabs (0.00s)
+=== RUN   TestDashboardReload
+--- PASS: TestDashboardReload (0.00s)
+=== RUN   TestDashboardInputCapture
+--- PASS: TestDashboardInputCapture (0.00s)
+=== RUN   TestDashboardReload_Error
+--- PASS: TestDashboardReload_Error (0.00s)
+=== RUN   TestUpdateRevisionDetail
+--- PASS: TestUpdateRevisionDetail (0.00s)
+=== RUN   TestListAndLoad
+--- PASS: TestListAndLoad (0.00s)
+=== RUN   TestGetSelectedService
+--- PASS: TestGetSelectedService (0.00s)
+=== RUN   TestShortcuts
+--- PASS: TestShortcuts (0.00s)
+=== RUN   TestHandleShortcuts
+--- PASS: TestHandleShortcuts (0.00s)
+=== RUN   TestHandleShortcuts_ProxyOpenURL
+--- PASS: TestHandleShortcuts_ProxyOpenURL (0.00s)
+=== RUN   TestShortcuts_Proxy
+--- PASS: TestShortcuts_Proxy (0.00s)
+=== RUN   TestHandleShortcuts_Proxy
+--- PASS: TestHandleShortcuts_Proxy (0.00s)
+=== RUN   TestRender
+--- PASS: TestRender (0.00s)
+=== RUN   TestFetch
+--- PASS: TestFetch (0.00s)
+=== RUN   TestListReload
+--- PASS: TestListReload (0.01s)
+=== RUN   TestListReload_Error
+--- PASS: TestListReload_Error (0.00s)
+=== RUN   TestRender_ScalingManual
+--- PASS: TestRender_ScalingManual (0.00s)
+PASS
+coverage: 85.5% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/app/service	0.035s	coverage: 85.5% of statements
+=== RUN   TestModal
+--- PASS: TestModal (0.00s)
+PASS
+coverage: 66.0% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/app/service/auth	0.014s	coverage: 66.0% of statements
+=== RUN   TestNewListComponent
+--- PASS: TestNewListComponent (0.00s)
+=== RUN   TestNewDetailComponent
+--- PASS: TestNewDetailComponent (0.00s)
+=== RUN   TestListComponent_Update
+--- PASS: TestListComponent_Update (0.00s)
+=== RUN   TestDetailComponent_Update
+--- PASS: TestDetailComponent_Update (0.00s)
+=== RUN   TestListComponent_Clear
+--- PASS: TestListComponent_Clear (0.00s)
+=== RUN   TestDetailComponent_Clear
+--- PASS: TestDetailComponent_Clear (0.00s)
+PASS
+coverage: 76.9% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/app/service/revision	0.007s	coverage: 76.9% of statements
+=== RUN   TestModal
+--- PASS: TestModal (0.00s)
+=== RUN   TestValidateScaleParams
+=== RUN   TestValidateScaleParams/Valid_Manual
+=== RUN   TestValidateScaleParams/Invalid_Manual
+=== RUN   TestValidateScaleParams/Valid_Auto
+=== RUN   TestValidateScaleParams/Valid_Auto_No_Max
+=== RUN   TestValidateScaleParams/Invalid_Auto_Min
+=== RUN   TestValidateScaleParams/Invalid_Auto_Max
+=== RUN   TestValidateScaleParams/Invalid_Auto_Range
+--- PASS: TestValidateScaleParams (0.00s)
+    --- PASS: TestValidateScaleParams/Valid_Manual (0.00s)
+    --- PASS: TestValidateScaleParams/Invalid_Manual (0.00s)
+    --- PASS: TestValidateScaleParams/Valid_Auto (0.00s)
+    --- PASS: TestValidateScaleParams/Valid_Auto_No_Max (0.00s)
+    --- PASS: TestValidateScaleParams/Invalid_Auto_Min (0.00s)
+    --- PASS: TestValidateScaleParams/Invalid_Auto_Max (0.00s)
+    --- PASS: TestValidateScaleParams/Invalid_Auto_Range (0.00s)
+PASS
+coverage: 64.9% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/app/service/scale	0.014s	coverage: 64.9% of statements
+=== RUN   TestValidateTrafficParams
+=== RUN   TestValidateTrafficParams/Valid_sum_100
+=== RUN   TestValidateTrafficParams/Invalid_sum_!=_100
+=== RUN   TestValidateTrafficParams/Invalid_input
+=== RUN   TestValidateTrafficParams/Single_100
+--- PASS: TestValidateTrafficParams (0.00s)
+    --- PASS: TestValidateTrafficParams/Valid_sum_100 (0.00s)
+    --- PASS: TestValidateTrafficParams/Invalid_sum_!=_100 (0.00s)
+    --- PASS: TestValidateTrafficParams/Invalid_input (0.00s)
+    --- PASS: TestValidateTrafficParams/Single_100 (0.00s)
+=== RUN   TestModal
+--- PASS: TestModal (0.00s)
+PASS
+coverage: 66.1% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/app/service/traffic	0.016s	coverage: 66.1% of statements
+=== RUN   TestRegistry
+--- PASS: TestRegistry (0.00s)
+=== RUN   TestGetByCategory
+--- PASS: TestGetByCategory (0.00s)
+=== RUN   TestFormatByCategory
+--- PASS: TestFormatByCategory (0.00s)
+=== RUN   TestFormat
+--- PASS: TestFormat (0.00s)
+PASS
+coverage: 100.0% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/app/shortcut	0.006s	coverage: 100.0% of statements
+=== RUN   TestList
+--- PASS: TestList (0.00s)
+=== RUN   TestLoad
+--- PASS: TestLoad (0.00s)
+=== RUN   TestListReload
+--- PASS: TestListReload (0.00s)
+=== RUN   TestListReload_Error
+--- PASS: TestListReload_Error (0.00s)
+=== RUN   TestGetSelectedWorkerPool
+--- PASS: TestGetSelectedWorkerPool (0.00s)
+=== RUN   TestGetSelectedWorkerPoolFull_Empty
+--- PASS: TestGetSelectedWorkerPoolFull_Empty (0.00s)
+=== RUN   TestShortcuts
+--- PASS: TestShortcuts (0.00s)
+=== RUN   TestRender
+--- PASS: TestRender (0.00s)
+PASS
+coverage: 96.6% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/app/workerpool	0.019s	coverage: 96.6% of statements
+=== RUN   TestModal
+--- PASS: TestModal (0.00s)
+=== RUN   TestValidateScaleParams
+=== RUN   TestValidateScaleParams/5
+=== RUN   TestValidateScaleParams/0
+=== RUN   TestValidateScaleParams/-1
+=== RUN   TestValidateScaleParams/abc
+=== RUN   TestValidateScaleParams/#00
+--- PASS: TestValidateScaleParams (0.00s)
+    --- PASS: TestValidateScaleParams/5 (0.00s)
+    --- PASS: TestValidateScaleParams/0 (0.00s)
+    --- PASS: TestValidateScaleParams/-1 (0.00s)
+    --- PASS: TestValidateScaleParams/abc (0.00s)
+    --- PASS: TestValidateScaleParams/#00 (0.00s)
+PASS
+coverage: 67.8% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/app/workerpool/scale	0.015s	coverage: 67.8% of statements
+=== RUN   TestNew
+--- PASS: TestNew (0.00s)
+PASS
+coverage: 100.0% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/component/footer	0.011s	coverage: 100.0% of statements
+=== RUN   TestNew
+--- PASS: TestNew (0.00s)
+=== RUN   TestUpdateInfo
+--- PASS: TestUpdateInfo (0.00s)
+PASS
+coverage: 100.0% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/component/header	0.011s	coverage: 100.0% of statements
+=== RUN   TestNew
+--- PASS: TestNew (0.00s)
+PASS
+coverage: 100.0% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/component/loader	0.007s	coverage: 100.0% of statements
+=== RUN   TestString
+--- PASS: TestString (0.00s)
+=== RUN   TestStringSimple
+--- PASS: TestStringSimple (0.00s)
+=== RUN   TestNew
+--- PASS: TestNew (0.00s)
+PASS
+coverage: 100.0% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/component/logo	0.004s	coverage: 100.0% of statements
+=== RUN   TestNew
+--- PASS: TestNew (0.00s)
+=== RUN   TestStartStop
+--- PASS: TestStartStop (0.15s)
+=== RUN   TestSetContext
+--- PASS: TestSetContext (0.00s)
+PASS
+coverage: 97.5% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/component/spinner	0.160s	coverage: 97.5% of statements
+=== RUN   TestNew
+--- PASS: TestNew (0.00s)
+=== RUN   TestSetHeadersWithExpansions
+--- PASS: TestSetHeadersWithExpansions (0.00s)
+=== RUN   TestSetHeaders
+--- PASS: TestSetHeaders (0.00s)
+=== RUN   TestBorderWrapper_Draw
+--- PASS: TestBorderWrapper_Draw (0.00s)
+PASS
+coverage: 97.4% of statements
+ok  	github.com/JulienBreux/run-cli/internal/run/tui/component/table	0.008s	coverage: 97.4% of statements
+=== RUN   TestNew
+--- PASS: TestNew (0.00s)
+=== RUN   TestDraw
+--- PASS: TestDraw (0.00s)
+PASS
+coverage: 81.8% of statements
+ok  	github.com/JulienBreux/run-cli/pkg/dropdown	0.008s	coverage: 81.8% of statements
+=== RUN   TestPrint
+--- PASS: TestPrint (0.00s)
+=== RUN   TestPrintError
+--- PASS: TestPrintError (0.00s)
+=== RUN   TestStringToFormat
+--- PASS: TestStringToFormat (0.00s)
+=== RUN   TestToJSON
+--- PASS: TestToJSON (0.00s)
+=== RUN   TestToJSONError
+--- PASS: TestToJSONError (0.00s)
+=== RUN   TestToYAML
+--- PASS: TestToYAML (0.00s)
+=== RUN   TestToYAMLError
+--- PASS: TestToYAMLError (0.00s)
+=== RUN   TestToYAML_MarshalFail
+--- PASS: TestToYAML_MarshalFail (0.00s)
+PASS
+coverage: 100.0% of statements
+ok  	github.com/JulienBreux/run-cli/pkg/format	0.009s	coverage: 100.0% of statements
+=== RUN   TestVersionDateFailed
+--- PASS: TestVersionDateFailed (0.00s)
+=== RUN   TestVersionDateSuccess
+--- PASS: TestVersionDateSuccess (0.00s)
+=== RUN   TestPrintVersionJSON
+--- PASS: TestPrintVersionJSON (0.00s)
+=== RUN   TestPrintVersionYAML
+--- PASS: TestPrintVersionYAML (0.00s)
+=== RUN   TestPrintVersionText
+--- PASS: TestPrintVersionText (0.00s)
+PASS
+coverage: 100.0% of statements
+ok  	github.com/JulienBreux/run-cli/pkg/version	0.007s	coverage: 100.0% of statements

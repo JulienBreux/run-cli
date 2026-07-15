@@ -19,10 +19,12 @@ package log
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"cloud.google.com/go/logging"
 	"cloud.google.com/go/logging/logadmin"
 	"github.com/JulienBreux/run-cli/internal/run/api/client"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 )
 
@@ -41,6 +43,12 @@ type EntryIterator interface {
 type ClientFactory func(ctx context.Context, projectID string) (Client, error)
 
 var clientFactory ClientFactory = NewGCPClient
+
+var (
+	logClientMu    sync.Mutex
+	logClients     = make(map[string]LogAdminClientWrapper)
+	logClientCreds *google.Credentials
+)
 
 // Interfaces for mocking
 type LogAdminClientWrapper interface {
@@ -77,15 +85,26 @@ type GCPClient struct {
 
 // NewGCPClient creates a new GCPClient.
 func NewGCPClient(ctx context.Context, projectID string) (Client, error) {
-	creds, err := client.FindDefaultCredentials(ctx, logging.ReadScope)
-	if err != nil {
-		return nil, fmt.Errorf("failed to find default credentials: %w", err)
+	logClientMu.Lock()
+	defer logClientMu.Unlock()
+
+	if c, ok := logClients[projectID]; ok {
+		return &GCPClient{client: c}, nil
 	}
 
-	c, err := createLogAdminClient(ctx, projectID, option.WithCredentials(creds))
+	if logClientCreds == nil {
+		creds, err := client.FindDefaultCredentials(ctx, logging.ReadScope)
+		if err != nil {
+			return nil, fmt.Errorf("failed to find default credentials: %w", err)
+		}
+		logClientCreds = creds
+	}
+
+	c, err := createLogAdminClient(ctx, projectID, option.WithCredentials(logClientCreds))
 	if err != nil {
 		return nil, err
 	}
+	logClients[projectID] = c
 
 	return &GCPClient{client: c}, nil
 }
@@ -101,7 +120,8 @@ func (c *GCPClient) Entries(ctx context.Context, opts ...interface{}) EntryItera
 }
 
 func (c *GCPClient) Close() error {
-	return c.client.Close()
+	// We don't close the shared client here to keep it available for other callers
+	return nil
 }
 
 // GCPEntryIterator wraps logadmin.EntryIterator.

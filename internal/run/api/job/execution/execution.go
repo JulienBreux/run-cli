@@ -20,12 +20,14 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 
 	run "cloud.google.com/go/run/apiv2"
 	"cloud.google.com/go/run/apiv2/runpb"
 	"github.com/JulienBreux/run-cli/internal/run/api/client"
 	"github.com/JulienBreux/run-cli/internal/run/model/common/condition"
 	model "github.com/JulienBreux/run-cli/internal/run/model/job/execution"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
@@ -99,22 +101,43 @@ type Client interface {
 }
 
 // GCPClient is the Google Cloud Platform implementation of Client.
-type GCPClient struct{}
+type GCPClient struct {
+	mu     sync.Mutex
+	creds  *google.Credentials
+	client ExecutionsClientWrapper
+}
 
-// ListExecutions lists executions for a project, region and job.
-func (c *GCPClient) ListExecutions(ctx context.Context, project, region, jobName string) ([]*runpb.Execution, error) {
-	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
-	if err != nil {
-		return nil, fmt.Errorf("failed to find default credentials: %w", err)
+func (c *GCPClient) getClient(ctx context.Context) (ExecutionsClientWrapper, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.client != nil {
+		return c.client, nil
 	}
 
-	cClient, err := createExecutionsClient(ctx, option.WithCredentials(creds))
+	if c.creds == nil {
+		creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
+		if err != nil {
+			return nil, fmt.Errorf("failed to find default credentials: %w", err)
+		}
+		c.creds = creds
+	}
+
+	cClient, err := createExecutionsClient(ctx, option.WithCredentials(c.creds))
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		_ = cClient.Close()
-	}()
+	c.client = cClient
+
+	return c.client, nil
+}
+
+// ListExecutions lists executions for a project, region and job.
+func (c *GCPClient) ListExecutions(ctx context.Context, project, region, jobName string) ([]*runpb.Execution, error) {
+	cClient, err := c.getClient(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	// Filter by job name
 	// The parent is the location. We filter by label or just iterate and filter?

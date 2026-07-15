@@ -252,12 +252,6 @@ func TestGCPClient(t *testing.T) {
 		createLogAdminClient = origCreateClient
 	}()
 
-	// Reset global state for testing
-	logClientMu.Lock()
-	logClients = make(map[string]LogAdminClientWrapper)
-	logClientCreds = nil
-	logClientMu.Unlock()
-
 	client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 		return &google.Credentials{}, nil
 	}
@@ -286,26 +280,16 @@ func TestGCPClient(t *testing.T) {
 	})
 
 	t.Run("NewGCPClient_AuthError", func(t *testing.T) {
-		logClientMu.Lock()
-		logClients = make(map[string]LogAdminClientWrapper)
-		logClientCreds = nil
-		logClientMu.Unlock()
-
 		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return nil, errors.New("auth failed")
 		}
 		
-		_, err := NewGCPClient(context.Background(), "project-auth-error")
+		_, err := NewGCPClient(context.Background(), "project")
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "failed to find default credentials")
 	})
 
 	t.Run("NewGCPClient_ClientCreationError", func(t *testing.T) {
-		logClientMu.Lock()
-		logClients = make(map[string]LogAdminClientWrapper)
-		logClientCreds = nil
-		logClientMu.Unlock()
-
 		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return &google.Credentials{}, nil
 		}
@@ -313,7 +297,7 @@ func TestGCPClient(t *testing.T) {
 			return nil, errors.New("creation failed")
 		}
 		
-		_, err := NewGCPClient(context.Background(), "project-creation-error")
+		_, err := NewGCPClient(context.Background(), "project")
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "creation failed")
 	})

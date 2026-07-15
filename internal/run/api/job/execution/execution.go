@@ -20,14 +20,12 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"sync"
 
 	run "cloud.google.com/go/run/apiv2"
 	"cloud.google.com/go/run/apiv2/runpb"
 	"github.com/JulienBreux/run-cli/internal/run/api/client"
 	"github.com/JulienBreux/run-cli/internal/run/model/common/condition"
 	model "github.com/JulienBreux/run-cli/internal/run/model/job/execution"
-	"golang.org/x/oauth2/google"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
@@ -101,43 +99,22 @@ type Client interface {
 }
 
 // GCPClient is the Google Cloud Platform implementation of Client.
-type GCPClient struct {
-	mu     sync.Mutex
-	creds  *google.Credentials
-	client ExecutionsClientWrapper
-}
-
-func (c *GCPClient) getClient(ctx context.Context) (ExecutionsClientWrapper, error) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	if c.client != nil {
-		return c.client, nil
-	}
-
-	if c.creds == nil {
-		creds, err := client.FindDefaultCredentials(context.Background(), run.DefaultAuthScopes()...)
-		if err != nil {
-			return nil, fmt.Errorf("failed to find default credentials: %w", err)
-		}
-		c.creds = creds
-	}
-
-	cClient, err := createExecutionsClient(context.Background(), option.WithCredentials(c.creds))
-	if err != nil {
-		return nil, err
-	}
-	c.client = cClient
-
-	return c.client, nil
-}
+type GCPClient struct{}
 
 // ListExecutions lists executions for a project, region and job.
 func (c *GCPClient) ListExecutions(ctx context.Context, project, region, jobName string) ([]*runpb.Execution, error) {
-	cClient, err := c.getClient(ctx)
+	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find default credentials: %w", err)
+	}
+
+	cClient, err := createExecutionsClient(ctx, option.WithCredentials(creds))
 	if err != nil {
 		return nil, err
 	}
+	defer func() {
+		_ = cClient.Close()
+	}()
 
 	// Filter by job name
 	// The parent is the location. We filter by label or just iterate and filter?

@@ -124,18 +124,6 @@ func (c *CreditsPage) update() {
 		return
 	}
 
-	// Spawn new particles
-	if len(c.particles) < 100 {
-		c.particles = append(c.particles, &Particle{
-			x:     float64(rand.Intn(w)),
-			y:     0,
-			vx:    (rand.Float64() - 0.5) * 20, // -10 to 10 chars/sec
-			vy:    rand.Float64()*20 + 10,      // 10 to 30 chars/sec
-			color: tcell.NewRGBColor(int32(rand.Intn(256)), int32(rand.Intn(256)), int32(rand.Intn(256))),
-			char:  []rune("★●◼▲")[rand.Intn(4)],
-		})
-	}
-
 	// Move particles
 	validParticles := c.particles[:0]
 	for _, p := range c.particles {
@@ -146,6 +134,24 @@ func (c *CreditsPage) update() {
 		}
 	}
 	c.particles = validParticles
+
+	// Spawn new particles
+	if len(c.particles) < 100 {
+		count := 1
+		if dt > 0.1 {
+			count = 5 // Spawn more if frame drop or test delay
+		}
+		for i := 0; i < count; i++ {
+			c.particles = append(c.particles, &Particle{
+				x:     float64(rand.Intn(w)),
+				y:     0,
+				vx:    (rand.Float64() - 0.5) * 20, // -10 to 10 chars/sec
+				vy:    rand.Float64()*20 + 10,      // 10 to 30 chars/sec
+				color: tcell.NewRGBColor(int32(rand.Intn(256)), int32(rand.Intn(256)), int32(rand.Intn(256))),
+				char:  []rune("★●◼▲")[rand.Intn(4)],
+			})
+		}
+	}
 
 	// Scroll Credits
 	c.scrollY -= 3.0 * dt // Speed (lines/sec)

@@ -105,15 +105,17 @@ func TestUpdate(t *testing.T) {
 
 	// Force update with simulated rect
 	c.SetRect(0, 0, 100, 100)
+
+	// Reset lastUpdate to ensure deterministic dt for the test
+	c.lastUpdate = time.Now().Add(-100 * time.Millisecond)
 	c.update()
 
 	// Check if particles were spawned
 	assert.Greater(t, len(c.particles), initialParticles, "Should spawn particles")
 
 	// Check scroll movement (might be negative)
-	// On first update dt might be very small, but scrollY should decrease
-	// Since we sleep a bit to ensure dt > 0
-	time.Sleep(10 * time.Millisecond)
+	// Reset lastUpdate again to ensure dt > 0
+	c.lastUpdate = time.Now().Add(-100 * time.Millisecond)
 	c.update()
 	assert.Less(t, c.scrollY, initialScroll, "Text should scroll upwards (negative Y)")
 }

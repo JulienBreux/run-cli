@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 
 	run "cloud.google.com/go/run/apiv2"
 	"cloud.google.com/go/run/apiv2/runpb"
@@ -99,22 +100,45 @@ type Client interface {
 }
 
 // GCPClient is the Google Cloud Platform implementation of Client.
-type GCPClient struct{}
+// It caches the initialized client wrapper to avoid recreating connections and credential discovery on each call.
+type GCPClient struct {
+	mu     sync.Mutex
+	client ExecutionsClientWrapper
+}
 
-// ListExecutions lists executions for a project, region and job.
-func (c *GCPClient) ListExecutions(ctx context.Context, project, region, jobName string) ([]*runpb.Execution, error) {
-	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
+// getClient retrieves the cached client, or initializes it if not yet created.
+func (c *GCPClient) getClient(ctx context.Context) (ExecutionsClientWrapper, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.client != nil {
+		return c.client, nil
+	}
+
+	// Always use context.Background() for shared/cached client initialization
+	// to ensure the shared client remains valid regardless of individual request context cancellations.
+	bgCtx := context.Background()
+
+	creds, err := client.FindDefaultCredentials(bgCtx, run.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
 	}
 
-	cClient, err := createExecutionsClient(ctx, option.WithCredentials(creds))
+	cClient, err := createExecutionsClient(bgCtx, option.WithCredentials(creds))
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		_ = cClient.Close()
-	}()
+
+	c.client = cClient
+	return c.client, nil
+}
+
+// ListExecutions lists executions for a project, region and job.
+func (c *GCPClient) ListExecutions(ctx context.Context, project, region, jobName string) ([]*runpb.Execution, error) {
+	cClient, err := c.getClient(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	// Filter by job name
 	// The parent is the location. We filter by label or just iterate and filter?

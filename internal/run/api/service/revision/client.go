@@ -19,6 +19,7 @@ package revision
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	run "cloud.google.com/go/run/apiv2"
 	"cloud.google.com/go/run/apiv2/runpb"
@@ -76,20 +77,45 @@ type Client interface {
 var apiClient Client = &GCPClient{}
 
 // GCPClient is the Google Cloud Platform implementation of Client.
-type GCPClient struct{}
+// It caches the initialized client wrapper to avoid recreating connections and credential discovery on each call.
+type GCPClient struct {
+	mu     sync.Mutex
+	client RevisionsClientWrapper
+}
 
-// ListRevisions lists revisions for a service.
-func (c *GCPClient) ListRevisions(ctx context.Context, project, region, service string) ([]*runpb.Revision, error) {
-	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
+// getClient retrieves the cached client, or initializes it if not yet created.
+func (c *GCPClient) getClient(ctx context.Context) (RevisionsClientWrapper, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.client != nil {
+		return c.client, nil
+	}
+
+	// Always use context.Background() for shared/cached client initialization
+	// to ensure the shared client remains valid regardless of individual request context cancellations.
+	bgCtx := context.Background()
+
+	creds, err := client.FindDefaultCredentials(bgCtx, run.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
 	}
 
-	cClient, err := createRevisionsClient(ctx, option.WithCredentials(creds))
+	cClient, err := createRevisionsClient(bgCtx, option.WithCredentials(creds))
 	if err != nil {
 		return nil, err
 	}
-	defer func() { _ = cClient.Close() }()
+
+	c.client = cClient
+	return c.client, nil
+}
+
+// ListRevisions lists revisions for a service.
+func (c *GCPClient) ListRevisions(ctx context.Context, project, region, service string) ([]*runpb.Revision, error) {
+	cClient, err := c.getClient(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	req := &runpb.ListRevisionsRequest{
 		Parent: fmt.Sprintf("projects/%s/locations/%s/services/%s", project, region, service),

@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync"
 
 	resourcemanager "cloud.google.com/go/resourcemanager/apiv3"
 	resourcemanagerpb "cloud.google.com/go/resourcemanager/apiv3/resourcemanagerpb"
@@ -79,23 +80,45 @@ type Client interface {
 var _ Client = (*GCPClient)(nil)
 
 // GCPClient is the Google Cloud Platform implementation of Client.
-type GCPClient struct{}
+// It caches the initialized client wrapper to avoid recreating connections and credential discovery on each call.
+type GCPClient struct {
+	mu     sync.Mutex
+	client ProjectsClientWrapper
+}
 
-// ListProjects lists projects for the current user.
-func (c *GCPClient) ListProjects(ctx context.Context) ([]model.Project, error) {
-	// Explicitly find default credentials
-	creds, err := client.FindDefaultCredentials(ctx, resourcemanager.DefaultAuthScopes()...)
+// getClient retrieves the cached client, or initializes it if not yet created.
+func (c *GCPClient) getClient(ctx context.Context) (ProjectsClientWrapper, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.client != nil {
+		return c.client, nil
+	}
+
+	// Always use context.Background() for shared/cached client initialization
+	// to ensure the shared client remains valid regardless of individual request context cancellations.
+	bgCtx := context.Background()
+
+	creds, err := client.FindDefaultCredentials(bgCtx, resourcemanager.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w. Tip: Try running 'gcloud auth application-default login' to authenticate the Go client", err)
 	}
 
-	cClient, err := createProjectsClient(ctx, option.WithCredentials(creds))
+	cClient, err := createProjectsClient(bgCtx, option.WithCredentials(creds))
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		_ = cClient.Close()
-	}()
+
+	c.client = cClient
+	return c.client, nil
+}
+
+// ListProjects lists projects for the current user.
+func (c *GCPClient) ListProjects(ctx context.Context) ([]model.Project, error) {
+	cClient, err := c.getClient(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	req := &resourcemanagerpb.SearchProjectsRequest{
 		// Query: "", // Empty query lists all projects

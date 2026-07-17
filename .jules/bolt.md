@@ -1,0 +1,5 @@
+# Bolt's Performance Journal
+
+## 2026-03-02 - GCP Client Caching and Credential Discovery Optimization
+**Learning:** Initializing Google Cloud Platform (GCP) clients and discovering default credentials is very slow (~300ms per initialization) because of credential file discovery, IAM checks, TLS handshakes, and gRPC dialing. Recreating these clients on every API call introduced significant latency. Caching clients in a thread-safe manner using `sync.Mutex` and reusing them significantly speeds up repeated API operations. When doing so, it is critical to use `context.Background()` during credential discovery and constructor initialization to ensure that if an individual user request's context is cancelled, the long-lived pooled connection is not invalidated.
+**Action:** Always employ thread-safe, lazy-initialized caching for expensive resources like cloud clients and API connections. Ensure proper test isolation by resetting global state caches in the unit tests so cached clients do not leak across distinct tests with mocked credentials.

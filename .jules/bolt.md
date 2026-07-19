@@ -1,0 +1,3 @@
+## 2026-07-16 - [GCP Client Lazy Initialization & Caching]
+**Learning:** Recreating GCP client wrappers and retrieving default credentials on every single API request in the TUI introduces a significant connection setup and authentication latency overhead (~300ms per request). Lazy-initializing and caching the client in a thread-safe manner using `sync.Mutex` and `context.Background()` completely avoids this overhead, making high-frequency TUI actions much faster.
+**Action:** Apply the thread-safe lazy-initialization and caching pattern using `sync.Mutex` and a `getClient()` method to any client-wrapper-holding GCP implementation in `internal/run/api/` packages.

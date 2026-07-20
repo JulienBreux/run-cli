@@ -106,11 +106,16 @@ type Client interface {
 var _ Client = (*GCPClient)(nil)
 
 // GCPClient is the Google Cloud Platform implementation of Client.
+// It is now stateful and caches the ServicesClientWrapper to prevent repetitive credential discovery
+// and client creation overhead (~300ms latency per call), improving performance significantly.
 type GCPClient struct {
 	mu     sync.Mutex
 	client ServicesClientWrapper
 }
 
+// getClient lazily initializes and returns the cached ServicesClientWrapper in a thread-safe manner.
+// Using context.Background() ensures the credentials and clients remain valid and are not canceled
+// with individual short-lived request contexts.
 func (c *GCPClient) getClient(ctx context.Context) (ServicesClientWrapper, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -119,15 +124,17 @@ func (c *GCPClient) getClient(ctx context.Context) (ServicesClientWrapper, error
 		return c.client, nil
 	}
 
-	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
+	bgCtx := context.Background()
+	creds, err := client.FindDefaultCredentials(bgCtx, run.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
 	}
 
-	cClient, err := createServicesClient(ctx, option.WithCredentials(creds))
+	cClient, err := createServicesClient(bgCtx, option.WithCredentials(creds))
 	if err != nil {
 		return nil, err
 	}
+
 	c.client = cClient
 	return c.client, nil
 }

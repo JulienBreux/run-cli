@@ -29,7 +29,7 @@ jobs:
         with:
           distribution: goreleaser
           version: "~> v2"
-          args: ${{ github.event_name == 'pull_request' && 'release --snapshot --clean' || 'release --clean' }}
+          args: release --clean ${{ github.event_name == 'pull_request' && '--snapshot' || '' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GH_TOKEN }}

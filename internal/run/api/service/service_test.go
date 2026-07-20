@@ -544,6 +544,25 @@ func TestGCPClient_UpdateService(t *testing.T) {
 		_, err := client.UpdateService(context.Background(), &runpb.Service{Name: "s1"})
 		assert.Error(t, err)
 	})
+
+	t.Run("Client Reuse", func(t *testing.T) {
+		callCount := 0
+		createServicesClient = func(ctx context.Context, opts ...option.ClientOption) (ServicesClientWrapper, error) {
+			callCount++
+			return &MockServicesClientWrapper{
+				ListServicesFunc: func(ctx context.Context, req *runpb.ListServicesRequest, opts ...gax.CallOption) ServiceIteratorWrapper {
+					return &MockServiceIteratorWrapper{}
+				},
+				CloseFunc: func() error { return nil },
+			}, nil
+		}
+
+		gcpClient := &GCPClient{}
+		_, _ = gcpClient.ListServices(context.Background(), "p", "r1")
+		_, _ = gcpClient.ListServices(context.Background(), "p", "r2")
+
+		assert.Equal(t, 1, callCount, "Expected createServicesClient to be called exactly once")
+	})
 }
 
 func TestWrappers_Delegation(t *testing.T) {
@@ -564,11 +583,10 @@ func TestWrappers_Delegation(t *testing.T) {
 	
 	t.Run("GCPUpdateServiceOperationWrapper", func(t *testing.T) {
 		op := &GCPUpdateServiceOperationWrapper{op: nil}
-				assert.Panics(t, func() { _, _ = op.Wait(context.Background()) })
-			})
-		}
-		
-		func TestUpdateAuthentication(t *testing.T) {
+		assert.Panics(t, func() { _, _ = op.Wait(context.Background()) })
+	})
+}
+func TestUpdateAuthentication(t *testing.T) {
 			originalClient := apiClient
 			defer func() { apiClient = originalClient }()
 		
@@ -598,7 +616,7 @@ func TestWrappers_Delegation(t *testing.T) {
 			assert.True(t, result.Security.InvokerIAMDisabled)
 		}
 		
-		func TestUpdateAuthentication_Error(t *testing.T) {
+func TestUpdateAuthentication_Error(t *testing.T) {
 			originalClient := apiClient
 			defer func() { apiClient = originalClient }()
 		

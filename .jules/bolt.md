@@ -1,0 +1,3 @@
+## 2026-07-20 - Lazy-Initialization Context Lifetime Safety in GCP Clients
+**Learning:** When implementing thread-safe, lazy-initialized caching for long-lived clients (such as GCP gRPC/REST clients), using an invocation-scoped or short-lived context to instantiate the client can lead to serious runtime errors if that context is later cancelled or times out. This shuts down background dialing routines and breaks subsequent operations on the cached client.
+**Action:** Always use a long-lived context, such as `context.Background()`, when discovering credentials and instantiating shared cached GCP clients, regardless of individual request context lifetimes.

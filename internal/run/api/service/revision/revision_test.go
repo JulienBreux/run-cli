@@ -257,6 +257,28 @@ func TestGCPClient_ListRevisions(t *testing.T) {
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "iter failed")
 	})
+
+	t.Run("Client Reuse", func(t *testing.T) {
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+			return &google.Credentials{}, nil
+		}
+		callCount := 0
+		createRevisionsClient = func(ctx context.Context, opts ...option.ClientOption) (RevisionsClientWrapper, error) {
+			callCount++
+			return &MockRevisionsClientWrapper{
+				ListRevisionsFunc: func(ctx context.Context, req *runpb.ListRevisionsRequest, opts ...gax.CallOption) RevisionIteratorWrapper {
+					return &MockRevisionIteratorWrapper{}
+				},
+				CloseFunc: func() error { return nil },
+			}, nil
+		}
+
+		gcpClient := &GCPClient{}
+		_, _ = gcpClient.ListRevisions(context.Background(), "p", "r", "s1")
+		_, _ = gcpClient.ListRevisions(context.Background(), "p", "r", "s2")
+
+		assert.Equal(t, 1, callCount, "Expected createRevisionsClient to be called exactly once due to caching")
+	})
 }
 
 func TestWrappers_Delegation(t *testing.T) {

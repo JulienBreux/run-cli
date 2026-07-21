@@ -130,8 +130,10 @@ func TestGCPClient_ListProjects(t *testing.T) {
 		return &google.Credentials{}, nil
 	}
 
-	t.Run("Success", func(t *testing.T) {
+	t.Run("Success and Client Caching", func(t *testing.T) {
+		createCount := 0
 		createProjectsClient = func(ctx context.Context, opts ...option.ClientOption) (ProjectsClientWrapper, error) {
+			createCount++
 			return &MockProjectsClientWrapper{
 				SearchProjectsFunc: func(ctx context.Context, req *resourcemanagerpb.SearchProjectsRequest, opts ...gax.CallOption) ProjectIteratorWrapper {
 					return &MockProjectIteratorWrapper{
@@ -145,12 +147,22 @@ func TestGCPClient_ListProjects(t *testing.T) {
 			}, nil
 		}
 
-		client := &GCPClient{}
-		projects, err := client.ListProjects(context.Background())
+		gcpClient := &GCPClient{}
+
+		// First call should create the client
+		projects, err := gcpClient.ListProjects(context.Background())
 		assert.NoError(t, err)
 		assert.Len(t, projects, 2)
 		assert.Equal(t, "p1", projects[0].Name)
 		assert.Equal(t, 1, projects[0].Number)
+		assert.Equal(t, 1, createCount)
+
+		// Second call should reuse cached client, not calling createProjectsClient again
+		projects2, err := gcpClient.ListProjects(context.Background())
+		assert.NoError(t, err)
+		assert.Len(t, projects2, 2)
+		assert.Equal(t, "p1", projects2[0].Name)
+		assert.Equal(t, 1, createCount)
 	})
 
 	t.Run("Auth Error", func(t *testing.T) {

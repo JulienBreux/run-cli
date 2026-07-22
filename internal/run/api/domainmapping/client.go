@@ -65,6 +65,9 @@ type GCPClient struct {
 	client DomainMappingsClientWrapper
 }
 
+// getClient lazily initializes and returns the cached DomainMappingsClientWrapper in a thread-safe manner.
+// Using context.Background() ensures the credentials and clients remain valid and are not canceled
+// with individual short-lived request contexts.
 func (c *GCPClient) getClient(ctx context.Context) (DomainMappingsClientWrapper, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -73,12 +76,13 @@ func (c *GCPClient) getClient(ctx context.Context) (DomainMappingsClientWrapper,
 		return c.client, nil
 	}
 
-	creds, err := client.FindDefaultCredentials(ctx, run.CloudPlatformScope)
+	bgCtx := context.Background()
+	creds, err := client.FindDefaultCredentials(bgCtx, run.CloudPlatformScope)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
 	}
 
-	dmClient, err := createClient(ctx, creds)
+	dmClient, err := createClient(bgCtx, creds)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create domain mappings client: %w", err)
 	}

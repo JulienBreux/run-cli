@@ -322,11 +322,10 @@ func TestShortcuts_Modals(t *testing.T) {
 	// --- Service Modals ---
 	currentPageID = service.LIST_PAGE_ID
 	svcTable := service.List(app).Table
-	// Populate with full struct for Describe/Scale
-	service.Load([]model_service.Service{{Name: "s1", Region: "r1"}})
-	svcTable.Select(1, 0)
 	
 	// Log
+	service.Load([]model_service.Service{{Name: "s1", Region: "r1"}})
+	svcTable.Select(1, 0)
 	shortcuts(tcell.NewEventKey(tcell.KeyRune, 'l', tcell.ModNone))
 	assert.Equal(t, log.MODAL_PAGE_ID, currentPageID)
 	// Close modal to reset
@@ -334,6 +333,8 @@ func TestShortcuts_Modals(t *testing.T) {
 	currentPageID = service.LIST_PAGE_ID
 	
 	// Describe
+	service.Load([]model_service.Service{{Name: "s1", Region: "r1"}})
+	svcTable.Select(1, 0)
 	shortcuts(tcell.NewEventKey(tcell.KeyRune, 'd', tcell.ModNone))
 	assert.Equal(t, describe.MODAL_PAGE_ID, currentPageID)
 	rootPages.RemovePage(describe.MODAL_PAGE_ID)

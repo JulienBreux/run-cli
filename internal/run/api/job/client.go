@@ -104,6 +104,9 @@ type GCPClient struct {
 	client JobsClientWrapper
 }
 
+// getClient lazily initializes and returns the cached JobsClientWrapper in a thread-safe manner.
+// Using context.Background() ensures the credentials and clients remain valid and are not canceled
+// with individual short-lived request contexts.
 func (c *GCPClient) getClient(ctx context.Context) (JobsClientWrapper, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -112,12 +115,13 @@ func (c *GCPClient) getClient(ctx context.Context) (JobsClientWrapper, error) {
 		return c.client, nil
 	}
 
-	creds, err := client.FindDefaultCredentials(ctx, run.DefaultAuthScopes()...)
+	bgCtx := context.Background()
+	creds, err := client.FindDefaultCredentials(bgCtx, run.DefaultAuthScopes()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find default credentials: %w", err)
 	}
 
-	cClient, err := createJobsClient(ctx, option.WithCredentials(creds))
+	cClient, err := createJobsClient(bgCtx, option.WithCredentials(creds))
 	if err != nil {
 		return nil, err
 	}

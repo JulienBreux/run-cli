@@ -19,10 +19,12 @@ package log
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"cloud.google.com/go/logging"
 	"cloud.google.com/go/logging/logadmin"
 	"github.com/JulienBreux/run-cli/internal/run/api/client"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 )
 
@@ -70,24 +72,49 @@ func (w *RealLogAdminClient) Close() error {
 	return w.client.Close()
 }
 
+// Global cache for thread-safe GCP Logging Clients to eliminate repetitive
+// credentials discovery and client creation overhead (~300ms latency per call).
+var (
+	logClients     = make(map[string]*GCPClient)
+	logClientCreds *google.Credentials
+	logClientMu    sync.Mutex
+)
+
 // GCPClient is the Google Cloud Platform implementation of Client.
 type GCPClient struct {
 	client LogAdminClientWrapper
 }
 
-// NewGCPClient creates a new GCPClient.
+// NewGCPClient creates a new GCPClient, using cached clients and credentials
+// where available to eliminate repetitive discovery and connection overhead (~300ms latency).
 func NewGCPClient(ctx context.Context, projectID string) (Client, error) {
-	creds, err := client.FindDefaultCredentials(ctx, logging.ReadScope)
-	if err != nil {
-		return nil, fmt.Errorf("failed to find default credentials: %w", err)
+	logClientMu.Lock()
+	defer logClientMu.Unlock()
+
+	if logClientCreds == nil {
+		// Discover credentials using a background context to ensure they remain valid
+		// even if the calling request context is cancelled.
+		creds, err := client.FindDefaultCredentials(context.Background(), logging.ReadScope)
+		if err != nil {
+			return nil, fmt.Errorf("failed to find default credentials: %w", err)
+		}
+		logClientCreds = creds
 	}
 
-	c, err := createLogAdminClient(ctx, projectID, option.WithCredentials(creds))
+	if cachedClient, exists := logClients[projectID]; exists {
+		return cachedClient, nil
+	}
+
+	// Create new client using a background context to ensure connection pool longevity
+	c, err := createLogAdminClient(context.Background(), projectID, option.WithCredentials(logClientCreds))
 	if err != nil {
 		return nil, err
 	}
 
-	return &GCPClient{client: c}, nil
+	gcpClient := &GCPClient{client: c}
+	logClients[projectID] = gcpClient
+
+	return gcpClient, nil
 }
 
 func (c *GCPClient) Entries(ctx context.Context, opts ...interface{}) EntryIterator {
@@ -101,7 +128,8 @@ func (c *GCPClient) Entries(ctx context.Context, opts ...interface{}) EntryItera
 }
 
 func (c *GCPClient) Close() error {
-	return c.client.Close()
+	// Close is a no-op to avoid closing shared connections
+	return nil
 }
 
 // GCPEntryIterator wraps logadmin.EntryIterator.

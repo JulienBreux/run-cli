@@ -74,7 +74,7 @@ const (
 var listServicesFunc = api_service.List
 
 // Fetch retrieves the list of services from the API.
-func Fetch(projectID, region string) ([]model_service.Service, error) {
+var Fetch = func(projectID, region string) ([]model_service.Service, error) {
 	return listServicesFunc(projectID, region)
 }
 

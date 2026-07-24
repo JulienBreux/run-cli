@@ -61,7 +61,7 @@ const (
 	SCALE_MODAL_PAGE_ID = "scale-workerpool"
 )
 
-var listWorkerPoolsFunc = api_workerpool.List
+var ListWorkerPoolsFunc = api_workerpool.List
 
 // List returns a list of workers.
 func List(app *tview.Application) *table.Table {
@@ -92,7 +92,7 @@ func ListReload(app *tview.Application, currentInfo info.Info, onResult func(err
 	go func() {
 		// Fetch real data
 		var err error
-		workers, err = listWorkerPoolsFunc(currentInfo.Project, currentInfo.Region)
+		workers, err = ListWorkerPoolsFunc(currentInfo.Project, currentInfo.Region)
 
 		app.QueueUpdateDraw(func() {
 			defer func() {

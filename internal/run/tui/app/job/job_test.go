@@ -66,14 +66,14 @@ func TestListReload(t *testing.T) {
 
 	List(app)
 
-	// Mock listJobsFunc
-	originalListJobsFunc := listJobsFunc
-	defer func() { listJobsFunc = originalListJobsFunc }()
+	// Mock ListJobsFunc
+	originalListJobsFunc := ListJobsFunc
+	defer func() { ListJobsFunc = originalListJobsFunc }()
 
 	expectedJobs := []model_job.Job{
 		{Name: "projects/p/locations/r/jobs/job-reloaded"},
 	}
-	listJobsFunc = func(projectID, region string) ([]model_job.Job, error) {
+	ListJobsFunc = func(projectID, region string) ([]model_job.Job, error) {
 		return expectedJobs, nil
 	}
 
@@ -111,10 +111,10 @@ func TestListReload_Error(t *testing.T) {
 
 	List(app)
 
-	originalListJobsFunc := listJobsFunc
-	defer func() { listJobsFunc = originalListJobsFunc }()
+	originalListJobsFunc := ListJobsFunc
+	defer func() { ListJobsFunc = originalListJobsFunc }()
 
-	listJobsFunc = func(projectID, region string) ([]model_job.Job, error) {
+	ListJobsFunc = func(projectID, region string) ([]model_job.Job, error) {
 		return nil, errors.New("fetch error")
 	}
 

@@ -245,6 +245,15 @@ func (m *MockLogAdminClientWrapper) Close() error {
 }
 
 func TestGCPClient(t *testing.T) {
+	resetCache := func() {
+		logClientMu.Lock()
+		logClients = make(map[string]LogAdminClientWrapper)
+		logClientCreds = nil
+		logClientMu.Unlock()
+	}
+	resetCache()
+	defer resetCache()
+
 	origFindCreds := client.FindDefaultCredentials
 	origCreateClient := createLogAdminClient
 	defer func() {
@@ -257,6 +266,9 @@ func TestGCPClient(t *testing.T) {
 	}
 
 	t.Run("NewGCPClient_Success", func(t *testing.T) {
+		resetCache()
+		defer resetCache()
+
 		createLogAdminClient = func(ctx context.Context, projectID string, opts ...option.ClientOption) (LogAdminClientWrapper, error) {
 			return &MockLogAdminClientWrapper{
 				EntriesFunc: func(ctx context.Context, opts ...logadmin.EntriesOption) EntryIterator {
@@ -280,6 +292,9 @@ func TestGCPClient(t *testing.T) {
 	})
 
 	t.Run("NewGCPClient_AuthError", func(t *testing.T) {
+		resetCache()
+		defer resetCache()
+
 		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return nil, errors.New("auth failed")
 		}
@@ -290,6 +305,9 @@ func TestGCPClient(t *testing.T) {
 	})
 
 	t.Run("NewGCPClient_ClientCreationError", func(t *testing.T) {
+		resetCache()
+		defer resetCache()
+
 		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return &google.Credentials{}, nil
 		}

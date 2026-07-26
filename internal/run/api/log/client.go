@@ -19,11 +19,19 @@ package log
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"cloud.google.com/go/logging"
 	"cloud.google.com/go/logging/logadmin"
 	"github.com/JulienBreux/run-cli/internal/run/api/client"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
+)
+
+var (
+	logClientMu    sync.Mutex
+	logClients     = make(map[string]LogAdminClientWrapper)
+	logClientCreds *google.Credentials
 )
 
 // Client defines the interface for Logging operations.
@@ -75,18 +83,35 @@ type GCPClient struct {
 	client LogAdminClientWrapper
 }
 
-// NewGCPClient creates a new GCPClient.
+// NewGCPClient creates a new GCPClient, using thread-safe caching of credentials
+// and clients per project ID. This avoids expensive (~300ms) credential discovery
+// and connection overhead on every log streaming request or poll loop.
+// Note: We use context.Background() during credentials discovery and client construction
+// so that request context cancellations do not invalidate the cached client or transport.
 func NewGCPClient(ctx context.Context, projectID string) (Client, error) {
-	creds, err := client.FindDefaultCredentials(ctx, logging.ReadScope)
-	if err != nil {
-		return nil, fmt.Errorf("failed to find default credentials: %w", err)
+	logClientMu.Lock()
+	defer logClientMu.Unlock()
+
+	if logClientCreds == nil {
+		bgCtx := context.Background()
+		creds, err := client.FindDefaultCredentials(bgCtx, logging.ReadScope)
+		if err != nil {
+			return nil, fmt.Errorf("failed to find default credentials: %w", err)
+		}
+		logClientCreds = creds
 	}
 
-	c, err := createLogAdminClient(ctx, projectID, option.WithCredentials(creds))
+	if c, exists := logClients[projectID]; exists {
+		return &GCPClient{client: c}, nil
+	}
+
+	bgCtx := context.Background()
+	c, err := createLogAdminClient(bgCtx, projectID, option.WithCredentials(logClientCreds))
 	if err != nil {
 		return nil, err
 	}
 
+	logClients[projectID] = c
 	return &GCPClient{client: c}, nil
 }
 
@@ -100,8 +125,10 @@ func (c *GCPClient) Entries(ctx context.Context, opts ...interface{}) EntryItera
 	return c.client.Entries(ctx, logOpts...)
 }
 
+// Close is a no-op because GCPClient represents a shared connection pooled client
+// and closing it would invalidate the client for all concurrent or subsequent requests.
 func (c *GCPClient) Close() error {
-	return c.client.Close()
+	return nil
 }
 
 // GCPEntryIterator wraps logadmin.EntryIterator.

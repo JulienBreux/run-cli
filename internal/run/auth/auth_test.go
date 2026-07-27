@@ -17,11 +17,14 @@ limitations under the License.
 package auth
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
 
 	api_region "github.com/JulienBreux/run-cli/internal/run/api/region"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 func TestGetInfo(t *testing.T) {
@@ -131,5 +134,66 @@ func TestGetInfo_Defaults(t *testing.T) {
 
 	if info.Region != api_region.ALL {
 		t.Errorf("Expected default Region 'all', got '%s'", info.Region)
+	}
+}
+
+type mockTokenSource struct {
+	token *oauth2.Token
+}
+
+func (m *mockTokenSource) Token() (*oauth2.Token, error) {
+	return m.token, nil
+}
+
+func TestGetIDToken_Caching(t *testing.T) {
+	// Reset/save global variables
+	origFindDefaultCredentials := findDefaultCredentials
+	origCachedCreds := cachedCreds
+	defer func() {
+		findDefaultCredentials = origFindDefaultCredentials
+		cachedCreds = origCachedCreds
+	}()
+
+	// Mock token source and extra fields
+	baseToken := &oauth2.Token{
+		AccessToken: "mock-access-token",
+	}
+	mockToken := baseToken.WithExtra(map[string]interface{}{
+		"id_token": "mock-id-token",
+	})
+	mockTS := &mockTokenSource{
+		token: mockToken,
+	}
+
+	callCount := 0
+	findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		callCount++
+		return &google.Credentials{
+			TokenSource: mockTS,
+		}, nil
+	}
+
+	// First call (cache miss)
+	cachedCreds = nil // Ensure cache is empty
+	token, err := GetIDToken(context.Background())
+	if err != nil {
+		t.Fatalf("GetIDToken failed: %v", err)
+	}
+	if token != "mock-id-token" {
+		t.Errorf("Expected token 'mock-id-token', got '%s'", token)
+	}
+
+	// Second call (cache hit)
+	token, err = GetIDToken(context.Background())
+	if err != nil {
+		t.Fatalf("GetIDToken second call failed: %v", err)
+	}
+	if token != "mock-id-token" {
+		t.Errorf("Expected token 'mock-id-token', got '%s'", token)
+	}
+
+	// Verify discovery was only called once
+	if callCount != 1 {
+		t.Errorf("Expected findDefaultCredentials to be called exactly 1 time, called %d times", callCount)
 	}
 }

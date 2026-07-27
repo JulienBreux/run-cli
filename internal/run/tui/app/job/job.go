@@ -58,7 +58,7 @@ const (
 	LIST_PAGE_SHORTCUT = tcell.KeyCtrlJ
 )
 
-var listJobsFunc = api_job.List
+var ListJobsFunc = api_job.List
 
 // List returns a list of jobs.
 func List(app *tview.Application) *table.Table {
@@ -87,7 +87,7 @@ func ListReload(app *tview.Application, currentInfo info.Info, onResult func(err
 	go func() {
 		// Fetch real data
 		var err error
-		jobs, err = listJobsFunc(currentInfo.Project, currentInfo.Region)
+		jobs, err = ListJobsFunc(currentInfo.Project, currentInfo.Region)
 
 		app.QueueUpdateDraw(func() {
 			defer func() {

@@ -244,12 +244,20 @@ func (m *MockLogAdminClientWrapper) Close() error {
 	return nil
 }
 
+func resetCache() {
+	logClientMu.Lock()
+	logClients = make(map[string]*GCPClient)
+	logClientCreds = nil
+	logClientMu.Unlock()
+}
+
 func TestGCPClient(t *testing.T) {
 	origFindCreds := client.FindDefaultCredentials
 	origCreateClient := createLogAdminClient
 	defer func() {
 		client.FindDefaultCredentials = origFindCreds
 		createLogAdminClient = origCreateClient
+		resetCache()
 	}()
 
 	client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
@@ -257,6 +265,7 @@ func TestGCPClient(t *testing.T) {
 	}
 
 	t.Run("NewGCPClient_Success", func(t *testing.T) {
+		resetCache()
 		createLogAdminClient = func(ctx context.Context, projectID string, opts ...option.ClientOption) (LogAdminClientWrapper, error) {
 			return &MockLogAdminClientWrapper{
 				EntriesFunc: func(ctx context.Context, opts ...logadmin.EntriesOption) EntryIterator {
@@ -280,6 +289,7 @@ func TestGCPClient(t *testing.T) {
 	})
 
 	t.Run("NewGCPClient_AuthError", func(t *testing.T) {
+		resetCache()
 		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return nil, errors.New("auth failed")
 		}
@@ -290,6 +300,7 @@ func TestGCPClient(t *testing.T) {
 	})
 
 	t.Run("NewGCPClient_ClientCreationError", func(t *testing.T) {
+		resetCache()
 		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return &google.Credentials{}, nil
 		}
@@ -300,6 +311,45 @@ func TestGCPClient(t *testing.T) {
 		_, err := NewGCPClient(context.Background(), "project")
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "creation failed")
+	})
+
+	t.Run("NewGCPClient_CachingAndReuse", func(t *testing.T) {
+		resetCache()
+
+		credsCallCount := 0
+		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+			credsCallCount++
+			return &google.Credentials{}, nil
+		}
+
+		creationCallCount := 0
+		createLogAdminClient = func(ctx context.Context, projectID string, opts ...option.ClientOption) (LogAdminClientWrapper, error) {
+			creationCallCount++
+			return &MockLogAdminClientWrapper{
+				CloseFunc: func() error { return nil },
+			}, nil
+		}
+
+		// First call
+		client1, err := NewGCPClient(context.Background(), "project-a")
+		assert.NoError(t, err)
+		assert.NotNil(t, client1)
+
+		// Second call for the SAME project should return cached client
+		client2, err := NewGCPClient(context.Background(), "project-a")
+		assert.NoError(t, err)
+		assert.Same(t, client1, client2)
+
+		// Third call for a DIFFERENT project should create a new client, but REUSE credentials
+		client3, err := NewGCPClient(context.Background(), "project-b")
+		assert.NoError(t, err)
+		assert.NotNil(t, client3)
+		assert.NotSame(t, client1, client3)
+
+		// Verify credentials were only discovered ONCE
+		assert.Equal(t, 1, credsCallCount)
+		// Verify clients were created EXACTLY TWICE (one for project-a, one for project-b)
+		assert.Equal(t, 2, creationCallCount)
 	})
 }
 

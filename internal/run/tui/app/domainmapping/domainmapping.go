@@ -58,7 +58,7 @@ const (
 	MODAL_PAGE_ID      = "modal-dns-records"
 )
 
-var listDomainMappingsFunc = api_domainmapping.List
+var ListDomainMappingsFunc = api_domainmapping.List
 
 // List returns a list of domain mappings.
 func List(app *tview.Application) *table.Table {
@@ -89,7 +89,7 @@ func ListReload(app *tview.Application, currentInfo info.Info, onResult func(err
 	go func() {
 		// Fetch real data
 		var err error
-		domainMappings, err = listDomainMappingsFunc(currentInfo.Project, currentInfo.Region)
+		domainMappings, err = ListDomainMappingsFunc(currentInfo.Project, currentInfo.Region)
 
 		app.QueueUpdateDraw(func() {
 			defer func() {

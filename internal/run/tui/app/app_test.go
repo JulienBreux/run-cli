@@ -18,15 +18,19 @@ package app
 
 import (
 	"testing"
+	"time"
 
 	"github.com/JulienBreux/run-cli/internal/run/config"
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
+	model_domainmapping "github.com/JulienBreux/run-cli/internal/run/model/domainmapping"
 	model_job "github.com/JulienBreux/run-cli/internal/run/model/job"
 	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
 	model_workerpool "github.com/JulienBreux/run-cli/internal/run/model/workerpool"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/describe"
+	"github.com/JulienBreux/run-cli/internal/run/tui/app/domainmapping"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/job"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/log"
+	"github.com/JulienBreux/run-cli/internal/run/tui/app/project"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/service"
 	service_scale "github.com/JulienBreux/run-cli/internal/run/tui/app/service/scale"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/workerpool"
@@ -47,6 +51,13 @@ func setupTestApp() {
 	pages = tview.NewPages()
 	mainLoader = loader.New(app)
 	currentConfig = &config.Config{Project: "test-project", Region: "us-central1"}
+
+	// Globally mock fetch and list functions to prevent them from contacting real GCP APIs in TUI unit tests
+	project.PreLoad = func() error { return nil }
+	service.Fetch = func(projectID, region string) ([]model_service.Service, error) { return nil, nil }
+	job.ListJobsFunc = func(project, region string) ([]model_job.Job, error) { return nil, nil }
+	workerpool.ListWorkerPoolsFunc = func(project, region string) ([]model_workerpool.WorkerPool, error) { return nil, nil }
+	domainmapping.ListDomainMappingsFunc = func(project, region string) ([]model_domainmapping.DomainMapping, error) { return nil, nil }
 
 	// Reset global state to avoid interference between tests
 	previousPageID = ""
@@ -184,8 +195,25 @@ func TestInitializeApp(t *testing.T) {
 	go func() {
 		_ = app.Run()
 	}()
-	defer app.Stop()
-	
+	defer func() {
+		app.Stop()
+		time.Sleep(150 * time.Millisecond)
+	}()
+
+	// Mock PreLoad and Fetch to avoid calling real GCP client/credentials APIs in tests
+	origPreLoad := project.PreLoad
+	origFetch := service.Fetch
+	defer func() {
+		project.PreLoad = origPreLoad
+		service.Fetch = origFetch
+	}()
+	project.PreLoad = func() error {
+		return nil
+	}
+	service.Fetch = func(projectID, region string) ([]model_service.Service, error) {
+		return []model_service.Service{}, nil
+	}
+
 	// Ensure rootPages is init
 	rootPages = tview.NewPages()
 	// Re-initialize mainLoader to be safe against race/overwrite in other tests
@@ -218,7 +246,10 @@ func TestSwitchTo(t *testing.T) {
 	buildLayout() // Inits footerPages, footerSpinner
 	
 	go func() { _ = app.Run() }()
-	defer app.Stop()
+	defer func() {
+		app.Stop()
+		time.Sleep(150 * time.Millisecond)
+	}()
 
 	// Test Service List
 	switchTo(service.LIST_PAGE_ID)

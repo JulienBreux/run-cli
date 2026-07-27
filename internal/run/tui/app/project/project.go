@@ -35,7 +35,7 @@ var (
 )
 
 // PreLoad fetches the projects and caches them.
-func PreLoad() error {
+var PreLoad = func() error {
 	var err error
 	CachedProjects, err = api_project.List()
 	return err

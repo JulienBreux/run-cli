@@ -68,14 +68,14 @@ func TestListReload(t *testing.T) {
 
 	List(app)
 
-	// Mock listWorkerPoolsFunc
-	originalListWorkerPoolsFunc := listWorkerPoolsFunc
-	defer func() { listWorkerPoolsFunc = originalListWorkerPoolsFunc }()
+	// Mock ListWorkerPoolsFunc
+	originalListWorkerPoolsFunc := ListWorkerPoolsFunc
+	defer func() { ListWorkerPoolsFunc = originalListWorkerPoolsFunc }()
 
 	expectedWorkers := []model_workerpool.WorkerPool{
 		{DisplayName: "pool-reloaded"},
 	}
-	listWorkerPoolsFunc = func(projectID, region string) ([]model_workerpool.WorkerPool, error) {
+	ListWorkerPoolsFunc = func(projectID, region string) ([]model_workerpool.WorkerPool, error) {
 		return expectedWorkers, nil
 	}
 
@@ -107,10 +107,10 @@ func TestListReload_Error(t *testing.T) {
 
 	List(app)
 
-	originalListWorkerPoolsFunc := listWorkerPoolsFunc
-	defer func() { listWorkerPoolsFunc = originalListWorkerPoolsFunc }()
+	originalListWorkerPoolsFunc := ListWorkerPoolsFunc
+	defer func() { ListWorkerPoolsFunc = originalListWorkerPoolsFunc }()
 
-	listWorkerPoolsFunc = func(projectID, region string) ([]model_workerpool.WorkerPool, error) {
+	ListWorkerPoolsFunc = func(projectID, region string) ([]model_workerpool.WorkerPool, error) {
 		return nil, errors.New("fetch error")
 	}
 

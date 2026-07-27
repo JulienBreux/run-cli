@@ -66,14 +66,14 @@ func TestListReload(t *testing.T) {
 
 	List(app)
 
-	// Mock listDomainMappingsFunc
-	originalListDomainMappingsFunc := listDomainMappingsFunc
-	defer func() { listDomainMappingsFunc = originalListDomainMappingsFunc }()
+	// Mock ListDomainMappingsFunc
+	originalListDomainMappingsFunc := ListDomainMappingsFunc
+	defer func() { ListDomainMappingsFunc = originalListDomainMappingsFunc }()
 
 	expectedDMs := []model_domainmapping.DomainMapping{
 		{Name: "reloaded.example.com"},
 	}
-	listDomainMappingsFunc = func(projectID, region string) ([]model_domainmapping.DomainMapping, error) {
+	ListDomainMappingsFunc = func(projectID, region string) ([]model_domainmapping.DomainMapping, error) {
 		return expectedDMs, nil
 	}
 
@@ -106,10 +106,10 @@ func TestListReload_Error(t *testing.T) {
 
 	List(app)
 
-	originalListDomainMappingsFunc := listDomainMappingsFunc
-	defer func() { listDomainMappingsFunc = originalListDomainMappingsFunc }()
+	originalListDomainMappingsFunc := ListDomainMappingsFunc
+	defer func() { ListDomainMappingsFunc = originalListDomainMappingsFunc }()
 
-	listDomainMappingsFunc = func(projectID, region string) ([]model_domainmapping.DomainMapping, error) {
+	ListDomainMappingsFunc = func(projectID, region string) ([]model_domainmapping.DomainMapping, error) {
 		return nil, errors.New("fetch error")
 	}
 

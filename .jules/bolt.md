@@ -1,5 +1,9 @@
 # Bolt's Journal
 
+## 2026-03-09 - GCP ID Token Caching & Credential Discovery Overhead
+**Learning:** Calling `auth.GetIDToken` repeatedly on proxy request boundaries triggers `google.FindDefaultCredentials` each time. This results in heavy filesystem lookups, env scanning, and GCP metadata queries, adding up to 300ms+ latency per request. Implementing thread-safe lazy-initialization and caching of discovered `google.Credentials` using a `sync.Mutex` completely bypasses credential discovery on subsequent calls. Using `context.Background()` during initial discovery ensures cached credentials remain unaffected by cancellations of transient request contexts.
+**Action:** Always verify if credential-based token sources or external API clients are lazily initialized and thread-safely cached rather than re-discovered on every invocation or HTTP request boundary.
+
 ## 2026-03-08 - GCP Logging Client Caching & Connection Longevity
 **Learning:** Establishing the GCP Stackdriver Logging client requires repeated Google credential discovery and connection establishment, causing high latency (~300ms) inside a reactive TUI interface. Caching `logadmin.Client` instances via a project-aware map with thread-safe `sync.Mutex` ensures subsequent streaming and log extraction operations are instantaneous. Crucially, calling `Close()` on individual stream terminations must be a no-op to prevent premature teardown of connection pools shared across other active streaming views.
 **Action:** Keep GCP Logging clients cached globally by project and handle connection termination via a no-op `Close` method, while adding test-isolation resets in unit tests.

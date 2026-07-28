@@ -17,11 +17,15 @@ limitations under the License.
 package auth
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	api_region "github.com/JulienBreux/run-cli/internal/run/api/region"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 func TestGetInfo(t *testing.T) {
@@ -131,5 +135,94 @@ func TestGetInfo_Defaults(t *testing.T) {
 
 	if info.Region != api_region.ALL {
 		t.Errorf("Expected default Region 'all', got '%s'", info.Region)
+	}
+}
+
+type mockTokenSource struct {
+	token *oauth2.Token
+}
+
+func (m *mockTokenSource) Token() (*oauth2.Token, error) {
+	return m.token, nil
+}
+
+func TestGetIDToken_Caching(t *testing.T) {
+	// Backup and defer restore global states
+	origFindCreds := findDefaultCredentials
+	origCachedCreds := cachedCreds
+	defer func() {
+		findDefaultCredentials = origFindCreds
+		cachedCreds = origCachedCreds
+	}()
+
+	// Reset cachedCreds for this test
+	cachedCreds = nil
+
+	callCount := 0
+	mockToken := (&oauth2.Token{
+		AccessToken: "mock-access-token",
+		Expiry:      time.Now().Add(time.Hour),
+	}).WithExtra(map[string]interface{}{"id_token": "mock-id-token"})
+
+	findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		callCount++
+		return &google.Credentials{
+			ProjectID:   "mock-project-id",
+			TokenSource: &mockTokenSource{token: mockToken},
+		}, nil
+	}
+
+	ctx := context.Background()
+
+	// Call 1
+	token1, err := GetIDToken(ctx)
+	if err != nil {
+		t.Fatalf("GetIDToken 1 failed: %v", err)
+	}
+	if token1 != "mock-id-token" {
+		t.Errorf("Expected token 'mock-id-token', got '%s'", token1)
+	}
+
+	// Call 2
+	token2, err := GetIDToken(ctx)
+	if err != nil {
+		t.Fatalf("GetIDToken 2 failed: %v", err)
+	}
+	if token2 != "mock-id-token" {
+		t.Errorf("Expected token 'mock-id-token', got '%s'", token2)
+	}
+
+	// Verify discovery was only called once
+	if callCount != 1 {
+		t.Errorf("Expected credential discovery to be called exactly 1 time, but called %d times", callCount)
+	}
+}
+
+func BenchmarkGetIDToken(b *testing.B) {
+	origFindCreds := findDefaultCredentials
+	origCachedCreds := cachedCreds
+	defer func() {
+		findDefaultCredentials = origFindCreds
+		cachedCreds = origCachedCreds
+	}()
+
+	cachedCreds = nil
+	mockToken := (&oauth2.Token{
+		AccessToken: "mock-access-token",
+		Expiry:      time.Now().Add(time.Hour),
+	}).WithExtra(map[string]interface{}{"id_token": "mock-id-token"})
+
+	findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		return &google.Credentials{
+			ProjectID:   "mock-project-id",
+			TokenSource: &mockTokenSource{token: mockToken},
+		}, nil
+	}
+
+	ctx := context.Background()
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _ = GetIDToken(ctx)
 	}
 }

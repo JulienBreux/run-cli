@@ -17,11 +17,17 @@ limitations under the License.
 package auth
 
 import (
+	"context"
+	"errors"
 	"os"
 	"path/filepath"
+	"strings"
+	"sync"
 	"testing"
 
 	api_region "github.com/JulienBreux/run-cli/internal/run/api/region"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 func TestGetInfo(t *testing.T) {
@@ -132,4 +138,135 @@ func TestGetInfo_Defaults(t *testing.T) {
 	if info.Region != api_region.ALL {
 		t.Errorf("Expected default Region 'all', got '%s'", info.Region)
 	}
+}
+
+type mockTokenSource struct {
+	token *oauth2.Token
+	err   error
+}
+
+func (m *mockTokenSource) Token() (*oauth2.Token, error) {
+	return m.token, m.err
+}
+
+func TestGetIDToken_CachingAndThreadSafety(t *testing.T) {
+	// Save and restore the original package-level findDefaultCredentials
+	origFindCreds := findDefaultCredentials
+	defer func() {
+		findDefaultCredentials = origFindCreds
+		// Reset credentials cache
+		idTokenCredsMu.Lock()
+		idTokenCreds = nil
+		idTokenCredsMu.Unlock()
+	}()
+
+	// Mock TokenSource that returns a token with "id_token" extra parameter
+	mockTS := &mockTokenSource{
+		token: (&oauth2.Token{}).WithExtra(map[string]interface{}{
+			"id_token": "my-id-token",
+		}),
+	}
+
+	credsDiscoveryCount := 0
+	var discoveryMu sync.Mutex
+
+	// Mock findDefaultCredentials
+	findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		discoveryMu.Lock()
+		credsDiscoveryCount++
+		discoveryMu.Unlock()
+		return &google.Credentials{
+			TokenSource: mockTS,
+		}, nil
+	}
+
+	t.Run("Caching and Reuse", func(t *testing.T) {
+		// Reset credentials cache
+		idTokenCredsMu.Lock()
+		idTokenCreds = nil
+		idTokenCredsMu.Unlock()
+		discoveryMu.Lock()
+		credsDiscoveryCount = 0
+		discoveryMu.Unlock()
+
+		ctx := context.Background()
+
+		// First call - should discover credentials
+		token1, err := GetIDToken(ctx)
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+		if token1 != "my-id-token" {
+			t.Errorf("Expected token 'my-id-token', got '%s'", token1)
+		}
+
+		// Second call - should reuse cached credentials and not discover them again
+		token2, err := GetIDToken(ctx)
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+		if token2 != "my-id-token" {
+			t.Errorf("Expected token 'my-id-token', got '%s'", token2)
+		}
+
+		// Check discovery count
+		discoveryMu.Lock()
+		count := credsDiscoveryCount
+		discoveryMu.Unlock()
+		if count != 1 {
+			t.Errorf("Expected findDefaultCredentials to be called exactly once, got %d", count)
+		}
+	})
+
+	t.Run("Thread Safety", func(t *testing.T) {
+		// Reset credentials cache
+		idTokenCredsMu.Lock()
+		idTokenCreds = nil
+		idTokenCredsMu.Unlock()
+		discoveryMu.Lock()
+		credsDiscoveryCount = 0
+		discoveryMu.Unlock()
+
+		ctx := context.Background()
+		var wg sync.WaitGroup
+		const numGoroutines = 10
+
+		for i := 0; i < numGoroutines; i++ {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				_, _ = GetIDToken(ctx)
+			}()
+		}
+		wg.Wait()
+
+		// Check discovery count - even with concurrent calls, discovery should only happen once
+		discoveryMu.Lock()
+		count := credsDiscoveryCount
+		discoveryMu.Unlock()
+		if count != 1 {
+			t.Errorf("Expected findDefaultCredentials to be called exactly once concurrently, got %d", count)
+		}
+	})
+
+	t.Run("Discovery Error Handling", func(t *testing.T) {
+		// Reset credentials cache
+		idTokenCredsMu.Lock()
+		idTokenCreds = nil
+		idTokenCredsMu.Unlock()
+
+		// Mock discovery failure
+		findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+			return nil, errors.New("simulated discovery failure")
+		}
+
+		ctx := context.Background()
+		_, err := GetIDToken(ctx)
+		if err == nil {
+			t.Fatal("Expected an error from discovery failure, got nil")
+		}
+		if !strings.Contains(err.Error(), "simulated discovery failure") {
+			t.Errorf("Expected error to mention simulated discovery failure, got %v", err)
+		}
+	})
 }

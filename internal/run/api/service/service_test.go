@@ -19,12 +19,14 @@ package service
 import (
 	"context"
 	"errors"
+	"sync"
 	"testing"
 	"time"
 
 	"cloud.google.com/go/run/apiv2/runpb"
 	"github.com/JulienBreux/run-cli/internal/run/api/client"
 	api_region "github.com/JulienBreux/run-cli/internal/run/api/region"
+	model "github.com/JulienBreux/run-cli/internal/run/model/service"
 	model_traffic "github.com/JulienBreux/run-cli/internal/run/model/service/traffic"
 	"github.com/googleapis/gax-go/v2"
 	"github.com/stretchr/testify/assert"
@@ -68,7 +70,7 @@ func TestMapService(t *testing.T) {
 	assert.Equal(t, "user@example.com", result.LastModifier)
 	assert.Equal(t, "my-project", result.Project)
 	assert.Equal(t, "us-central1", result.Region)
-	
+
 	// Scaling
 	assert.Equal(t, "AUTOMATIC", result.Scaling.ScalingMode)
 	assert.Equal(t, int32(1), result.Scaling.MinInstances)
@@ -77,7 +79,7 @@ func TestMapService(t *testing.T) {
 	// Traffic
 	assert.Len(t, result.TrafficStatuses, 1)
 	assert.Equal(t, "my-service-v1", result.TrafficStatuses[0].Revision)
-	
+
 	// Revisions
 	assert.Equal(t, "my-service-v1", result.LatestReadyRevision)
 	assert.Equal(t, "my-service-v2", result.LatestCreatedRevision)
@@ -317,7 +319,7 @@ func TestList_AllRegions(t *testing.T) {
 
 	services, err := List("p", api_region.ALL)
 	assert.NoError(t, err)
-	
+
 	// We expect at least 1 service
 	found := false
 	for _, s := range services {
@@ -402,11 +404,11 @@ func TestGCPClient_ListServices(t *testing.T) {
 		client.FindDefaultCredentials = origFindCreds
 		createServicesClient = origCreateClient
 	}()
-	
+
 	client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 		return &google.Credentials{}, nil
 	}
-	
+
 	t.Run("Success", func(t *testing.T) {
 		createServicesClient = func(ctx context.Context, opts ...option.ClientOption) (ServicesClientWrapper, error) {
 			return &MockServicesClientWrapper{
@@ -418,14 +420,14 @@ func TestGCPClient_ListServices(t *testing.T) {
 				CloseFunc: func() error { return nil },
 			}, nil
 		}
-		
+
 		client := &GCPClient{}
 		services, err := client.ListServices(context.Background(), "p", "r")
 		assert.NoError(t, err)
 		assert.Len(t, services, 1)
 		assert.Equal(t, "s1", services[0].Name)
 	})
-	
+
 	t.Run("Auth Error", func(t *testing.T) {
 		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return nil, errors.New("auth failed")
@@ -434,7 +436,7 @@ func TestGCPClient_ListServices(t *testing.T) {
 		_, err := client.ListServices(context.Background(), "p", "r")
 		assert.Error(t, err)
 	})
-	
+
 	t.Run("Iterator Auth Error", func(t *testing.T) {
 		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return &google.Credentials{}, nil
@@ -477,13 +479,13 @@ func TestGCPClient_GetService(t *testing.T) {
 				CloseFunc: func() error { return nil },
 			}, nil
 		}
-		
+
 		client := &GCPClient{}
 		s, err := client.GetService(context.Background(), "s1")
 		assert.NoError(t, err)
 		assert.Equal(t, "s1", s.Name)
 	})
-	
+
 	t.Run("Get Error", func(t *testing.T) {
 		createServicesClient = func(ctx context.Context, opts ...option.ClientOption) (ServicesClientWrapper, error) {
 			return &MockServicesClientWrapper{
@@ -524,13 +526,13 @@ func TestGCPClient_UpdateService(t *testing.T) {
 				CloseFunc: func() error { return nil },
 			}, nil
 		}
-		
+
 		client := &GCPClient{}
 		s, err := client.UpdateService(context.Background(), &runpb.Service{Name: "s1"})
 		assert.NoError(t, err)
 		assert.Equal(t, "s1-updated", s.Name)
 	})
-	
+
 	t.Run("Update Start Error", func(t *testing.T) {
 		createServicesClient = func(ctx context.Context, opts ...option.ClientOption) (ServicesClientWrapper, error) {
 			return &MockServicesClientWrapper{
@@ -567,7 +569,7 @@ func TestGCPClient_UpdateService(t *testing.T) {
 
 func TestWrappers_Delegation(t *testing.T) {
 	// Expect panics because nil clients are used
-	
+
 	t.Run("GCPServicesClientWrapper", func(t *testing.T) {
 		w := &GCPServicesClientWrapper{client: nil}
 		assert.Panics(t, func() { _ = w.ListServices(context.Background(), nil) })
@@ -575,71 +577,115 @@ func TestWrappers_Delegation(t *testing.T) {
 		assert.Panics(t, func() { _, _ = w.UpdateService(context.Background(), nil) })
 		assert.Panics(t, func() { _ = w.Close() })
 	})
-	
+
 	t.Run("GCPServiceIteratorWrapper", func(t *testing.T) {
 		it := &GCPServiceIteratorWrapper{it: nil}
 		assert.Panics(t, func() { _, _ = it.Next() })
 	})
-	
+
 	t.Run("GCPUpdateServiceOperationWrapper", func(t *testing.T) {
 		op := &GCPUpdateServiceOperationWrapper{op: nil}
 		assert.Panics(t, func() { _, _ = op.Wait(context.Background()) })
 	})
 }
 func TestUpdateAuthentication(t *testing.T) {
-			originalClient := apiClient
-			defer func() { apiClient = originalClient }()
-		
-			mock := &MockClient{}
-			apiClient = mock
-		
-			// Setup GetService mock
-			mock.GetServiceFunc = func(ctx context.Context, name string) (*runpb.Service, error) {
-				return &runpb.Service{
-					Name:               name,
-					InvokerIamDisabled: false,
-				}, nil
-			}
-		
-			// Setup UpdateService mock
-			mock.UpdateServiceFunc = func(ctx context.Context, service *runpb.Service) (*runpb.Service, error) {
-				// Assert that auth was updated correctly
-				assert.True(t, service.InvokerIamDisabled)
-				return service, nil
-			}
-		
-			result, err := UpdateAuthentication(context.Background(), "p", "r", "s1", true)
-		
-			assert.NoError(t, err)
-			assert.NotNil(t, result)
-			assert.Equal(t, "s1", result.Name)
-			assert.True(t, result.Security.InvokerIAMDisabled)
-		}
-		
+	originalClient := apiClient
+	defer func() { apiClient = originalClient }()
+
+	mock := &MockClient{}
+	apiClient = mock
+
+	// Setup GetService mock
+	mock.GetServiceFunc = func(ctx context.Context, name string) (*runpb.Service, error) {
+		return &runpb.Service{
+			Name:               name,
+			InvokerIamDisabled: false,
+		}, nil
+	}
+
+	// Setup UpdateService mock
+	mock.UpdateServiceFunc = func(ctx context.Context, service *runpb.Service) (*runpb.Service, error) {
+		// Assert that auth was updated correctly
+		assert.True(t, service.InvokerIamDisabled)
+		return service, nil
+	}
+
+	result, err := UpdateAuthentication(context.Background(), "p", "r", "s1", true)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, "s1", result.Name)
+	assert.True(t, result.Security.InvokerIAMDisabled)
+}
+
 func TestUpdateAuthentication_Error(t *testing.T) {
-			originalClient := apiClient
-			defer func() { apiClient = originalClient }()
-		
-			mock := &MockClient{}
-			apiClient = mock
-		
-			// Test GetService Error
-			mock.GetServiceFunc = func(ctx context.Context, name string) (*runpb.Service, error) {
-				return nil, assert.AnError
+	originalClient := apiClient
+	defer func() { apiClient = originalClient }()
+
+	mock := &MockClient{}
+	apiClient = mock
+
+	// Test GetService Error
+	mock.GetServiceFunc = func(ctx context.Context, name string) (*runpb.Service, error) {
+		return nil, assert.AnError
+	}
+	_, err := UpdateAuthentication(context.Background(), "p", "r", "s", true)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to get service")
+
+	// Test UpdateService Error
+	mock.GetServiceFunc = func(ctx context.Context, name string) (*runpb.Service, error) {
+		return &runpb.Service{Name: name}, nil
+	}
+	mock.UpdateServiceFunc = func(ctx context.Context, service *runpb.Service) (*runpb.Service, error) {
+		return nil, assert.AnError
+	}
+	_, err = UpdateAuthentication(context.Background(), "p", "r", "s", true)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to update service")
+}
+
+func BenchmarkList_AllRegions_Comparison(b *testing.B) {
+	originalClient := apiClient
+	defer func() { apiClient = originalClient }()
+
+	mock := &MockClient{}
+	apiClient = mock
+
+	mock.ListServicesFunc = func(ctx context.Context, project, region string) ([]*runpb.Service, error) {
+		return []*runpb.Service{
+			{Name: "s1", Uri: "uri1"},
+			{Name: "s2", Uri: "uri2"},
+		}, nil
+	}
+
+	b.Run("Original_Mutex_Approach", func(b *testing.B) {
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			var (
+				mu       sync.Mutex
+				services []model.Service
+				wg       sync.WaitGroup
+			)
+			for _, r := range api_region.List() {
+				wg.Add(1)
+				go func(region string) {
+					defer wg.Done()
+					if s, err := List("p", region); err == nil {
+						mu.Lock()
+						services = append(services, s...)
+						mu.Unlock()
+					}
+				}(r)
 			}
-			_, err := UpdateAuthentication(context.Background(), "p", "r", "s", true)
-			assert.Error(t, err)
-			assert.Contains(t, err.Error(), "failed to get service")
-		
-			// Test UpdateService Error
-			mock.GetServiceFunc = func(ctx context.Context, name string) (*runpb.Service, error) {
-				return &runpb.Service{Name: name}, nil
-			}
-			mock.UpdateServiceFunc = func(ctx context.Context, service *runpb.Service) (*runpb.Service, error) {
-				return nil, assert.AnError
-			}
-			_, err = UpdateAuthentication(context.Background(), "p", "r", "s", true)
-			assert.Error(t, err)
-			assert.Contains(t, err.Error(), "failed to update service")
+			wg.Wait()
 		}
-		
+	})
+
+	b.Run("Optimized_LockFree_MapReduce", func(b *testing.B) {
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			_, _ = List("p", api_region.ALL)
+		}
+	})
+}

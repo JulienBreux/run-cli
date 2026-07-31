@@ -110,28 +110,40 @@ func UpdateScaling(ctx context.Context, project, region, workerPoolName string, 
 	return &wp, nil
 }
 
+// listAllRegions retrieves worker pools from all supported regions concurrently.
+// It is optimized using a lock-free, pre-allocated map-reduce pattern with a slice of slices ([][]model.WorkerPool)
+// instead of a sync.Mutex and shared slice. This completely eliminates lock contention
+// and reduces heap allocations (avoiding repeated slice resizing during concurrent appends).
 func listAllRegions(project string) ([]model.WorkerPool, error) {
-	var (
-		mu          sync.Mutex
-		workerPools []model.WorkerPool
-		wg          sync.WaitGroup
-	)
+	regions := api_region.List()
+	results := make([][]model.WorkerPool, len(regions))
+	var wg sync.WaitGroup
 
-	for _, region := range api_region.List() {
+	for i, region := range regions {
 		wg.Add(1)
-		go func(r string) {
+		go func(idx int, r string) {
 			defer wg.Done()
 			// Call List recursively for each region
 			// We ignore errors here to allow partial success (e.g. if one region is down or disabled)
 			if wp, err := List(project, r); err == nil {
-				mu.Lock()
-				workerPools = append(workerPools, wp...)
-				mu.Unlock()
+				results[idx] = wp
 			}
-		}(region)
+		}(i, region)
 	}
 
 	wg.Wait()
+
+	// Calculate exact total size to pre-allocate flat list once
+	total := 0
+	for _, r := range results {
+		total += len(r)
+	}
+
+	workerPools := make([]model.WorkerPool, 0, total)
+	for _, r := range results {
+		workerPools = append(workerPools, r...)
+	}
+
 	return workerPools, nil
 }
 

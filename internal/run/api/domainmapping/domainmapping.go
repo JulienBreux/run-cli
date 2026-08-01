@@ -50,25 +50,34 @@ func List(project, region string) ([]model.DomainMapping, error) {
 }
 
 func listAllRegions(project string) ([]model.DomainMapping, error) {
-	var (
-		mu             sync.Mutex
-		domainMappings []model.DomainMapping
-		wg             sync.WaitGroup
-	)
+	regions := api_region.List()
+	results := make([][]model.DomainMapping, len(regions))
+	var wg sync.WaitGroup
 
-	for _, region := range api_region.List() {
+	for i, region := range regions {
 		wg.Add(1)
-		go func(r string) {
+		go func(idx int, r string) {
 			defer wg.Done()
 			if dms, err := List(project, r); err == nil {
-				mu.Lock()
-				domainMappings = append(domainMappings, dms...)
-				mu.Unlock()
+				results[idx] = dms
 			}
-		}(region)
+		}(i, region)
 	}
 
 	wg.Wait()
+
+	// Pre-calculate exact capacity needed to eliminate dynamic slice growth
+	var totalSize int
+	for _, dms := range results {
+		totalSize += len(dms)
+	}
+
+	// Lock-free flat pre-allocated slice
+	domainMappings := make([]model.DomainMapping, 0, totalSize)
+	for _, dms := range results {
+		domainMappings = append(domainMappings, dms...)
+	}
+
 	return domainMappings, nil
 }
 

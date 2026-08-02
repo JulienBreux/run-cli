@@ -49,26 +49,37 @@ func List(project, region string) ([]model.DomainMapping, error) {
 	return domainMappings, nil
 }
 
+// listAllRegions retrieves domain mappings from all regions concurrently.
+// It is optimized with a lock-free pre-allocated map-reduce slice-of-slices pattern
+// to eliminate mutex contention and avoid redundant heap allocations.
 func listAllRegions(project string) ([]model.DomainMapping, error) {
-	var (
-		mu             sync.Mutex
-		domainMappings []model.DomainMapping
-		wg             sync.WaitGroup
-	)
+	regions := api_region.List()
+	results := make([][]model.DomainMapping, len(regions))
+	var wg sync.WaitGroup
 
-	for _, region := range api_region.List() {
+	for i, region := range regions {
 		wg.Add(1)
-		go func(r string) {
+		go func(idx int, r string) {
 			defer wg.Done()
 			if dms, err := List(project, r); err == nil {
-				mu.Lock()
-				domainMappings = append(domainMappings, dms...)
-				mu.Unlock()
+				results[idx] = dms
 			}
-		}(region)
+		}(i, region)
 	}
 
 	wg.Wait()
+
+	// Calculate total size to perform exactly one allocation for the merged slice
+	var totalSize int
+	for _, dms := range results {
+		totalSize += len(dms)
+	}
+
+	domainMappings := make([]model.DomainMapping, 0, totalSize)
+	for _, dms := range results {
+		domainMappings = append(domainMappings, dms...)
+	}
+
 	return domainMappings, nil
 }
 

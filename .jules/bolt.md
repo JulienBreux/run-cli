@@ -1,5 +1,9 @@
 # Bolt's Journal
 
+## 2026-03-09 - Lock-Free Multi-Regional Listing Optimization
+**Learning:** Multi-regional listing operations that query multiple GCP regions concurrently can suffer from lock contention when multiple goroutines write to a single shared slice using a `sync.Mutex`. By pre-allocating an intermediate slice of slices `[][]T` and having each goroutine write directly to its corresponding region's index without locking, contention is entirely eliminated. Pre-allocating the final flat slice once the exact total size is known also avoids multiple dynamic slice reallocations.
+**Action:** Use a lock-free pre-allocated map-reduce pattern (`[][]T`) instead of a shared `sync.Mutex` and dynamic slice `[]T` for concurrent collection.
+
 ## 2026-03-08 - GCP Logging Client Caching & Connection Longevity
 **Learning:** Establishing the GCP Stackdriver Logging client requires repeated Google credential discovery and connection establishment, causing high latency (~300ms) inside a reactive TUI interface. Caching `logadmin.Client` instances via a project-aware map with thread-safe `sync.Mutex` ensures subsequent streaming and log extraction operations are instantaneous. Crucially, calling `Close()` on individual stream terminations must be a no-op to prevent premature teardown of connection pools shared across other active streaming views.
 **Action:** Keep GCP Logging clients cached globally by project and handle connection termination via a no-op `Close` method, while adding test-isolation resets in unit tests.

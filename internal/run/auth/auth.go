@@ -24,6 +24,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	api_region "github.com/JulienBreux/run-cli/internal/run/api/region"
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
@@ -36,6 +37,11 @@ var (
 		"openid",
 		"email",
 	}
+
+	// Variables for dependency injection and caching of credentials
+	findDefaultCredentials = google.FindDefaultCredentials
+	idTokenCreds           *google.Credentials
+	idTokenCredsMu         sync.Mutex
 )
 
 func getConfigDir() (string, error) {
@@ -131,11 +137,22 @@ func parseConfig(path string) (info.Info, error) {
 }
 
 // GetIDToken retrieves an identity token for the given audience using Google Cloud credentials.
+// It uses a thread-safe lazy-initialization and caching pattern via sync.Mutex and package-level
+// variables to prevent repeated, high-latency credential discovery (~300ms overhead per call).
 var GetIDToken = func(ctx context.Context) (string, error) {
-	creds, err := google.FindDefaultCredentials(ctx, scopes...)
-	if err != nil {
-		return "", fmt.Errorf("failed to find default credentials: %w", err)
+	idTokenCredsMu.Lock()
+	if idTokenCreds == nil {
+		// Use context.Background() during credential discovery to prevent transient request context
+		// cancellations from closing or invalidating the cached credentials.
+		creds, err := findDefaultCredentials(context.Background(), scopes...)
+		if err != nil {
+			idTokenCredsMu.Unlock()
+			return "", fmt.Errorf("failed to find default credentials: %w", err)
+		}
+		idTokenCreds = creds
 	}
+	creds := idTokenCreds
+	idTokenCredsMu.Unlock()
 
 	token, err := creds.TokenSource.Token()
 	if err != nil {

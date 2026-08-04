@@ -17,11 +17,17 @@ limitations under the License.
 package auth
 
 import (
+	"context"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
+	"time"
 
 	api_region "github.com/JulienBreux/run-cli/internal/run/api/region"
+	"github.com/stretchr/testify/assert"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 func TestGetInfo(t *testing.T) {
@@ -131,5 +137,76 @@ func TestGetInfo_Defaults(t *testing.T) {
 
 	if info.Region != api_region.ALL {
 		t.Errorf("Expected default Region 'all', got '%s'", info.Region)
+	}
+}
+
+type mockTokenSource struct {
+	token *oauth2.Token
+	err   error
+}
+
+func (m *mockTokenSource) Token() (*oauth2.Token, error) {
+	return m.token, m.err
+}
+
+func TestGetIDToken_CachingAndThreadSafety(t *testing.T) {
+	// Backup and restore package-level variables
+	origFindDefaultCredentials := findDefaultCredentials
+	origIdTokenCreds := idTokenCreds
+	defer func() {
+		findDefaultCredentials = origFindDefaultCredentials
+		idTokenCreds = origIdTokenCreds
+	}()
+
+	// Reset cached credentials
+	idTokenCreds = nil
+
+	var callCount int
+	var mu sync.Mutex
+
+	// Mock token source that returns a valid ID token
+	mockTok := &oauth2.Token{
+		AccessToken: "mock-access-token",
+		Expiry:      time.Now().Add(1 * time.Hour),
+	}
+	mockTok = mockTok.WithExtra(map[string]interface{}{
+		"id_token": "cached-id-token-xyz",
+	})
+
+	// Mock findDefaultCredentials
+	findDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
+		mu.Lock()
+		callCount++
+		mu.Unlock()
+		return &google.Credentials{
+			TokenSource: &mockTokenSource{token: mockTok},
+		}, nil
+	}
+
+	ctx := context.Background()
+
+	// Call concurrently to verify thread safety and that it's only discovered once
+	var wg sync.WaitGroup
+	numGoroutines := 10
+	results := make([]string, numGoroutines)
+	errors := make([]error, numGoroutines)
+
+	for i := 0; i < numGoroutines; i++ {
+		wg.Add(1)
+		go func(index int) {
+			defer wg.Done()
+			token, err := GetIDToken(ctx)
+			results[index] = token
+			errors[index] = err
+		}(i)
+	}
+	wg.Wait()
+
+	// Assertions
+	assert.Equal(t, 1, callCount, "findDefaultCredentials should only be called once due to caching")
+
+	for i := 0; i < numGoroutines; i++ {
+		assert.NoError(t, errors[i])
+		assert.Equal(t, "cached-id-token-xyz", results[i])
 	}
 }

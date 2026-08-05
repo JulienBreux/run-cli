@@ -299,26 +299,36 @@ func UpdateTraffic(ctx context.Context, project, region, serviceName string, tar
 }
 
 func listAllRegions(project string) ([]model.Service, error) {
-	var (
-		mu       sync.Mutex
-		services []model.Service
-		wg       sync.WaitGroup
-	)
+	// Optimization: lock-free, pre-allocated map-reduce pattern with a slice of slices [][]model.Service.
+	// This eliminates mutex contention across concurrent region requests, avoids repeated slice resizing/heap allocations,
+	// and optimizes concurrency to reduce latency and memory usage.
+	regions := api_region.List()
+	results := make([][]model.Service, len(regions))
+	var wg sync.WaitGroup
 
-	for _, region := range api_region.List() {
+	for i, region := range regions {
 		wg.Add(1)
-		go func(r string) {
+		go func(idx int, r string) {
 			defer wg.Done()
 			// Call List recursively for each region
 			// We ignore errors here to allow partial success (e.g. if one region is down or disabled)
 			if s, err := List(project, r); err == nil {
-				mu.Lock()
-				services = append(services, s...)
-				mu.Unlock()
+				results[idx] = s
 			}
-		}(region)
+		}(i, region)
 	}
 
 	wg.Wait()
+
+	total := 0
+	for _, s := range results {
+		total += len(s)
+	}
+
+	services := make([]model.Service, 0, total)
+	for _, s := range results {
+		services = append(services, s...)
+	}
+
 	return services, nil
 }

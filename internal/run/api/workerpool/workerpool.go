@@ -111,27 +111,37 @@ func UpdateScaling(ctx context.Context, project, region, workerPoolName string, 
 }
 
 func listAllRegions(project string) ([]model.WorkerPool, error) {
-	var (
-		mu          sync.Mutex
-		workerPools []model.WorkerPool
-		wg          sync.WaitGroup
-	)
+	// Optimization: lock-free, pre-allocated map-reduce pattern with a slice of slices [][]model.WorkerPool.
+	// This eliminates mutex contention across concurrent region requests, avoids repeated slice resizing/heap allocations,
+	// and optimizes concurrency to reduce latency and memory usage.
+	regions := api_region.List()
+	results := make([][]model.WorkerPool, len(regions))
+	var wg sync.WaitGroup
 
-	for _, region := range api_region.List() {
+	for i, region := range regions {
 		wg.Add(1)
-		go func(r string) {
+		go func(idx int, r string) {
 			defer wg.Done()
 			// Call List recursively for each region
 			// We ignore errors here to allow partial success (e.g. if one region is down or disabled)
 			if wp, err := List(project, r); err == nil {
-				mu.Lock()
-				workerPools = append(workerPools, wp...)
-				mu.Unlock()
+				results[idx] = wp
 			}
-		}(region)
+		}(i, region)
 	}
 
 	wg.Wait()
+
+	total := 0
+	for _, wp := range results {
+		total += len(wp)
+	}
+
+	workerPools := make([]model.WorkerPool, 0, total)
+	for _, wp := range results {
+		workerPools = append(workerPools, wp...)
+	}
+
 	return workerPools, nil
 }
 

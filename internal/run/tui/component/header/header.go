@@ -105,10 +105,10 @@ func columnShortcuts() *tview.Flex {
 			// No, standard reading is Col 1 then Col 2.
 			// Current: Col 1 (Project) | Col 2 (Services)
 			// Registry: Services, ..., Project
-			
+
 			// If I want Project in Col 1, I should reorder Registry or filter specifically.
 			// Reordering Registry seems cleanest for "Single Source of Truth defining order".
-			
+
 			_, _ = fmt.Fprint(col2, formatted) // Put early items in Col 2 to match existing (Services on right)
 		} else {
 			_, _ = fmt.Fprint(col1, formatted) // Put later items in Col 1 (Project on left)

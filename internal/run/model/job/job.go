@@ -26,30 +26,30 @@ import (
 
 // Job represents a Cloud Run job.
 type Job struct {
-	Name                   string               `json:"name"`
-	UID                    string               `json:"uid"`
-	Generation             int64                `json:"generation"`
-	Labels                 map[string]string    `json:"labels"`
-	Annotations            map[string]string    `json:"annotations"`
-	CreateTime             time.Time            `json:"createTime"`
-	UpdateTime             time.Time            `json:"updateTime"`
-	DeleteTime             time.Time            `json:"deleteTime"`
-	ExpireTime             time.Time            `json:"expireTime"`
-	Creator                string               `json:"creator"`
-	LastModifier           string               `json:"lastModifier"`
-	Client                 string               `json:"client"`
-	ClientVersion          string               `json:"clientVersion"`
-	LaunchStage            string               `json:"launchStage"`
-	BinaryAuthorization    *BinaryAuthorization `json:"binaryAuthorization"`
-	Template               *ExecutionTemplate   `json:"template"`
-	ObservedGeneration     int64                `json:"observedGeneration"`
-	TerminalCondition      *condition.Condition `json:"terminalCondition"`
+	Name                   string                 `json:"name"`
+	UID                    string                 `json:"uid"`
+	Generation             int64                  `json:"generation"`
+	Labels                 map[string]string      `json:"labels"`
+	Annotations            map[string]string      `json:"annotations"`
+	CreateTime             time.Time              `json:"createTime"`
+	UpdateTime             time.Time              `json:"updateTime"`
+	DeleteTime             time.Time              `json:"deleteTime"`
+	ExpireTime             time.Time              `json:"expireTime"`
+	Creator                string                 `json:"creator"`
+	LastModifier           string                 `json:"lastModifier"`
+	Client                 string                 `json:"client"`
+	ClientVersion          string                 `json:"clientVersion"`
+	LaunchStage            string                 `json:"launchStage"`
+	BinaryAuthorization    *BinaryAuthorization   `json:"binaryAuthorization"`
+	Template               *ExecutionTemplate     `json:"template"`
+	ObservedGeneration     int64                  `json:"observedGeneration"`
+	TerminalCondition      *condition.Condition   `json:"terminalCondition"`
 	Conditions             []*condition.Condition `json:"conditions"`
-	ExecutionCount         int64                `json:"executionCount"`
-	LatestCreatedExecution *ExecutionReference  `json:"latestCreatedExecution"`
-	Reconciling            bool                 `json:"reconciling"`
-	SatisfiesPZS           bool                 `json:"satisfiesPzs"`
-	Region                 string               `json:"region"` // New field
+	ExecutionCount         int64                  `json:"executionCount"`
+	LatestCreatedExecution *ExecutionReference    `json:"latestCreatedExecution"`
+	Reconciling            bool                   `json:"reconciling"`
+	SatisfiesPZS           bool                   `json:"satisfiesPzs"`
+	Region                 string                 `json:"region"` // New field
 }
 
 // ExecutionReference represents a reference to a specific execution.

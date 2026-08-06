@@ -45,11 +45,11 @@ func TestNewCmdVersion(t *testing.T) {
 	// Test execution
 	cmd.SetOut(out)
 	cmd.SetErr(err)
-	
+
 	// Execute the command
 	execErr := cmd.Execute()
 	assert.NoError(t, execErr)
-	
+
 	// Verify output contains version info
 	// Note: exact content depends on pkg/version globals, but we expect at least "Version:"
 	assert.Contains(t, out.String(), "Version:")

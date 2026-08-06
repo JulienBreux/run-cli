@@ -157,7 +157,7 @@ func mapService(resp *runpb.Service, project, region string) model.Service {
 // UpdateScaling updates the scaling settings for a service.
 func UpdateScaling(ctx context.Context, project, region, serviceName string, min, max, manual int32) (*model.Service, error) {
 	fullServiceName := fmt.Sprintf("projects/%s/locations/%s/services/%s", project, region, serviceName)
-	
+
 	service, err := apiClient.GetService(ctx, fullServiceName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get service: %w", err)
@@ -299,26 +299,34 @@ func UpdateTraffic(ctx context.Context, project, region, serviceName string, tar
 }
 
 func listAllRegions(project string) ([]model.Service, error) {
-	var (
-		mu       sync.Mutex
-		services []model.Service
-		wg       sync.WaitGroup
-	)
+	regions := api_region.List()
+	results := make([][]model.Service, len(regions))
+	var wg sync.WaitGroup
 
-	for _, region := range api_region.List() {
+	for i, region := range regions {
 		wg.Add(1)
-		go func(r string) {
+		go func(idx int, r string) {
 			defer wg.Done()
 			// Call List recursively for each region
 			// We ignore errors here to allow partial success (e.g. if one region is down or disabled)
 			if s, err := List(project, r); err == nil {
-				mu.Lock()
-				services = append(services, s...)
-				mu.Unlock()
+				results[idx] = s
 			}
-		}(region)
+		}(i, region)
 	}
 
 	wg.Wait()
+
+	// Pre-allocate the final flat slice based on the exact total size of all results
+	var total int
+	for _, r := range results {
+		total += len(r)
+	}
+
+	services := make([]model.Service, 0, total)
+	for _, r := range results {
+		services = append(services, r...)
+	}
+
 	return services, nil
 }

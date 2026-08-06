@@ -116,20 +116,20 @@ func TestMapRevision(t *testing.T) {
 	assert.Equal(t, "my-service", result.Service)
 	assert.Equal(t, "user@example.com", result.Author)
 	assert.Equal(t, now.Unix(), result.CreateTime.Unix())
-	
+
 	// Containers
 	assert.Len(t, result.Containers, 1)
 	assert.Equal(t, "c1", result.Containers[0].Name)
 	assert.True(t, result.Containers[0].Resources.CPUIdle)
-	
+
 	// Env
 	assert.Equal(t, "EXECUTION_ENVIRONMENT_GEN2", result.ExecutionEnvironment)
 	assert.Equal(t, int32(80), result.MaxInstanceRequestConcurrency)
 	assert.Equal(t, 30*time.Second, result.Timeout)
-	
+
 	// Accelerator
 	assert.Equal(t, "nvidia-tesla-t4", result.Accelerator)
-	
+
 	// Top level shortcuts
 	assert.True(t, result.CpuIdle)
 	assert.True(t, result.StartupCpuBoost)

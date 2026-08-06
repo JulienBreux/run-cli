@@ -52,13 +52,13 @@ func TestUpdateInfo(t *testing.T) {
 		Region:  "r2",
 		User:    "u2",
 	}
-	
-	// This function modifies the global infoView. 
+
+	// This function modifies the global infoView.
 	// Since we can't inspect the text content easily without drawing, we just ensure it doesn't panic.
 	assert.NotPanics(t, func() {
 		header.UpdateInfo(newInfo)
 	})
-	
-	// Note: Testing side effects on global variables is brittle in parallel tests, 
+
+	// Note: Testing side effects on global variables is brittle in parallel tests,
 	// but acceptable here given the legacy code structure.
 }

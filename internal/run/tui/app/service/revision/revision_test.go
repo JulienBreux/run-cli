@@ -20,10 +20,10 @@ import (
 	"testing"
 	"time"
 
-	model_revision "github.com/JulienBreux/run-cli/internal/run/model/service/revision"
-	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
 	model_container "github.com/JulienBreux/run-cli/internal/run/model/common/container"
 	model_resources "github.com/JulienBreux/run-cli/internal/run/model/common/resources"
+	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
+	model_revision "github.com/JulienBreux/run-cli/internal/run/model/service/revision"
 	"github.com/rivo/tview"
 	"github.com/stretchr/testify/assert"
 )
@@ -53,25 +53,25 @@ func TestListComponent_Update(t *testing.T) {
 
 func TestDetailComponent_Update(t *testing.T) {
 	comp := NewDetailComponent()
-	
+
 	rev := model_revision.Revision{
-		Name: "rev1", 
-		Author: "user@example.com",
-		CreateTime: time.Now(),
-		CpuIdle: true,
-		StartupCpuBoost: true,
+		Name:                          "rev1",
+		Author:                        "user@example.com",
+		CreateTime:                    time.Now(),
+		CpuIdle:                       true,
+		StartupCpuBoost:               true,
 		MaxInstanceRequestConcurrency: 80,
-		Timeout: 300 * time.Second,
-		ExecutionEnvironment: "EXECUTION_ENVIRONMENT_GEN2",
+		Timeout:                       300 * time.Second,
+		ExecutionEnvironment:          "EXECUTION_ENVIRONMENT_GEN2",
 		Containers: []*model_container.Container{
 			{
-				Name: "c1",
+				Name:  "c1",
 				Image: "image1",
 				Ports: []*model_container.Port{{ContainerPort: 8080}},
 				Resources: &model_resources.Resources{
 					Limits: map[string]string{
 						"memory": "512Mi",
-						"cpu": "1",
+						"cpu":    "1",
 					},
 				},
 			},

@@ -51,8 +51,8 @@ func TestNew(t *testing.T) {
 	if l == nil {
 		t.Error("logo.New() should return a non-nil TextView")
 	}
-	
-	// We can't easily extract text from TextView directly without drawing, 
+
+	// We can't easily extract text from TextView directly without drawing,
 	// but we can check if it was initialized (not crashing).
 	// In a real TUI test we might use a screen simulation, but for unit test ensuring it returns expected type is often enough.
 	// However, we can assert properties if we want.

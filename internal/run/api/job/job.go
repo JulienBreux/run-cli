@@ -79,27 +79,35 @@ func mapJob(resp *runpb.Job, region string) model.Job {
 }
 
 func listAllRegions(project string) ([]model.Job, error) {
-	var (
-		mu   sync.Mutex
-		jobs []model.Job
-		wg   sync.WaitGroup
-	)
+	regions := api_region.List()
+	results := make([][]model.Job, len(regions))
+	var wg sync.WaitGroup
 
-	for _, region := range api_region.List() {
+	for i, region := range regions {
 		wg.Add(1)
-		go func(r string) {
+		go func(idx int, r string) {
 			defer wg.Done()
 			// Call List recursively for each region
 			// We ignore errors here to allow partial success (e.g. if one region is down or disabled)
 			if j, err := List(project, r); err == nil {
-				mu.Lock()
-				jobs = append(jobs, j...)
-				mu.Unlock()
+				results[idx] = j
 			}
-		}(region)
+		}(i, region)
 	}
 
 	wg.Wait()
+
+	// Pre-allocate the final flat slice based on the exact total size of all results
+	var total int
+	for _, r := range results {
+		total += len(r)
+	}
+
+	jobs := make([]model.Job, 0, total)
+	for _, r := range results {
+		jobs = append(jobs, r...)
+	}
+
 	return jobs, nil
 }
 

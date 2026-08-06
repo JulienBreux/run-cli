@@ -34,10 +34,10 @@ func TestNew(t *testing.T) {
 	assert.NotNil(t, cmd)
 	assert.Equal(t, "run", cmd.Use)
 	assert.Equal(t, "Run is a CLI to play with Google Cloud Run interactively.", cmd.Short)
-	
+
 	// Check subcommands
 	assert.True(t, cmd.HasSubCommands())
-	
+
 	// Check if version command exists
 	found := false
 	for _, c := range cmd.Commands() {

@@ -111,27 +111,34 @@ func UpdateScaling(ctx context.Context, project, region, workerPoolName string, 
 }
 
 func listAllRegions(project string) ([]model.WorkerPool, error) {
-	var (
-		mu          sync.Mutex
-		workerPools []model.WorkerPool
-		wg          sync.WaitGroup
-	)
+	regions := api_region.List()
+	results := make([][]model.WorkerPool, len(regions))
+	var wg sync.WaitGroup
 
-	for _, region := range api_region.List() {
+	for i, region := range regions {
 		wg.Add(1)
-		go func(r string) {
+		go func(idx int, r string) {
 			defer wg.Done()
 			// Call List recursively for each region
 			// We ignore errors here to allow partial success (e.g. if one region is down or disabled)
 			if wp, err := List(project, r); err == nil {
-				mu.Lock()
-				workerPools = append(workerPools, wp...)
-				mu.Unlock()
+				results[idx] = wp
 			}
-		}(region)
+		}(i, region)
 	}
 
 	wg.Wait()
+
+	// Pre-allocate the final flat slice based on the exact total size of all results
+	var total int
+	for _, r := range results {
+		total += len(r)
+	}
+
+	workerPools := make([]model.WorkerPool, 0, total)
+	for _, r := range results {
+		workerPools = append(workerPools, r...)
+	}
+
 	return workerPools, nil
 }
-

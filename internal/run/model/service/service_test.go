@@ -27,8 +27,8 @@ import (
 func TestService(t *testing.T) {
 	now := time.Now()
 	s := Service{
-		Name: "service",
-		URI:  "https://service.run.app",
+		Name:       "service",
+		URI:        "https://service.run.app",
 		CreateTime: now,
 		UpdateTime: now,
 		Region:     "us-central1",

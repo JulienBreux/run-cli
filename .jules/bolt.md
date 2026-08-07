@@ -1,5 +1,9 @@
 # Bolt's Journal
 
+## 2026-03-09 - Lock-free Concurrent Listing Map-Reduce Pattern
+**Learning:** Using `sync.Mutex` and a shared slice to aggregate results across concurrent goroutines (such as 24 regional Cloud Run listings) creates lock contention and triggers repetitive slice heap reallocations as the slice dynamically grows. Replacing this with a pre-allocated slice of slices (`[][]T`) is fully thread-safe and lock-free because each goroutine writes to a distinct index. After joining, summing individual sizes to pre-allocate the final merged slice with exact capacity results in exactly one heap allocation and zero contention.
+**Action:** Use lock-free, pre-allocated map-reduce patterns with slices of slices instead of shared slices with mutex locks when aggregating concurrent job or service list results.
+
 ## 2026-03-08 - GCP Logging Client Caching & Connection Longevity
 **Learning:** Establishing the GCP Stackdriver Logging client requires repeated Google credential discovery and connection establishment, causing high latency (~300ms) inside a reactive TUI interface. Caching `logadmin.Client` instances via a project-aware map with thread-safe `sync.Mutex` ensures subsequent streaming and log extraction operations are instantaneous. Crucially, calling `Close()` on individual stream terminations must be a no-op to prevent premature teardown of connection pools shared across other active streaming views.
 **Action:** Keep GCP Logging clients cached globally by project and handle connection termination via a no-op `Close` method, while adding test-isolation resets in unit tests.

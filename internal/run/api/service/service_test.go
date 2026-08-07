@@ -642,4 +642,27 @@ func TestUpdateAuthentication_Error(t *testing.T) {
 			assert.Error(t, err)
 			assert.Contains(t, err.Error(), "failed to update service")
 		}
+
+func BenchmarkListAllRegions(b *testing.B) {
+	originalClient := apiClient
+	defer func() { apiClient = originalClient }()
+
+	mock := &MockClient{}
+	apiClient = mock
+
+	mock.ListServicesFunc = func(ctx context.Context, project, region string) ([]*runpb.Service, error) {
+		return []*runpb.Service{
+			{Name: "projects/p/locations/" + region + "/services/s1"},
+			{Name: "projects/p/locations/" + region + "/services/s2"},
+		}, nil
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, err := List("p", api_region.ALL)
+		if err != nil {
+			b.Fatalf("expected no error, got %v", err)
+		}
+	}
+}
 		

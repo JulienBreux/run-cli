@@ -149,7 +149,7 @@ func TestList_AllRegions(t *testing.T) {
 
 	dms, err := List("p", "all")
 	assert.NoError(t, err)
-	
+
 	// Since api_region.List() returns many regions, we just want to ensure we called List for them and aggregated results.
 	// We mocked return for "us-central1".
 	found := false
@@ -212,7 +212,7 @@ func TestGCPClient_ListDomainMappings(t *testing.T) {
 				ListFunc: func(parent string, pageToken string) (*run.ListDomainMappingsResponse, error) {
 					if pageToken == "" {
 						return &run.ListDomainMappingsResponse{
-							Items: []*run.DomainMapping{{Metadata: &run.ObjectMeta{Name: "dm1"}}},
+							Items:    []*run.DomainMapping{{Metadata: &run.ObjectMeta{Name: "dm1"}}},
 							Metadata: &run.ListMeta{Continue: "next-page"},
 						}, nil
 					}
@@ -245,7 +245,7 @@ func TestGCPClient_ListDomainMappings(t *testing.T) {
 	})
 
 	t.Run("ClientCreationError", func(t *testing.T) {
-        // Reset auth mock for this test
+		// Reset auth mock for this test
 		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return &google.Credentials{}, nil
 		}
@@ -259,7 +259,7 @@ func TestGCPClient_ListDomainMappings(t *testing.T) {
 	})
 
 	t.Run("ListError", func(t *testing.T) {
-        // Reset auth mock for this test
+		// Reset auth mock for this test
 		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return &google.Credentials{}, nil
 		}

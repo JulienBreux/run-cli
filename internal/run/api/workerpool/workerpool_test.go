@@ -84,11 +84,11 @@ func TestMapWorkerPool(t *testing.T) {
 	assert.Equal(t, now.Unix(), result.UpdateTime.Unix())
 	assert.Equal(t, "my-project", result.Project)
 	assert.Equal(t, "us-central1", result.Region)
-	
+
 	// Scaling
 	assert.NotNil(t, result.Scaling)
 	assert.Equal(t, int32(2), result.Scaling.ManualInstanceCount)
-	
+
 	// Labels
 	assert.Equal(t, "prod", result.Labels["env"])
 }
@@ -362,13 +362,13 @@ func TestGCPClient_GetWorkerPool(t *testing.T) {
 				CloseFunc: func() error { return nil },
 			}, nil
 		}
-		
+
 		client := &GCPClient{}
 		pool, err := client.GetWorkerPool(context.Background(), "pool1")
 		assert.NoError(t, err)
 		assert.Equal(t, "pool1", pool.Name)
 	})
-	
+
 	t.Run("Get Error", func(t *testing.T) {
 		createWorkerPoolsClient = func(ctx context.Context, opts ...option.ClientOption) (WorkerPoolsClientWrapper, error) {
 			return &MockWorkerPoolsClientWrapper{
@@ -378,7 +378,7 @@ func TestGCPClient_GetWorkerPool(t *testing.T) {
 				CloseFunc: func() error { return nil },
 			}, nil
 		}
-		
+
 		client := &GCPClient{}
 		_, err := client.GetWorkerPool(context.Background(), "pool1")
 		assert.Error(t, err)
@@ -388,7 +388,7 @@ func TestGCPClient_GetWorkerPool(t *testing.T) {
 		createWorkerPoolsClient = func(ctx context.Context, opts ...option.ClientOption) (WorkerPoolsClientWrapper, error) {
 			return nil, errors.New("client creation error")
 		}
-		
+
 		client := &GCPClient{}
 		_, err := client.GetWorkerPool(context.Background(), "pool1")
 		assert.Error(t, err)
@@ -421,7 +421,7 @@ func TestGCPClient_UpdateWorkerPool(t *testing.T) {
 				CloseFunc: func() error { return nil },
 			}, nil
 		}
-		
+
 		client := &GCPClient{}
 		pool, err := client.UpdateWorkerPool(context.Background(), &runpb.WorkerPool{Name: "pool1"})
 		assert.NoError(t, err)
@@ -437,7 +437,7 @@ func TestGCPClient_UpdateWorkerPool(t *testing.T) {
 				CloseFunc: func() error { return nil },
 			}, nil
 		}
-		
+
 		client := &GCPClient{}
 		_, err := client.UpdateWorkerPool(context.Background(), &runpb.WorkerPool{Name: "pool1"})
 		assert.Error(t, err)
@@ -447,7 +447,7 @@ func TestGCPClient_UpdateWorkerPool(t *testing.T) {
 		createWorkerPoolsClient = func(ctx context.Context, opts ...option.ClientOption) (WorkerPoolsClientWrapper, error) {
 			return nil, errors.New("client creation error")
 		}
-		
+
 		client := &GCPClient{}
 		_, err := client.UpdateWorkerPool(context.Background(), &runpb.WorkerPool{Name: "pool1"})
 		assert.Error(t, err)
@@ -467,7 +467,7 @@ func TestGCPClient_UpdateWorkerPool(t *testing.T) {
 				CloseFunc: func() error { return nil },
 			}, nil
 		}
-		
+
 		client := &GCPClient{}
 		_, err := client.UpdateWorkerPool(context.Background(), &runpb.WorkerPool{Name: "pool1"})
 		assert.Error(t, err)
@@ -477,7 +477,7 @@ func TestGCPClient_UpdateWorkerPool(t *testing.T) {
 
 func TestWrappers_Delegation(t *testing.T) {
 	// Expect panics because nil clients are used
-	
+
 	t.Run("GCPWorkerPoolsClientWrapper", func(t *testing.T) {
 		w := &GCPWorkerPoolsClientWrapper{client: nil}
 		assert.Panics(t, func() { _ = w.ListWorkerPools(context.Background(), nil) })
@@ -485,12 +485,12 @@ func TestWrappers_Delegation(t *testing.T) {
 		assert.Panics(t, func() { _, _ = w.UpdateWorkerPool(context.Background(), nil) })
 		assert.Panics(t, func() { _ = w.Close() })
 	})
-	
+
 	t.Run("GCPWorkerPoolIteratorWrapper", func(t *testing.T) {
 		it := &GCPWorkerPoolIteratorWrapper{it: nil}
 		assert.Panics(t, func() { _, _ = it.Next() })
 	})
-	
+
 	t.Run("GCPUpdateWorkerPoolOperationWrapper", func(t *testing.T) {
 		op := &GCPUpdateWorkerPoolOperationWrapper{op: nil}
 		assert.Panics(t, func() { _, _ = op.Wait(context.Background()) })

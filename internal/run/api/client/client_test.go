@@ -57,7 +57,7 @@ func TestWrapError(t *testing.T) {
 			assert.Error(t, got)
 			assert.Contains(t, got.Error(), tt.wantSubString)
 			if tt.wantWrapped {
-				assert.ErrorIs(t, got, tt.inputErr) // Checks if it wraps the original error
+				assert.ErrorIs(t, got, tt.inputErr)  // Checks if it wraps the original error
 				assert.NotEqual(t, tt.inputErr, got) // Should not be exactly the same object (wrapped)
 			} else {
 				assert.Equal(t, tt.inputErr, got) // Should be exactly the same

@@ -74,12 +74,12 @@ func TestMapJob(t *testing.T) {
 	assert.Equal(t, resp.Name, result.Name)
 	assert.Equal(t, "user@example.com", result.Creator)
 	assert.Equal(t, "us-central1", result.Region)
-	
+
 	// Execution
 	assert.NotNil(t, result.LatestCreatedExecution)
 	assert.Equal(t, resp.LatestCreatedExecution.Name, result.LatestCreatedExecution.Name)
 	assert.Equal(t, now.Unix(), result.LatestCreatedExecution.CreateTime.Unix())
-	
+
 	// Condition
 	assert.NotNil(t, result.TerminalCondition)
 	assert.Equal(t, "CONDITION_SUCCEEDED", result.TerminalCondition.State)
@@ -186,7 +186,7 @@ func TestList_AllRegions(t *testing.T) {
 
 	jobs, err := List("p", api_region.ALL)
 	assert.NoError(t, err)
-	
+
 	found := false
 	for _, j := range jobs {
 		if j.Name == "job-us" && j.Region == "us-central1" {
@@ -295,7 +295,7 @@ func TestGCPClient_ListJobs(t *testing.T) {
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "failed to find default credentials")
 	})
-	
+
 	t.Run("Client Creation Error", func(t *testing.T) {
 		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return &google.Credentials{}, nil
@@ -328,7 +328,7 @@ func TestGCPClient_ListJobs(t *testing.T) {
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "iter error")
 	})
-	
+
 	t.Run("Iterator Auth Error", func(t *testing.T) {
 		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return &google.Credentials{}, nil
@@ -357,7 +357,7 @@ func TestGCPClient_RunJob(t *testing.T) {
 		client.FindDefaultCredentials = origFindCreds
 		createJobsClient = origCreateClient
 	}()
-	
+
 	client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 		return &google.Credentials{}, nil
 	}
@@ -375,13 +375,13 @@ func TestGCPClient_RunJob(t *testing.T) {
 				CloseFunc: func() error { return nil },
 			}, nil
 		}
-		
+
 		client := &GCPClient{}
 		exec, err := client.RunJob(context.Background(), "job1")
 		assert.NoError(t, err)
 		assert.Equal(t, "exec-1", exec.Name)
 	})
-	
+
 	t.Run("Run Error", func(t *testing.T) {
 		createJobsClient = func(ctx context.Context, opts ...option.ClientOption) (JobsClientWrapper, error) {
 			return &MockJobsClientWrapper{
@@ -391,18 +391,18 @@ func TestGCPClient_RunJob(t *testing.T) {
 				CloseFunc: func() error { return nil },
 			}, nil
 		}
-		
+
 		client := &GCPClient{}
 		_, err := client.RunJob(context.Background(), "job1")
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "run failed")
 	})
-	
+
 	t.Run("Client Creation Error", func(t *testing.T) {
 		createJobsClient = func(ctx context.Context, opts ...option.ClientOption) (JobsClientWrapper, error) {
 			return nil, errors.New("client creation error")
 		}
-		
+
 		client := &GCPClient{}
 		_, err := client.RunJob(context.Background(), "job1")
 		assert.Error(t, err)
@@ -412,19 +412,19 @@ func TestGCPClient_RunJob(t *testing.T) {
 
 func TestWrappers_Delegation(t *testing.T) {
 	// Expect panics because nil clients are used
-	
+
 	t.Run("GCPJobsClientWrapper", func(t *testing.T) {
 		w := &GCPJobsClientWrapper{client: nil}
 		assert.Panics(t, func() { _ = w.ListJobs(context.Background(), nil) })
 		assert.Panics(t, func() { _, _ = w.RunJob(context.Background(), nil) })
 		assert.Panics(t, func() { _ = w.Close() })
 	})
-	
+
 	t.Run("GCPJobIteratorWrapper", func(t *testing.T) {
 		it := &GCPJobIteratorWrapper{it: nil}
 		assert.Panics(t, func() { _, _ = it.Next() })
 	})
-	
+
 	t.Run("GCPRunJobOperationWrapper", func(t *testing.T) {
 		op := &GCPRunJobOperationWrapper{op: nil}
 		assert.Panics(t, func() { _, _ = op.Wait(context.Background()) })

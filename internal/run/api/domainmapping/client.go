@@ -116,7 +116,7 @@ func (c *GCPClient) ListDomainMappings(ctx context.Context, project, region stri
 		} else {
 			pageToken = ""
 		}
-		
+
 		if pageToken == "" {
 			break
 		}

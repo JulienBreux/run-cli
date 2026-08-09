@@ -115,7 +115,7 @@ func TestDashboardReload(t *testing.T) {
 
 func TestDashboardShortcuts(t *testing.T) {
 	_ = footer.New()
-	
+
 	assert.NotPanics(t, func() {
 		DashboardShortcuts()
 	})

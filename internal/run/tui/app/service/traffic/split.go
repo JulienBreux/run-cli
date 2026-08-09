@@ -92,7 +92,7 @@ func Modal(app *tview.Application, service *model_service.Service, allRevisions 
 			tcell.StyleDefault.Background(tcell.ColorDarkGray),
 			tcell.StyleDefault.Background(tcell.ColorLightCyan).Foreground(tcell.ColorBlack),
 		)
-		
+
 		// Set initial selection
 		foundIndex := -1
 		for i, opt := range revOptions {
@@ -136,7 +136,7 @@ func Modal(app *tview.Application, service *model_service.Service, allRevisions 
 			}
 		}
 	}
-	
+
 	// Ensure at least one row if empty (though usually traffic is 100%)
 	if len(rows) == 0 {
 		// Default to latest ready revision if possible, else first available
@@ -147,21 +147,21 @@ func Modal(app *tview.Application, service *model_service.Service, allRevisions 
 		addRow(defaultRev, "100")
 	}
 
-	// Add Button (Dynamic Adding not easily supported by tview.Form structure in one pass, 
-	// typically requires rebuilding the form or using a custom layout. 
+	// Add Button (Dynamic Adding not easily supported by tview.Form structure in one pass,
+	// typically requires rebuilding the form or using a custom layout.
 	// For simplicity in this iteration, we will just allow editing existing splits.
-	// OR we can add a "Add Split" button that rebuilds the form? 
+	// OR we can add a "Add Split" button that rebuilds the form?
 	// tview.Form doesn't expose InsertItem easily.
-	
-	// Let's rely on a simpler approach: 
+
+	// Let's rely on a simpler approach:
 	// We list *all* revisions? No, that's too many.
 	// We need to allow adding.
-	
+
 	// Let's try to add a "Add Revision" button *at the end*?
 	// The standard Form AddButton adds to the bottom bar.
-	
+
 	form.AddButton("Add Revision", func() {
-		// We can't dynamically insert form items easily into the *middle* of the rendered form list 
+		// We can't dynamically insert form items easily into the *middle* of the rendered form list
 		// without rebuilding or hacking internals.
 		// However, we can just append to the form items list.
 		if len(allRevisions) > 0 {
@@ -174,15 +174,15 @@ func Modal(app *tview.Application, service *model_service.Service, allRevisions 
 	form.AddButton("Save", func() {
 		var params []string
 		var targets []model_traffic.TrafficTarget
-		
+
 		// Collect data
 		// Iterate through our rows struct which holds references
 		for _, r := range rows {
 			_, rev := r.dropdown.GetCurrentOption()
 			percentText := r.input.GetText()
-			
+
 			params = append(params, percentText)
-			
+
 			percent, _ := strconv.ParseInt(percentText, 10, 32)
 			targets = append(targets, model_traffic.TrafficTarget{
 				Revision: rev,
@@ -231,7 +231,7 @@ func Modal(app *tview.Application, service *model_service.Service, allRevisions 
 	// Global Grid wrapper for centering
 	grid := tview.NewGrid().
 		SetColumns(0, 60, 0).
-		SetRows(0, 20, 0). // Fixed height for now, scrolling handled by Form if needed? Form scrolls? 
+		SetRows(0, 20, 0). // Fixed height for now, scrolling handled by Form if needed? Form scrolls?
 		AddItem(container, 1, 1, 1, 1, 0, 0, true)
 
 	// Escape to Close

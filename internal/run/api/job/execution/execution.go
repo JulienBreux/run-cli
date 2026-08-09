@@ -55,7 +55,7 @@ func mapExecution(resp *runpb.Execution, region string) model.Execution {
 	// We can try to find the "Completed" or "Succeeded" condition or check terminal condition logic if exposed directly.
 	// runpb.Execution doesn't have a direct TerminalCondition field like Job, but it has Conditions.
 	// We usually look for "Completed" type.
-	
+
 	// Helper to find latest relevant condition or just map all of them.
 	var conditions []*condition.Condition
 	for _, c := range resp.Conditions {
@@ -66,7 +66,7 @@ func mapExecution(resp *runpb.Execution, region string) model.Execution {
 			LastTransitionTime: c.LastTransitionTime.AsTime(),
 		}
 		conditions = append(conditions, cond)
-		
+
 		// Heuristic: If condition is "Completed", treat as terminal status for summary
 		if c.Type == "Completed" {
 			terminalCondition = cond
@@ -151,10 +151,10 @@ func (c *GCPClient) ListExecutions(ctx context.Context, project, region, jobName
 	// BUT, executions are children of Jobs? No, they are children of Location.
 	// The resource name is projects/*/locations/*/jobs/*/executions/ -> v1
 	// v2: projects/*/locations/*/jobs/*/executions
-	
+
 	// Wait, `runpb.ListExecutionsRequest` expects Parent = `projects/{project}/locations/{location}/jobs/{job}` OR `projects/{project}/locations/{location}`.
 	// If we can pass the job as parent, we get filtered list!
-	
+
 	parent := jobName
 	if !strings.HasPrefix(jobName, "projects/") {
 		parent = fmt.Sprintf("projects/%s/locations/%s/jobs/%s", project, region, jobName)

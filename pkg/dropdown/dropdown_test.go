@@ -35,7 +35,7 @@ func TestDraw(t *testing.T) {
 	screen := tcell.NewSimulationScreen("")
 	err := screen.Init()
 	assert.NoError(t, err)
-	
+
 	d.Draw(screen)
 	// No panic implies success for now
 }

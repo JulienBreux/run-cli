@@ -284,7 +284,7 @@ func TestGCPClient(t *testing.T) {
 		entry, err := it.Next()
 		assert.NoError(t, err)
 		assert.Equal(t, "log1", entry.Payload)
-		
+
 		assert.NoError(t, client.Close())
 	})
 
@@ -293,7 +293,7 @@ func TestGCPClient(t *testing.T) {
 		client.FindDefaultCredentials = func(ctx context.Context, scopes ...string) (*google.Credentials, error) {
 			return nil, errors.New("auth failed")
 		}
-		
+
 		_, err := NewGCPClient(context.Background(), "project")
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "failed to find default credentials")
@@ -307,7 +307,7 @@ func TestGCPClient(t *testing.T) {
 		createLogAdminClient = func(ctx context.Context, projectID string, opts ...option.ClientOption) (LogAdminClientWrapper, error) {
 			return nil, errors.New("creation failed")
 		}
-		
+
 		_, err := NewGCPClient(context.Background(), "project")
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "creation failed")
@@ -355,13 +355,13 @@ func TestGCPClient(t *testing.T) {
 
 func TestWrappers_Delegation(t *testing.T) {
 	// Expect panics because nil clients are used
-	
+
 	t.Run("RealLogAdminClient", func(t *testing.T) {
 		w := &RealLogAdminClient{client: nil}
 		assert.Panics(t, func() { _ = w.Entries(context.Background()) })
 		assert.Panics(t, func() { _ = w.Close() })
 	})
-	
+
 	t.Run("GCPEntryIterator", func(t *testing.T) {
 		it := &GCPEntryIterator{it: nil}
 		assert.Panics(t, func() { _, _ = it.Next() })

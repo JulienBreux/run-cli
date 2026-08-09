@@ -58,12 +58,12 @@ func TestOpenRegionModal(t *testing.T) {
 func TestModalCallbacks(t *testing.T) {
 	setupTestApp()
 	buildLayout()
-	
+
 	// Create temp home for config save
 	tmpDir, _ := os.MkdirTemp("", "run-cli-app-test")
 	defer func() { _ = os.RemoveAll(tmpDir) }()
 	_ = os.Setenv("HOME", tmpDir)
-	
+
 	// 1. Project Callback
 	project.CachedProjects = []model_project.Project{{Name: "new-p"}}
 	openProjectModal()
@@ -71,10 +71,10 @@ func TestModalCallbacks(t *testing.T) {
 	sel := projectModal.(*project.ProjectSelector)
 	sel.List.SetCurrentItem(0)
 	sel.Submit() // Triggers onSelect
-	
+
 	assert.Equal(t, "new-p", currentInfo.Project)
 	assert.Equal(t, "new-p", currentConfig.Project)
-	
+
 	// 2. Region Callback
 	openRegionModal()
 	selReg := regionModal.(*region.RegionSelector)
@@ -82,7 +82,7 @@ func TestModalCallbacks(t *testing.T) {
 	selReg.Filter("us-east1")
 	selReg.List.SetCurrentItem(0)
 	selReg.Submit()
-	
+
 	assert.Equal(t, "us-east1", currentInfo.Region)
 	assert.Equal(t, "us-east1", currentConfig.Region)
 }

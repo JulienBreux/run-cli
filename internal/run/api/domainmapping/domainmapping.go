@@ -21,10 +21,10 @@ import (
 	"sync"
 	"time"
 
-	"google.golang.org/api/run/v1"
 	api_region "github.com/JulienBreux/run-cli/internal/run/api/region"
-	model "github.com/JulienBreux/run-cli/internal/run/model/domainmapping"
 	"github.com/JulienBreux/run-cli/internal/run/model/common/condition"
+	model "github.com/JulienBreux/run-cli/internal/run/model/domainmapping"
+	"google.golang.org/api/run/v1"
 )
 
 var apiClient Client = &GCPClient{}
@@ -50,25 +50,35 @@ func List(project, region string) ([]model.DomainMapping, error) {
 }
 
 func listAllRegions(project string) ([]model.DomainMapping, error) {
-	var (
-		mu             sync.Mutex
-		domainMappings []model.DomainMapping
-		wg             sync.WaitGroup
-	)
+	// Optimization: lock-free, pre-allocated map-reduce pattern with a slice of slices [][]model.DomainMapping.
+	// This eliminates mutex contention across concurrent region requests, avoids repeated slice resizing/heap allocations,
+	// and optimizes concurrency to reduce latency and memory usage.
+	regions := api_region.List()
+	results := make([][]model.DomainMapping, len(regions))
+	var wg sync.WaitGroup
 
-	for _, region := range api_region.List() {
+	for i, region := range regions {
 		wg.Add(1)
-		go func(r string) {
+		go func(idx int, r string) {
 			defer wg.Done()
 			if dms, err := List(project, r); err == nil {
-				mu.Lock()
-				domainMappings = append(domainMappings, dms...)
-				mu.Unlock()
+				results[idx] = dms
 			}
-		}(region)
+		}(i, region)
 	}
 
 	wg.Wait()
+
+	total := 0
+	for _, dms := range results {
+		total += len(dms)
+	}
+
+	domainMappings := make([]model.DomainMapping, 0, total)
+	for _, dms := range results {
+		domainMappings = append(domainMappings, dms...)
+	}
+
 	return domainMappings, nil
 }
 
@@ -95,12 +105,12 @@ func mapDomainMapping(resp *run.DomainMapping, project, region string) model.Dom
 			})
 		}
 	}
-	
+
 	routeName := ""
 	if resp.Spec != nil {
 		routeName = resp.Spec.RouteName
 	}
-	
+
 	createTime := time.Time{}
 	name := ""
 	creator := ""

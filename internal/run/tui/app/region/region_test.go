@@ -34,7 +34,7 @@ func TestRegionModal_Init(t *testing.T) {
 	assert.NotNil(t, selector.List)
 	assert.NotNil(t, selector.Filter)
 	assert.NotNil(t, selector.Submit)
-	
+
 	// Should satisfy Primitive interface
 	var _ tview.Primitive = selector
 }
@@ -56,7 +56,7 @@ func TestRegionModal_Filtering(t *testing.T) {
 	// Filter "non-existent-region"
 	selector.Filter("non-existent-region")
 	assert.Equal(t, 0, selector.List.GetItemCount())
-	
+
 	// Reset
 	selector.Filter("")
 	assert.Equal(t, initialCount, selector.List.GetItemCount())
@@ -66,7 +66,7 @@ func TestRegionModal_Selection(t *testing.T) {
 	app := tview.NewApplication()
 	var selectedRegion string
 	closed := false
-	
+
 	onSelect := func(r string) {
 		selectedRegion = r
 	}
@@ -80,18 +80,18 @@ func TestRegionModal_Selection(t *testing.T) {
 	selector.Filter("europe-west1")
 	selector.List.SetCurrentItem(0)
 	selector.Submit()
-	
+
 	assert.True(t, closed)
 	assert.Equal(t, "europe-west1", selectedRegion)
-	
+
 	// Reset
 	closed = false
 	selectedRegion = ""
-	
+
 	// Test selecting "All Regions"
 	// We know "- (All Regions)" is added first in the list
 	selector.Filter("") // Reset filter
-	
+
 	// Find the index of "- (All Regions)"
 	idx := -1
 	for i := 0; i < selector.List.GetItemCount(); i++ {
@@ -102,10 +102,10 @@ func TestRegionModal_Selection(t *testing.T) {
 		}
 	}
 	assert.NotEqual(t, -1, idx, "Could not find 'All Regions' option")
-	
+
 	selector.List.SetCurrentItem(idx)
 	selector.Submit()
-	
+
 	assert.True(t, closed)
 	assert.Equal(t, api_region.ALL, selectedRegion)
 }
@@ -114,23 +114,23 @@ func TestInputCapture(t *testing.T) {
 	app := tview.NewApplication()
 	closed := false
 	closeModal := func() { closed = true }
-	
+
 	selector := RegionModal(app, func(s string) {}, closeModal)
 	handler := selector.Content.GetInputCapture()
-	
+
 	// Test Escape
 	eventEsc := tcell.NewEventKey(tcell.KeyEscape, 0, tcell.ModNone)
 	ret := handler(eventEsc)
 	assert.Nil(t, ret)
 	assert.True(t, closed)
-	
+
 	// Test Tab Cycling
 	// Simulate Input has Focus
 	app.SetFocus(selector.Input)
 	eventTab := tcell.NewEventKey(tcell.KeyTab, 0, tcell.ModNone)
 	handler(eventTab) // Should move focus to List
 	assert.True(t, selector.List.HasFocus())
-	
+
 	// Simulate Down arrow from Input
 	app.SetFocus(selector.Input)
 	eventDown := tcell.NewEventKey(tcell.KeyDown, 0, tcell.ModNone)

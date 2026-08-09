@@ -1,5 +1,9 @@
 # Bolt's Journal
 
+## 2026-03-09 - Lock-Free Pre-Allocated Map-Reduce for Multi-Regional Queries
+**Learning:** Performing multi-regional queries (like `listAllRegions` across 24 GCP regions) concurrently using a shared slice protected by `sync.Mutex` causes lock contention, slice allocation churn, and heavy garbage collection overhead. Utilizing a lock-free, pre-allocated map-reduce pattern using a slice of slices (`[][]T`) eliminates mutex contention entirely, and pre-allocating the final result slice based on the exact sum of sizes of individual regional results reduces heap allocations considerably.
+**Action:** Always favor lock-free, index-mapped pre-allocation arrays (`[][]T`) over shared mutex-protected slices (`[]T`) when collecting results concurrently from a known, fixed number of concurrent tasks.
+
 ## 2026-03-08 - GCP Logging Client Caching & Connection Longevity
 **Learning:** Establishing the GCP Stackdriver Logging client requires repeated Google credential discovery and connection establishment, causing high latency (~300ms) inside a reactive TUI interface. Caching `logadmin.Client` instances via a project-aware map with thread-safe `sync.Mutex` ensures subsequent streaming and log extraction operations are instantaneous. Crucially, calling `Close()` on individual stream terminations must be a no-op to prevent premature teardown of connection pools shared across other active streaming views.
 **Action:** Keep GCP Logging clients cached globally by project and handle connection termination via a no-op `Close` method, while adding test-isolation resets in unit tests.

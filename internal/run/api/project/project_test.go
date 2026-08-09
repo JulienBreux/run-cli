@@ -241,62 +241,48 @@ func TestMapProject(t *testing.T) {
 
 	result := mapProject(resp)
 
-		assert.Equal(t, "my-project", result.Name)
+	assert.Equal(t, "my-project", result.Name)
 
-		assert.Equal(t, 123456, result.Number)
+	assert.Equal(t, 123456, result.Number)
 
-	}
+}
 
-	
+func TestWrappers_Delegation(t *testing.T) {
 
-	func TestWrappers_Delegation(t *testing.T) {
+	// This test exercises the wrapper methods to ensure coverage.
 
-		// This test exercises the wrapper methods to ensure coverage.
+	// Since we can't easily mock the underlying GCP client, we expect panics when calling methods on nil clients.
 
-		// Since we can't easily mock the underlying GCP client, we expect panics when calling methods on nil clients.
+	// This confirms the wrappers are attempting to delegate.
 
-		// This confirms the wrappers are attempting to delegate.
+	t.Run("GCPProjectsClientWrapper", func(t *testing.T) {
 
-	
+		w := &GCPProjectsClientWrapper{client: nil} // Nil client
 
-		t.Run("GCPProjectsClientWrapper", func(t *testing.T) {
+		assert.Panics(t, func() {
 
-			w := &GCPProjectsClientWrapper{client: nil} // Nil client
-
-	
-
-			assert.Panics(t, func() {
-
-				w.SearchProjects(context.Background(), nil)
-
-			})
-
-	
-
-			assert.Panics(t, func() {
-
-				_ = w.Close()
-
-			})
+			w.SearchProjects(context.Background(), nil)
 
 		})
 
-	
+		assert.Panics(t, func() {
 
-		t.Run("GCPProjectIteratorWrapper", func(t *testing.T) {
-
-			it := &GCPProjectIteratorWrapper{it: nil} // Nil iterator
-
-	
-
-			assert.Panics(t, func() {
-
-				_, _ = it.Next()
-
-			})
+			_ = w.Close()
 
 		})
 
-	}
+	})
 
-	
+	t.Run("GCPProjectIteratorWrapper", func(t *testing.T) {
+
+		it := &GCPProjectIteratorWrapper{it: nil} // Nil iterator
+
+		assert.Panics(t, func() {
+
+			_, _ = it.Next()
+
+		})
+
+	})
+
+}

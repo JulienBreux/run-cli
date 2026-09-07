@@ -1,0 +1,10 @@
+Task: Create Instance Data Models (TDD)
+Summary of changes:
+- Created Instance model struct matching Google Cloud Run v2 REST resource projects.locations.instances.
+- Created ContainerStatus struct.
+- Implemented helper methods: ID(), Status(), and FormattedURLs().
+- Added comprehensive unit tests with >94% coverage.
+Files modified/created:
+- internal/run/model/instance/instance.go
+- internal/run/model/instance/instance_test.go
+Core why: Provide domain representations and status calculations for Cloud Run Instances.

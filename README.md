@@ -106,7 +106,7 @@ This project uses a `Makefile` to streamline development.
 
 ### Prerequisites
 
-*   [Go](https://go.dev/doc/install)
+*   [Go](https://go.dev/doc/install) (version 1.27+)
 *   [Docker](https://docs.docker.com/get-docker/) (for building the Docker image)
 
 ### Build from source

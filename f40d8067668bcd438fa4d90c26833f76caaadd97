@@ -1,0 +1,4 @@
+Task: Upgrade Module Dependencies
+Summary: Upgraded direct and indirect module dependencies to latest versions and ran go mod tidy.
+Files modified: go.mod, go.sum
+Why: Keep dependencies up to date with Go 1.27.1 runtime and libraries.

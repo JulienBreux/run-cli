@@ -1,0 +1,4 @@
+Task: Update Tech Stack Specification
+Summary: Updated Go language requirement to Go 1.27+ in conductor/tech-stack.md.
+Files modified: conductor/tech-stack.md
+Why: Reflect the new Go version requirement in project specifications.

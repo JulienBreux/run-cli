@@ -1,0 +1,4 @@
+Task: Update Project Documentation
+Summary: Updated Go version requirements to 1.27+ in README.md and CI workflows (test.yml, release.yml).
+Files modified: README.md, .github/workflows/test.yml, .github/workflows/release.yml
+Why: Ensure documentation and GitHub Actions CI pipelines use Go 1.27.

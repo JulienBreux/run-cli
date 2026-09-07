@@ -1,0 +1,8 @@
+{
+  "track_id": "instances_resource_20260907",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-09-07T14:26:30Z",
+  "updated_at": "2026-09-07T14:26:30Z",
+  "description": "Add the new resource \"instances\" in the CLI."
+}

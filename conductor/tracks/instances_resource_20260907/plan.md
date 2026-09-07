@@ -10,9 +10,9 @@
 - [x] Task: Conductor - User Manual Verification 'Instances Data Models & API Client' (Protocol in workflow.md)
 
 ## Phase 2: TUI Components for Instances (List, Dashboard, Lifecycle & Modals)
-- [ ] Task: Implement Instances List View (TDD)
-    - [ ] Write unit tests for Instances table rendering and key bindings in `internal/run/tui/app/instance/instance_test.go`
-    - [ ] Implement `internal/run/tui/app/instance/instance.go` table view with status indicators, columns, and navigation shortcuts
+- [x] Task: Implement Instances List View (TDD) [d579b36]
+    - [x] Write unit tests for Instances table rendering and key bindings in `internal/run/tui/app/instance/instance_test.go`
+    - [x] Implement `internal/run/tui/app/instance/instance.go` table view with status indicators, columns, and navigation shortcuts
 - [ ] Task: Implement Instance Dashboard & Describe View (TDD)
     - [ ] Write unit tests for Instance dashboard tabs and describe rendering in `internal/run/tui/app/instance/dashboard_test.go`
     - [ ] Implement `internal/run/tui/app/instance/dashboard.go` (Overview, Containers, Conditions, YAML/JSON view)

@@ -9,6 +9,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Add the new resource "instances" in the CLI.**
+- [~] **Track: Add the new resource "instances" in the CLI.**
 *Link: [./tracks/instances_resource_20260907/](./tracks/instances_resource_20260907/)*
 

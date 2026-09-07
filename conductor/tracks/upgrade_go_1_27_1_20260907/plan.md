@@ -13,8 +13,8 @@ Upgrade the project to Go 1.27.1, update project dependencies to their latest co
 ## Phase 2: Documentation & Tech Stack Alignment
 - [x] Task: Update Tech Stack Specification 83875e5
     - [x] Update Go version reference in `conductor/tech-stack.md`
-- [ ] Task: Update Project Documentation
-    - [ ] Update `README.md` and any docs with the new Go version requirements
+- [x] Task: Update Project Documentation acecba8
+    - [x] Update `README.md` and any docs with the new Go version requirements
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Documentation & Tech Stack Alignment' (Protocol in workflow.md)
 
 ## Phase 3: Verification & Quality Gates

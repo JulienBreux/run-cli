@@ -3,8 +3,8 @@
 Upgrade the project to Go 1.27.1, update project dependencies to their latest compatible versions, align documentation and tech stack references, and ensure all build, test, and lint gates pass.
 
 ## Phase 1: Environment & Dependency Upgrade
-- [ ] Task: Update Go Version in Module
-    - [ ] Update `go.mod` directive to Go 1.27.1
+- [x] Task: Update Go Version in Module 41a20e3
+    - [x] Update `go.mod` directive to Go 1.27.1
 - [ ] Task: Upgrade Module Dependencies
     - [ ] Upgrade dependencies to their latest compatible versions
     - [ ] Run `go mod tidy` to clean up `go.mod` and `go.sum`

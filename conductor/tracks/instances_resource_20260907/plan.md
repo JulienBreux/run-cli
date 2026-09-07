@@ -7,7 +7,7 @@
 - [x] Task: Create Instances API Client (TDD) [e07e046]
     - [x] Write unit tests and mocks for `InstancesClientWrapper` in `internal/run/api/instance/client_test.go`
     - [x] Implement `InstancesClientWrapper` and API methods (`ListInstances`, `GetInstance`, `StartInstance`, `StopInstance`, `DeleteInstance`) in `internal/run/api/instance/client.go`
-- [ ] Task: Conductor - User Manual Verification 'Instances Data Models & API Client' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Instances Data Models & API Client' (Protocol in workflow.md)
 
 ## Phase 2: TUI Components for Instances (List, Dashboard, Lifecycle & Modals)
 - [ ] Task: Implement Instances List View (TDD)

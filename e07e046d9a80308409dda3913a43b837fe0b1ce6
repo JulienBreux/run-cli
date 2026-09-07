@@ -1,0 +1,12 @@
+Task: Create Instances API Client (TDD)
+Summary of changes:
+- Created InstancesClientWrapper, InstanceIteratorWrapper, InstanceOperationWrapper interfaces for mocking.
+- Implemented GCPClient wrapping cloud.google.com/go/run/apiv2 InstancesClient.
+- Implemented ListInstances, GetInstance, StartInstance, StopInstance, DeleteInstance API calls.
+- Implemented package-level List, Get, Start, Stop, Delete, mapInstance, and multi-region listAllRegions functions.
+- Added comprehensive unit tests with >84% coverage.
+Files modified/created:
+- internal/run/api/instance/client.go
+- internal/run/api/instance/instance.go
+- internal/run/api/instance/client_test.go
+Core why: Enable listing, retrieving, starting, stopping, and deleting Cloud Run instances via the GCP API.

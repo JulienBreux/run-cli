@@ -1,0 +1,8 @@
+{
+  "track_id": "upgrade_go_1_27_1_20260907",
+  "type": "chore",
+  "status": "new",
+  "created_at": "2026-09-07T12:06:30Z",
+  "updated_at": "2026-09-07T12:06:30Z",
+  "description": "Upgrade this project to the go version 1.27.1"
+}

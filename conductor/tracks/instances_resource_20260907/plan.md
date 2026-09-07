@@ -13,9 +13,9 @@
 - [x] Task: Implement Instances List View (TDD) [d579b36]
     - [x] Write unit tests for Instances table rendering and key bindings in `internal/run/tui/app/instance/instance_test.go`
     - [x] Implement `internal/run/tui/app/instance/instance.go` table view with status indicators, columns, and navigation shortcuts
-- [ ] Task: Implement Instance Dashboard & Describe View (TDD)
-    - [ ] Write unit tests for Instance dashboard tabs and describe rendering in `internal/run/tui/app/instance/dashboard_test.go`
-    - [ ] Implement `internal/run/tui/app/instance/dashboard.go` (Overview, Containers, Conditions, YAML/JSON view)
+- [x] Task: Implement Instance Dashboard & Describe View (TDD) [0d11909]
+    - [x] Write unit tests for Instance dashboard tabs and describe rendering in `internal/run/tui/app/instance/dashboard_test.go`
+    - [x] Implement `internal/run/tui/app/instance/dashboard.go` (Overview, Containers, Conditions, YAML/JSON view)
 - [ ] Task: Implement Instance Lifecycle Actions & Modals (TDD)
     - [ ] Write unit tests for Start, Stop, and Delete action handlers/modals in `internal/run/tui/app/instance/action_test.go`
     - [ ] Implement async Start, Stop, and Delete actions with spinners and confirmation modal in `internal/run/tui/app/instance/action.go`

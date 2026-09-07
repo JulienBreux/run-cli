@@ -11,8 +11,8 @@ Upgrade the project to Go 1.27.1, update project dependencies to their latest co
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Environment & Dependency Upgrade' (Protocol in workflow.md) b42f5a4
 
 ## Phase 2: Documentation & Tech Stack Alignment
-- [ ] Task: Update Tech Stack Specification
-    - [ ] Update Go version reference in `conductor/tech-stack.md`
+- [x] Task: Update Tech Stack Specification 83875e5
+    - [x] Update Go version reference in `conductor/tech-stack.md`
 - [ ] Task: Update Project Documentation
     - [ ] Update `README.md` and any docs with the new Go version requirements
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Documentation & Tech Stack Alignment' (Protocol in workflow.md)

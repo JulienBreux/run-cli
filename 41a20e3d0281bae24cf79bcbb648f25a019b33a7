@@ -1,0 +1,4 @@
+Task: Update Go Version in Module
+Summary: Updated go.mod go directive to 1.27.1.
+Files modified: go.mod
+Why: Standardize project module definition on Go 1.27.1.

@@ -4,9 +4,9 @@
 - [x] Task: Create Instance Data Models (TDD) [a7aebfe]
     - [x] Write unit tests for instance model and converters in `internal/run/model/instance/instance_test.go`
     - [x] Implement instance data structures, status helpers, and protobuf converters in `internal/run/model/instance/instance.go`
-- [ ] Task: Create Instances API Client (TDD)
-    - [ ] Write unit tests and mocks for `InstancesClientWrapper` in `internal/run/api/instance/client_test.go`
-    - [ ] Implement `InstancesClientWrapper` and API methods (`ListInstances`, `GetInstance`, `StartInstance`, `StopInstance`, `DeleteInstance`) in `internal/run/api/instance/client.go`
+- [x] Task: Create Instances API Client (TDD) [e07e046]
+    - [x] Write unit tests and mocks for `InstancesClientWrapper` in `internal/run/api/instance/client_test.go`
+    - [x] Implement `InstancesClientWrapper` and API methods (`ListInstances`, `GetInstance`, `StartInstance`, `StopInstance`, `DeleteInstance`) in `internal/run/api/instance/client.go`
 - [ ] Task: Conductor - User Manual Verification 'Instances Data Models & API Client' (Protocol in workflow.md)
 
 ## Phase 2: TUI Components for Instances (List, Dashboard, Lifecycle & Modals)

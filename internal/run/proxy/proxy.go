@@ -111,10 +111,11 @@ func (m *Manager) Stop(serviceName string) error {
 		return fmt.Errorf("no proxy running for service: %s", serviceName)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
 	if err := info.Server.Shutdown(ctx); err != nil {
+		_ = info.Server.Close()
 		return fmt.Errorf("failed to stop proxy server: %w", err)
 	}
 

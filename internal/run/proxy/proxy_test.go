@@ -39,12 +39,20 @@ func TestManager_StartStop(t *testing.T) {
 
 	// Verify we can reach the proxy
 	proxyURL := fmt.Sprintf("http://127.0.0.1:%d", info.Port)
-	resp, err := http.Get(proxyURL)
+	client := &http.Client{
+		Timeout: 1 * time.Second,
+		Transport: &http.Transport{
+			DisableKeepAlives: true,
+		},
+	}
+	resp, err := client.Get(proxyURL)
 	assert.NoError(t, err)
-	defer func() {
+	if resp != nil && resp.Body != nil {
 		_ = resp.Body.Close()
-	}()
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	}
+	if resp != nil {
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+	}
 
 	// Test Start duplicate
 	_, err = m.Start(ctx, "test-service", targetServer.URL)
@@ -61,7 +69,7 @@ func TestManager_StartStop(t *testing.T) {
 	// Verify proxy is stopped
 	// Wait a bit for shutdown
 	time.Sleep(100 * time.Millisecond)
-	_, err = http.Get(proxyURL)
+	_, err = client.Get(proxyURL)
 	assert.Error(t, err) // Should fail to connect
 	// Error message depends on OS/network stack, but usually "connection refused"
 

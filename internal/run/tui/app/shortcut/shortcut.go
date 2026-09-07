@@ -45,12 +45,15 @@ const (
 	CategoryJobList          = "Job List"
 	CategoryWorkerList       = "Worker List"
 	CategoryDomainMapping    = "Domain Mapping"
+	CategoryInstanceList     = "Instance List"
+	CategoryInstanceDashboard = "Instance Dashboard"
 )
 
 var Registry = []Shortcut{
 	// Global
 	{Key: "ctrl+s", TCellKey: tcell.KeyCtrlS, Description: "Services", Category: CategoryGlobal},
 	{Key: "ctrl+j", TCellKey: tcell.KeyCtrlJ, Description: "Jobs", Category: CategoryGlobal},
+	{Key: "ctrl+i", TCellKey: tcell.KeyCtrlI, Description: "Instances", Category: CategoryGlobal},
 	{Key: "ctrl+w", TCellKey: tcell.KeyCtrlW, Description: "Worker Pools", Category: CategoryGlobal},
 	{Key: "ctrl+d", TCellKey: tcell.KeyCtrlD, Description: "Domain Mappings", Category: CategoryGlobal},
 	{Key: "ctrl+p", TCellKey: tcell.KeyCtrlP, Description: "Project", Category: CategoryGlobal},
@@ -93,6 +96,20 @@ var Registry = []Shortcut{
 	{Key: "r", Rune: 'r', Description: "Refresh", Category: CategoryDomainMapping},
 	{Key: "o", Rune: 'o', Description: "Open URL", Category: CategoryDomainMapping},
 	{Key: "enter", TCellKey: tcell.KeyEnter, Description: "Info", Category: CategoryDomainMapping},
+
+	// Instance List
+	{Key: "r", Rune: 'r', Description: "Refresh", Category: CategoryInstanceList},
+	{Key: "d", Rune: 'd', Description: "Describe", Category: CategoryInstanceList},
+	{Key: "l", Rune: 'l', Description: "Logs", Category: CategoryInstanceList},
+	{Key: "s", Rune: 's', Description: "Start", Category: CategoryInstanceList},
+	{Key: "x", Rune: 'x', Description: "Stop", Category: CategoryInstanceList},
+	{Key: "k", Rune: 'k', Description: "Delete", Category: CategoryInstanceList},
+	{Key: "enter", TCellKey: tcell.KeyEnter, Description: "Details", Category: CategoryInstanceList},
+
+	// Instance Dashboard
+	{Key: "esc", TCellKey: tcell.KeyEscape, Description: "Back", Category: CategoryInstanceDashboard},
+	{Key: "tab", TCellKey: tcell.KeyTab, Description: "Next Tab", Category: CategoryInstanceDashboard},
+	{Key: "shift-tab", TCellKey: tcell.KeyBacktab, Description: "Prev Tab", Category: CategoryInstanceDashboard},
 }
 
 // GetByCategory returns shortcuts for a given category.

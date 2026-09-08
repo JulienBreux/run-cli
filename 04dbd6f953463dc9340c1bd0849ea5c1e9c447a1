@@ -1,0 +1,10 @@
+Phase: Application Integration & Documentation
+Automated Tests: go test -v ./internal/run/tui/app ./internal/run/tui/app/help
+Quality Gates: make lint (0 issues), make build (success)
+Manual Verification:
+1. Checked help modal displays Instance List and Instance Dashboard shortcuts.
+2. Verified global shortcut Ctrl+I navigates to instances list.
+3. Verified instance dashboard Enter and tab navigation.
+4. Verified instance lifecycle actions, modals, and log query filters.
+5. Verified README.md documentation for Instances.
+User Confirmation: Yes, automated and manual checks verified successfully.

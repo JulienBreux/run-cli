@@ -9,7 +9,7 @@
     - [x] Implement `InstancesClientWrapper` and API methods (`ListInstances`, `GetInstance`, `StartInstance`, `StopInstance`, `DeleteInstance`) in `internal/run/api/instance/client.go`
 - [x] Task: Conductor - User Manual Verification 'Instances Data Models & API Client' (Protocol in workflow.md)
 
-## Phase 2: TUI Components for Instances (List, Dashboard, Lifecycle & Modals)
+## Phase 2: TUI Components for Instances (List, Dashboard, Lifecycle & Modals) [checkpoint: 8085198]
 - [x] Task: Implement Instances List View (TDD) [d579b36]
     - [x] Write unit tests for Instances table rendering and key bindings in `internal/run/tui/app/instance/instance_test.go`
     - [x] Implement `internal/run/tui/app/instance/instance.go` table view with status indicators, columns, and navigation shortcuts
@@ -19,7 +19,7 @@
 - [x] Task: Implement Instance Lifecycle Actions & Modals (TDD) [043b3ec]
     - [x] Write unit tests for Start, Stop, and Delete action handlers/modals in `internal/run/tui/app/instance/action_test.go`
     - [x] Implement async Start, Stop, and Delete actions with spinners and confirmation modal in `internal/run/tui/app/instance/action.go`
-- [ ] Task: Conductor - User Manual Verification 'TUI Components for Instances (List, Dashboard, Lifecycle & Modals)' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'TUI Components for Instances (List, Dashboard, Lifecycle & Modals)' (Protocol in workflow.md)
 
 ## Phase 3: Application Integration & Documentation
 - [ ] Task: Wire Instances Navigation and Shortcuts in Main App (TDD)

@@ -267,12 +267,6 @@ func TestInitializeApp(t *testing.T) {
 func TestSwitchTo(t *testing.T) {
 	setupTestApp()
 	buildLayout() // Inits footerPages, footerSpinner
-	
-	go func() { _ = app.Run() }()
-	defer func() {
-		app.Stop()
-		time.Sleep(150 * time.Millisecond)
-	}()
 
 	// Test Service List
 	switchTo(service.LIST_PAGE_ID)

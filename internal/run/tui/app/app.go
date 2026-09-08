@@ -28,6 +28,7 @@ import (
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
 	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/domainmapping"
+	"github.com/JulienBreux/run-cli/internal/run/tui/app/instance"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/job"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/project"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/region"
@@ -76,13 +77,15 @@ const (
 	LOADER_PAGE_ID  = "loader"
 	LAYOUT_PAGE_ID  = "layout"
 
-	CONSOLE_URL               = "https://console.cloud.google.com/run?project=%s"
-	CONSOLE_SERVICE_URL       = "https://console.cloud.google.com/run/detail/%s/%s/metrics?project=%s"
-	CONSOLE_JOB_LIST_URL      = "https://console.cloud.google.com/run/jobs?project=%s"
-	CONSOLE_JOB_DETAIL_URL    = "https://console.cloud.google.com/run/jobs/details/%s/%s/metrics?project=%s"
-	CONSOLE_WORKER_LIST_URL   = "https://console.cloud.google.com/run/workerpools?project=%s"
-	CONSOLE_WORKER_DETAIL_URL = "https://console.cloud.google.com/run/workerpools/details/%s/%s?project=%s"
-	RELEASE_NOTES_URL         = "https://docs.cloud.google.com/run/docs/release-notes"
+	CONSOLE_URL                 = "https://console.cloud.google.com/run?project=%s"
+	CONSOLE_SERVICE_URL         = "https://console.cloud.google.com/run/detail/%s/%s/metrics?project=%s"
+	CONSOLE_JOB_LIST_URL        = "https://console.cloud.google.com/run/jobs?project=%s"
+	CONSOLE_JOB_DETAIL_URL      = "https://console.cloud.google.com/run/jobs/details/%s/%s/metrics?project=%s"
+	CONSOLE_WORKER_LIST_URL     = "https://console.cloud.google.com/run/workerpools?project=%s"
+	CONSOLE_WORKER_DETAIL_URL   = "https://console.cloud.google.com/run/workerpools/details/%s/%s?project=%s"
+	CONSOLE_INSTANCE_LIST_URL   = "https://console.cloud.google.com/run/instances?project=%s"
+	CONSOLE_INSTANCE_DETAIL_URL = "https://console.cloud.google.com/run/instances/details/%s/%s?project=%s"
+	RELEASE_NOTES_URL           = "https://docs.cloud.google.com/run/docs/release-notes"
 )
 
 // Run runs the application.
@@ -173,12 +176,18 @@ func buildLayout() *tview.Flex {
 	// Lists
 	pages.AddPage(service.LIST_PAGE_ID, service.List(app).View, true, true)
 	pages.AddPage(job.LIST_PAGE_ID, job.List(app).View, true, true)
+	pages.AddPage(instance.LIST_PAGE_ID, instance.List(app).View, true, true)
 	pages.AddPage(workerpool.LIST_PAGE_ID, workerpool.List(app).View, true, true)
 	pages.AddPage(domainmapping.LIST_PAGE_ID, domainmapping.List(app).View, true, true)
 
 	// Dashboards
 	pages.AddPage(service.DASHBOARD_PAGE_ID, service.Dashboard(app), true, false)
 	pages.AddPage(job.DASHBOARD_PAGE_ID, job.Dashboard(app), true, false)
+	pages.AddPage(instance.DASHBOARD_PAGE_ID, instance.Dashboard(app), true, false)
+
+	instance.OnDashboardBack = func() {
+		switchTo(instance.LIST_PAGE_ID)
+	}
 
 	// Loading (Top)
 	loadingSpinner = spinner.New(app, 1)
@@ -243,6 +252,13 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 			} else {
 				u = fmt.Sprintf(CONSOLE_WORKER_LIST_URL, currentInfo.Project)
 			}
+		case instance.LIST_PAGE_ID:
+			name, region := instance.GetSelectedInstance()
+			if name != "" && region != "" {
+				u = fmt.Sprintf(CONSOLE_INSTANCE_DETAIL_URL, region, name, currentInfo.Project)
+			} else {
+				u = fmt.Sprintf(CONSOLE_INSTANCE_LIST_URL, currentInfo.Project)
+			}
 		}
 
 		if !strings.HasSuffix(os.Args[0], ".test") {
@@ -266,6 +282,10 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 	}
 	if event.Key() == job.LIST_PAGE_SHORTCUT {
 		switchTo(job.LIST_PAGE_ID)
+		return nil
+	}
+	if event.Key() == instance.LIST_PAGE_SHORTCUT {
+		switchTo(instance.LIST_PAGE_ID)
 		return nil
 	}
 	if event.Key() == workerpool.LIST_PAGE_SHORTCUT {
@@ -294,6 +314,10 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 		}
 		if currentPageID == job.DASHBOARD_PAGE_ID {
 			switchTo(job.LIST_PAGE_ID)
+			return nil
+		}
+		if currentPageID == instance.DASHBOARD_PAGE_ID {
+			switchTo(instance.LIST_PAGE_ID)
 			return nil
 		}
 	}
@@ -442,6 +466,86 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 		}
 	}
 
+	// Instance List
+	if currentPageID == instance.LIST_PAGE_ID {
+		if event.Key() == tcell.KeyEnter {
+			switchTo(instance.DASHBOARD_PAGE_ID)
+			return nil
+		}
+		if event.Rune() == 'r' {
+			switchTo(instance.LIST_PAGE_ID)
+			return nil
+		}
+		if event.Rune() == 'l' {
+			name, region := instance.GetSelectedInstance()
+			if name != "" {
+				openLogModal(name, region, "instance")
+			}
+			return nil
+		}
+		if event.Rune() == 'd' {
+			if inst := instance.GetSelectedInstanceFull(); inst != nil {
+				openDescribeModal(inst, inst.Name)
+			}
+			return nil
+		}
+		if event.Rune() == 's' {
+			name, region := instance.GetSelectedInstance()
+			if name != "" {
+				showLoading()
+				instance.StartAction(app, currentInfo.Project, region, name, func(err error) {
+					hideLoading()
+					if err != nil {
+						showError(err)
+					} else {
+						switchTo(instance.LIST_PAGE_ID)
+					}
+				})
+			}
+			return nil
+		}
+		if event.Rune() == 'x' {
+			name, region := instance.GetSelectedInstance()
+			if name != "" {
+				showLoading()
+				instance.StopAction(app, currentInfo.Project, region, name, func(err error) {
+					hideLoading()
+					if err != nil {
+						showError(err)
+					} else {
+						switchTo(instance.LIST_PAGE_ID)
+					}
+				})
+			}
+			return nil
+		}
+		if event.Rune() == 'k' {
+			name, region := instance.GetSelectedInstance()
+			if name != "" {
+				deleteModal := instance.DeleteModal(app, currentInfo.Project, region, name, func(deleted bool, err error) {
+					rootPages.RemovePage(instance.DELETE_MODAL_PAGE_ID)
+					currentPageID = previousPageID
+					pages.SwitchToPage(currentPageID)
+					app.SetFocus(pages)
+					instance.Shortcuts()
+					if deleted {
+						if err != nil {
+							showError(err)
+						} else {
+							switchTo(instance.LIST_PAGE_ID)
+						}
+					}
+				})
+				rootPages.AddPage(instance.DELETE_MODAL_PAGE_ID, deleteModal, true, true)
+				previousPageID = currentPageID
+				currentPageID = instance.DELETE_MODAL_PAGE_ID
+				footer.ContextShortcutView.Clear()
+				app.SetFocus(deleteModal)
+			}
+			return nil
+		}
+	}
+
 	// Domain Mapping List
 	if currentPageID == domainmapping.LIST_PAGE_ID {
 		if event.Key() == tcell.KeyEnter {
@@ -485,6 +589,9 @@ func switchTo(pageID string) {
 	if currentPageID == service.DASHBOARD_PAGE_ID && pageID != service.DASHBOARD_PAGE_ID {
 		service.DashboardClear()
 	}
+	if currentPageID == instance.DASHBOARD_PAGE_ID && pageID != instance.DASHBOARD_PAGE_ID {
+		instance.DashboardClear()
+	}
 
 	previousPageID = currentPageID
 	currentPageID = pageID
@@ -519,6 +626,16 @@ func switchTo(pageID string) {
 		job.Shortcuts()
 		showLoading()
 		job.ListReload(app, currentInfo, callback)
+	case instance.LIST_PAGE_ID:
+		instance.Shortcuts()
+		showLoading()
+		instance.ListReload(app, currentInfo, callback)
+	case instance.DASHBOARD_PAGE_ID:
+		if inst := instance.GetSelectedInstanceFull(); inst != nil {
+			instance.DashboardShortcuts()
+			showLoading()
+			instance.DashboardReload(app, currentInfo, inst, callback)
+		}
 	case workerpool.LIST_PAGE_ID:
 		workerpool.Shortcuts()
 		showLoading()

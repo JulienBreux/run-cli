@@ -23,11 +23,13 @@ import (
 	"github.com/JulienBreux/run-cli/internal/run/config"
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
 	model_domainmapping "github.com/JulienBreux/run-cli/internal/run/model/domainmapping"
+	model_instance "github.com/JulienBreux/run-cli/internal/run/model/instance"
 	model_job "github.com/JulienBreux/run-cli/internal/run/model/job"
 	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
 	model_workerpool "github.com/JulienBreux/run-cli/internal/run/model/workerpool"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/describe"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/domainmapping"
+	"github.com/JulienBreux/run-cli/internal/run/tui/app/instance"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/job"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/log"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/project"
@@ -58,6 +60,7 @@ func setupTestApp() {
 	job.ListJobsFunc = func(project, region string) ([]model_job.Job, error) { return nil, nil }
 	workerpool.ListWorkerPoolsFunc = func(project, region string) ([]model_workerpool.WorkerPool, error) { return nil, nil }
 	domainmapping.ListDomainMappingsFunc = func(project, region string) ([]model_domainmapping.DomainMapping, error) { return nil, nil }
+	instance.ListInstancesFunc = func(project, region string) ([]model_instance.Instance, error) { return nil, nil }
 
 	// Reset global state to avoid interference between tests
 	previousPageID = ""
@@ -107,6 +110,7 @@ func TestShortcuts_Navigation(t *testing.T) {
 	}{
 		{"To Service List", service.LIST_PAGE_SHORTCUT, service.LIST_PAGE_ID},
 		{"To Job List", job.LIST_PAGE_SHORTCUT, job.LIST_PAGE_ID},
+		{"To Instance List", instance.LIST_PAGE_SHORTCUT, instance.LIST_PAGE_ID},
 		{"To WorkerPool List", workerpool.LIST_PAGE_SHORTCUT, workerpool.LIST_PAGE_ID},
 	}
 
@@ -141,6 +145,14 @@ func TestShortcuts_Escape(t *testing.T) {
 
 	assert.Nil(t, result)
 	assert.Equal(t, service.LIST_PAGE_ID, currentPageID)
+
+	// Simulate being on Instance Dashboard
+	currentPageID = instance.DASHBOARD_PAGE_ID
+	event = tcell.NewEventKey(tcell.KeyEscape, 0, tcell.ModNone)
+	result = shortcuts(event)
+
+	assert.Nil(t, result)
+	assert.Equal(t, instance.LIST_PAGE_ID, currentPageID)
 }
 
 func TestShortcuts_OpenConsole(t *testing.T) {
@@ -187,6 +199,17 @@ func TestShortcuts_OpenConsole(t *testing.T) {
 	eventWP := tcell.NewEventKey(tcell.KeyCtrlZ, 0, tcell.ModNone)
 	resultWP := shortcuts(eventWP)
 	assert.Nil(t, resultWP)
+
+	// Instance List
+	currentPageID = instance.LIST_PAGE_ID
+	instTable := instance.List(app).Table
+	instTable.SetCell(1, 0, tview.NewTableCell("inst1"))
+	instTable.SetCell(1, 1, tview.NewTableCell("r1"))
+	instTable.Select(1, 0)
+
+	eventInst := tcell.NewEventKey(tcell.KeyCtrlZ, 0, tcell.ModNone)
+	resultInst := shortcuts(eventInst)
+	assert.Nil(t, resultInst)
 }
 
 func TestInitializeApp(t *testing.T) {
@@ -453,4 +476,66 @@ func TestRun(t *testing.T) {
 	// initializeApp is unexported.
 	
 	// Let's rely on what we have. 41% is low.
+}
+
+func TestShortcuts_InstanceList(t *testing.T) {
+	setupTestApp()
+	rootPages.AddPage(LAYOUT_PAGE_ID, tview.NewBox(), true, true)
+	buildLayout()
+
+	currentPageID = instance.LIST_PAGE_ID
+	instTable := instance.List(app).Table
+	instance.Load([]model_instance.Instance{{Name: "inst1", Region: "r1"}})
+	instTable.Select(1, 0)
+
+	// Enter -> Dashboard
+	shortcuts(tcell.NewEventKey(tcell.KeyEnter, 0, tcell.ModNone))
+	assert.Equal(t, instance.DASHBOARD_PAGE_ID, currentPageID)
+	currentPageID = instance.LIST_PAGE_ID
+
+	// 'r' -> Reload
+	shortcuts(tcell.NewEventKey(tcell.KeyRune, 'r', tcell.ModNone))
+	assert.Equal(t, instance.LIST_PAGE_ID, currentPageID)
+
+	// 'd' -> Describe
+	shortcuts(tcell.NewEventKey(tcell.KeyRune, 'd', tcell.ModNone))
+	assert.Equal(t, describe.MODAL_PAGE_ID, currentPageID)
+	rootPages.RemovePage(describe.MODAL_PAGE_ID)
+	currentPageID = instance.LIST_PAGE_ID
+
+	// 'l' -> Log
+	shortcuts(tcell.NewEventKey(tcell.KeyRune, 'l', tcell.ModNone))
+	assert.Equal(t, log.MODAL_PAGE_ID, currentPageID)
+	rootPages.RemovePage(log.MODAL_PAGE_ID)
+	currentPageID = instance.LIST_PAGE_ID
+
+	// 's' -> Start
+	startCalled := false
+	origStart := instance.StartInstanceFunc
+	defer func() { instance.StartInstanceFunc = origStart }()
+	instance.StartInstanceFunc = func(project, region, instanceID string) error {
+		startCalled = true
+		return nil
+	}
+	shortcuts(tcell.NewEventKey(tcell.KeyRune, 's', tcell.ModNone))
+	time.Sleep(50 * time.Millisecond)
+	assert.True(t, startCalled)
+
+	// 'x' -> Stop
+	stopCalled := false
+	origStop := instance.StopInstanceFunc
+	defer func() { instance.StopInstanceFunc = origStop }()
+	instance.StopInstanceFunc = func(project, region, instanceID string) error {
+		stopCalled = true
+		return nil
+	}
+	shortcuts(tcell.NewEventKey(tcell.KeyRune, 'x', tcell.ModNone))
+	time.Sleep(50 * time.Millisecond)
+	assert.True(t, stopCalled)
+
+	// 'k' -> Delete Modal
+	shortcuts(tcell.NewEventKey(tcell.KeyRune, 'k', tcell.ModNone))
+	assert.Equal(t, instance.DELETE_MODAL_PAGE_ID, currentPageID)
+	rootPages.RemovePage(instance.DELETE_MODAL_PAGE_ID)
+	currentPageID = instance.LIST_PAGE_ID
 }

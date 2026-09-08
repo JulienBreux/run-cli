@@ -394,3 +394,23 @@ func DashboardShortcuts() {
 	s := shortcut.FormatByCategory(shortcut.CategoryInstanceDashboard, nil)
 	footer.ContextShortcutView.SetText(s)
 }
+
+// DashboardClear clears the dashboard state and components.
+func DashboardClear() {
+	dashboardInstance = nil
+	if overviewDetail != nil {
+		overviewDetail.Clear()
+	}
+	if containersDetail != nil {
+		containersDetail.Clear()
+	}
+	if conditionsDetail != nil {
+		conditionsDetail.Clear()
+	}
+	if yamlDetail != nil {
+		yamlDetail.Clear()
+	}
+	if dashboardHeader != nil {
+		dashboardHeader.Clear()
+	}
+}

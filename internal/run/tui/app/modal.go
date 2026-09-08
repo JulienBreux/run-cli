@@ -28,6 +28,7 @@ import (
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/describe"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/domainmapping"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/help"
+	"github.com/JulienBreux/run-cli/internal/run/tui/app/instance"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/job"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/log"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/project"
@@ -95,6 +96,8 @@ func openLogModal(name, region, logType string) {
 		filter = fmt.Sprintf(`resource.type="cloud_run_revision" resource.labels.service_name="%s" resource.labels.location="%s"`, name, region)
 	case "job":
 		filter = fmt.Sprintf(`resource.type="cloud_run_job" resource.labels.job_name="%s" resource.labels.location="%s"`, name, region)
+	case "instance":
+		filter = fmt.Sprintf(`resource.type="cloud_run_instance" resource.labels.instance_id="%s" resource.labels.location="%s"`, name, region)
 	}
 
 	logModal := log.LogModal(app, currentInfo.Project, filter, name, func() {
@@ -108,6 +111,8 @@ func openLogModal(name, region, logType string) {
 			service.Shortcuts()
 		case "job":
 			job.Shortcuts()
+		case "instance":
+			instance.Shortcuts()
 		}
 	})
 
@@ -132,6 +137,8 @@ func openDescribeModal(resource any, title string) {
 			service.Shortcuts()
 		case job.LIST_PAGE_ID:
 			job.Shortcuts()
+		case instance.LIST_PAGE_ID:
+			instance.Shortcuts()
 		case workerpool.LIST_PAGE_ID:
 			workerpool.Shortcuts()
 		}

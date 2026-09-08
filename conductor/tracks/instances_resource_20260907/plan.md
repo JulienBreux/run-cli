@@ -25,7 +25,7 @@
 - [x] Task: Wire Instances Navigation and Shortcuts in Main App (TDD) [2fe8511]
     - [x] Write unit tests for `Ctrl+I` navigation, shortcut capture, and console URL generation in `internal/run/tui/app/app_test.go`
     - [x] Update `internal/run/tui/app/app.go` with `Ctrl+I` shortcut, console URL mapping, preload integration, and footer hints
-- [~] Task: Update Centralized Help and Documentation (TDD/Docs)
-    - [ ] Update help modal in `internal/run/tui/app/help/help.go` and tests in `internal/run/tui/app/help/help_test.go`
-    - [ ] Update `README.md` with the new Instances resource documentation and keyboard shortcuts
-- [ ] Task: Conductor - User Manual Verification 'Application Integration & Documentation' (Protocol in workflow.md)
+- [x] Task: Update Centralized Help and Documentation (TDD/Docs) [e7c6825]
+    - [x] Update help modal in `internal/run/tui/app/help/help.go` and tests in `internal/run/tui/app/help/help_test.go`
+    - [x] Update `README.md` with the new Instances resource documentation and keyboard shortcuts
+- [~] Task: Conductor - User Manual Verification 'Application Integration & Documentation' (Protocol in workflow.md)

@@ -19,6 +19,7 @@ package help
 import (
 	"testing"
 
+	"github.com/JulienBreux/run-cli/internal/run/tui/app/shortcut"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 	"github.com/stretchr/testify/assert"
@@ -53,4 +54,24 @@ func TestHelpModal(t *testing.T) {
 	closeFuncCalled = false
 	handler(tcell.NewEventKey(tcell.KeyRune, '?', tcell.ModNone))
 	assert.True(t, closeFuncCalled)
+}
+
+func TestHelpModal_ContainsInstanceShortcuts(t *testing.T) {
+	app := tview.NewApplication()
+	modal := HelpModal(app, func() {})
+	assert.NotNil(t, modal)
+
+	foundInstanceList := false
+	foundInstanceDashboard := false
+	for r := 0; r < modal.Table.GetRowCount(); r++ {
+		text := modal.Table.GetCell(r, 0).Text
+		if text == "[yellow::b]"+shortcut.CategoryInstanceList {
+			foundInstanceList = true
+		}
+		if text == "[yellow::b]"+shortcut.CategoryInstanceDashboard {
+			foundInstanceDashboard = true
+		}
+	}
+	assert.True(t, foundInstanceList, "Instance List category should be in help modal")
+	assert.True(t, foundInstanceDashboard, "Instance Dashboard category should be in help modal")
 }

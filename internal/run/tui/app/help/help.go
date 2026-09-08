@@ -69,7 +69,7 @@ func HelpModal(app *tview.Application, closeFunc func()) *Help {
 
 	grid := tview.NewGrid().
 		SetColumns(0, 80, 0).
-		SetRows(0, 35, 0).
+		SetRows(0, 40, 0).
 		AddItem(table, 1, 1, 1, 1, 0, 0, true)
 
 	return &Help{

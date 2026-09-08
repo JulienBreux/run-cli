@@ -50,6 +50,14 @@ The idea is to establish a high-performance, terminal-based alternative to the G
 *   **Job Dashboard:** Dedicated view for jobs including execution history and status.
 *   **Execution Management:** View detailed execution history with task success/failure counts, duration, and status.
 
+### 🖥️ Instances
+
+*   **Instance Management:** View, inspect, and manage your Google Cloud Run instances (`Ctrl+I`).
+*   **Direct Lifecycle Actions:** Start (`s`), Stop (`x`), and Delete (`k`) instances interactively.
+*   **Instance Dashboard:** Explore multi-tab inspection dashboards including Overview, Containers, Conditions & Networking, and raw syntax-highlighted YAML/JSON definitions (`Enter`).
+*   **Log Viewer:** Stream Cloud Logging records specific to instances (`l`).
+*   **Console Integration:** Direct shortcut (`Ctrl+Z`) to open the selected instance or instances list directly in Google Cloud Console.
+
 ### 👷 Worker Pools
 
 *   **Worker Pool Management:** View and manage your Cloud Run worker pools.

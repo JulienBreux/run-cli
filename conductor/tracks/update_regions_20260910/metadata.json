@@ -1,0 +1,8 @@
+{
+  "track_id": "update_regions_20260910",
+  "type": "chore",
+  "status": "new",
+  "created_at": "2026-09-10T14:40:00Z",
+  "updated_at": "2026-09-10T14:40:00Z",
+  "description": "Add a make command using gcloud compute regions list to update the list of regions in internal/run/api/region/region.go"
+}

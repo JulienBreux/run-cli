@@ -116,6 +116,7 @@ This project uses a `Makefile` to streamline development.
 
 *   [Go](https://go.dev/doc/install) (version 1.27+)
 *   [Docker](https://docs.docker.com/get-docker/) (for building the Docker image)
+*   [Google Cloud SDK](https://cloud.google.com/sdk) (`gcloud`, optional, for updating the regions list)
 
 ### Build from source
 
@@ -141,6 +142,14 @@ To lint the codebase:
 
 ```sh
 make lint
+```
+
+### Updating Regions
+
+To update the list of supported regions in `internal/run/api/region/region.go` using the `gcloud` CLI:
+
+```sh
+make regions-update
 ```
 
 ## 💪 Contributing

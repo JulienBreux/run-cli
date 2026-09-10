@@ -17,14 +17,31 @@ limitations under the License.
 package region
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func TestConstants(t *testing.T) {
+	assert.Equal(t, "all", ALL)
+}
 
 func TestList(t *testing.T) {
 	regions := List()
 	assert.NotEmpty(t, regions)
 	assert.Contains(t, regions, "us-central1")
 	assert.Contains(t, regions, "europe-west1")
+
+	// Ensure sorted
+	assert.True(t, sort.StringsAreSorted(regions), "regions list should be sorted alphabetically")
+
+	// Ensure no duplicates and valid format
+	seen := make(map[string]bool)
+	for _, r := range regions {
+		assert.NotEmpty(t, r)
+		assert.False(t, seen[r], "duplicate region found: %s", r)
+		seen[r] = true
+		assert.Regexp(t, "^[a-z0-9-]+$", r, "region name should be lowercase alphanumeric with hyphens")
+	}
 }

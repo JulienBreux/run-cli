@@ -47,7 +47,20 @@ demo-record: build ## Demo to .cast
 demo-to-gif: ## Demo to gif
 	agg ${RUN_ASSETS_DIR}/${RUN_DEMO_CAST_FILE} ${RUN_ASSETS_DIR}/${RUN_DEMO_GIF_FILE}
 
+regions-update: ## Update list of regions in region.go using gcloud
+	@which gcloud > /dev/null 2>&1 || (echo "Error: gcloud CLI is required but not installed." && exit 1)
+	@echo "Fetching regions from gcloud..."
+	@REGIONS=$$(gcloud compute regions list | tail -n +2 | awk '{print $$1}' | sort -u); \
+	if [ -z "$$REGIONS" ]; then \
+		echo "Error: No regions returned from gcloud."; \
+		exit 1; \
+	fi; \
+	FORMATTED_REGIONS=$$(echo "$$REGIONS" | sed 's/.*/\t\t"&",/'); \
+	printf '/*\nCopyright 2026 Julien Breux\n\nLicensed under the Apache License, Version 2.0 (the "License");\nyou may not use this file except in compliance with the License.\nYou may obtain a copy of the License at\n\n    https://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an "AS IS" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.\n*/\n\npackage region\n\n// Represents all regions.\nconst ALL = "all"\n\n// List returns a list of supported Cloud Run regions.\nfunc List() []string {\n\treturn []string{\n%s\n\t}\n}\n' "$$FORMATTED_REGIONS" > internal/run/api/region/region.go
+	@go fmt ./internal/run/api/region/...
+	@echo "Regions successfully updated in internal/run/api/region/region.go"
+
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: generate lint test coverage coverage-total coverage-html clean build build-image run run-container demo-record demo-to-gif help
+.PHONY: generate lint test coverage coverage-total coverage-html clean build build-image run run-container demo-record demo-to-gif help regions-update

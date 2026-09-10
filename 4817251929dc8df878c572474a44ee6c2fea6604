@@ -1,0 +1,3 @@
+Task: Document Command in README.md
+- Added Google Cloud SDK to Prerequisites in README.md.
+- Added Updating Regions section documenting 'make regions-update'.

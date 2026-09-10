@@ -19,6 +19,6 @@
 - [x] Task: Verify Codebase Quality and Generated Regions [8a059cf]
     - [x] Run `make regions-update` (if gcloud is available) or verify with test inputs
     - [x] Run `make test`, `make lint`, and `make build` to guarantee compliance
-- [ ] Task: Document Command in README.md
-    - [ ] Add `make regions-update` explanation under development commands in `README.md`
+- [x] Task: Document Command in README.md [4817251]
+    - [x] Add `make regions-update` explanation under development commands in `README.md`
 - [ ] Task: Conductor - User Manual Verification 'Verification & Documentation' (Protocol in workflow.md)

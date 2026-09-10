@@ -1,0 +1,4 @@
+Task: Enhance Region Unit Tests (TDD)
+- Added TestConstants verifying the ALL constant.
+- Added assertions in TestList for sorting order, uniqueness (no duplicates), and valid naming conventions.
+- Verified 100% statement coverage on region package.

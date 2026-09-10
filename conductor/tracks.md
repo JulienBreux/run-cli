@@ -14,5 +14,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Add a make command using gcloud compute regions list to update the list of regions in internal/run/api/region/region.go**
+- [~] **Track: Add a make command using gcloud compute regions list to update the list of regions in internal/run/api/region/region.go**
 *Link: [./tracks/update_regions_20260910/](./tracks/update_regions_20260910/)*

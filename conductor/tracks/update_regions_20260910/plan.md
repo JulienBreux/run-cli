@@ -1,9 +1,9 @@
 # Implementation Plan: Add Makefile Command to Update Cloud Run Regions
 
 ## Phase 1: Unit Testing Baseline & Validation
-- [ ] Task: Enhance Region Unit Tests (TDD)
-    - [ ] Add unit tests verifying region format, non-empty list, and known standard regions in `internal/run/api/region/region_test.go`
-    - [ ] Verify test suite passes with `go test ./internal/run/api/region/...`
+- [x] Task: Enhance Region Unit Tests (TDD) [b00c03b]
+    - [x] Add unit tests verifying region format, non-empty list, and known standard regions in `internal/run/api/region/region_test.go`
+    - [x] Verify test suite passes with `go test ./internal/run/api/region/...`
 - [ ] Task: Conductor - User Manual Verification 'Unit Testing Baseline & Validation' (Protocol in workflow.md)
 
 ## Phase 2: Makefile Implementation & Region Update Command

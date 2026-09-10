@@ -7,12 +7,12 @@
 - [x] Task: Conductor - User Manual Verification 'Unit Testing Baseline & Validation' (Protocol in workflow.md)
 
 ## Phase 2: Makefile Implementation & Region Update Command
-- [ ] Task: Implement `regions-update` Target in Makefile
-    - [ ] Add prerequisite validation ensuring `gcloud` is installed
-    - [ ] Implement the shell command recipe to query `gcloud compute regions list | tail -n +2 | awk '{print $$1}'` and sort results
-    - [ ] Format output into Go string slice and safely update `internal/run/api/region/region.go`
-    - [ ] Run `go fmt ./internal/run/api/region/...` post-update
-    - [ ] Register `regions-update` in `.PHONY` and add help comment
+- [x] Task: Implement `regions-update` Target in Makefile [0f4afb7]
+    - [x] Add prerequisite validation ensuring `gcloud` is installed
+    - [x] Implement the shell command recipe to query `gcloud compute regions list | tail -n +2 | awk '{print $$1}'` and sort results
+    - [x] Format output into Go string slice and safely update `internal/run/api/region/region.go`
+    - [x] Run `go fmt ./internal/run/api/region/...` post-update
+    - [x] Register `regions-update` in `.PHONY` and add help comment
 - [ ] Task: Conductor - User Manual Verification 'Makefile Implementation & Region Update Command' (Protocol in workflow.md)
 
 ## Phase 3: Verification & Documentation

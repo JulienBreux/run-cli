@@ -21,6 +21,7 @@ import (
 
 	model_project "github.com/JulienBreux/run-cli/internal/run/model/common/project"
 	model_domainmapping "github.com/JulienBreux/run-cli/internal/run/model/domainmapping"
+	model_instance "github.com/JulienBreux/run-cli/internal/run/model/instance"
 	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
 	model_revision "github.com/JulienBreux/run-cli/internal/run/model/service/revision"
 	model_workerpool "github.com/JulienBreux/run-cli/internal/run/model/workerpool"
@@ -29,6 +30,7 @@ import (
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/domainmapping"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/help"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/instance"
+	instance_auth "github.com/JulienBreux/run-cli/internal/run/tui/app/instance/auth"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/job"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/log"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/project"
@@ -190,6 +192,34 @@ func openServiceAuthModal(s *model_service.Service) {
 	rootPages.AddPage(service_auth.MODAL_PAGE_ID, authModal, true, true)
 	previousPageID = currentPageID
 	currentPageID = service_auth.MODAL_PAGE_ID
+
+	footer.ContextShortcutView.Clear()
+	app.SetFocus(authModal)
+}
+
+func openInstanceAuthModal(inst *model_instance.Instance) {
+	if inst.Project == "" {
+		inst.Project = currentInfo.Project
+	}
+	if inst.Region == "" {
+		inst.Region = currentInfo.Region
+	}
+
+	authModal := instance_auth.Modal(app, inst, rootPages, func(refresh bool) {
+		rootPages.RemovePage(instance_auth.MODAL_PAGE_ID)
+		if refresh {
+			switchTo(previousPageID)
+		} else {
+			currentPageID = previousPageID
+			pages.SwitchToPage(currentPageID)
+			app.SetFocus(pages)
+			instance.Shortcuts()
+		}
+	})
+
+	rootPages.AddPage(instance_auth.MODAL_PAGE_ID, authModal, true, true)
+	previousPageID = currentPageID
+	currentPageID = instance_auth.MODAL_PAGE_ID
 
 	footer.ContextShortcutView.Clear()
 	app.SetFocus(authModal)

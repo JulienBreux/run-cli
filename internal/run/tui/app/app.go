@@ -544,6 +544,12 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 			}
 			return nil
 		}
+		if event.Rune() == 'a' {
+			if inst := instance.GetSelectedInstanceFull(); inst != nil {
+				openInstanceAuthModal(inst)
+			}
+			return nil
+		}
 		if result := instance.HandleShortcuts(event); result == nil {
 			return nil
 		}

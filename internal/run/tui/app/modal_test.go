@@ -20,12 +20,14 @@ import (
 	"os"
 	"testing"
 
+	model_instance "github.com/JulienBreux/run-cli/internal/run/model/instance"
 	model_project "github.com/JulienBreux/run-cli/internal/run/model/common/project"
 	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
 	model_workerpool "github.com/JulienBreux/run-cli/internal/run/model/workerpool"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/credits"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/describe"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/help"
+	instance_auth "github.com/JulienBreux/run-cli/internal/run/tui/app/instance/auth"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/log"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/project"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/region"
@@ -143,3 +145,18 @@ func TestOpenCreditsModal(t *testing.T) {
 
 	assert.Equal(t, credits.MODAL_PAGE_ID, currentPageID)
 }
+
+func TestOpenInstanceAuthModal(t *testing.T) {
+	setupTestApp()
+	buildLayout()
+
+	inst := &model_instance.Instance{
+		Name:    "inst-1",
+		Project: "p1",
+		Region:  "us-central1",
+	}
+	openInstanceAuthModal(inst)
+
+	assert.Equal(t, instance_auth.MODAL_PAGE_ID, currentPageID)
+}
+

@@ -30,6 +30,7 @@ import (
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/describe"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/domainmapping"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/instance"
+	instance_auth "github.com/JulienBreux/run-cli/internal/run/tui/app/instance/auth"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/job"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/log"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/project"
@@ -531,6 +532,14 @@ func TestShortcuts_InstanceList(t *testing.T) {
 	shortcuts(tcell.NewEventKey(tcell.KeyRune, 'k', tcell.ModNone))
 	assert.Equal(t, instance.DELETE_MODAL_PAGE_ID, currentPageID)
 	rootPages.RemovePage(instance.DELETE_MODAL_PAGE_ID)
+	currentPageID = instance.LIST_PAGE_ID
+
+	// 'a' -> Auth Modal
+	instance.Load([]model_instance.Instance{{Name: "inst1", Region: "r1"}})
+	instTable.Select(1, 0)
+	shortcuts(tcell.NewEventKey(tcell.KeyRune, 'a', tcell.ModNone))
+	assert.Equal(t, instance_auth.MODAL_PAGE_ID, currentPageID)
+	rootPages.RemovePage(instance_auth.MODAL_PAGE_ID)
 	currentPageID = instance.LIST_PAGE_ID
 
 	// 'p' -> Toggle Proxy

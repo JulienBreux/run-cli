@@ -1,0 +1,11 @@
+Phase: Authentication Modal & App Integration
+Status: Approved by user
+Coverage Summary:
+- internal/run/tui/app/instance/auth: 93.1%
+- internal/run/tui/app: 41.7% (modal and keyboard shortcuts tested)
+- Full project test suite passing with 0 lint errors
+Verification Details:
+- Created Instance Authentication modal with dropdown and async save
+- Added openInstanceAuthModal in modal.go with automatic list refresh
+- Wired 'a' key in app.go to open instance authentication modal
+- Verified via automated tests and approved by user manual verification.

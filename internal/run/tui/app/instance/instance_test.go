@@ -280,3 +280,109 @@ func TestRender_ProxyAndAuth(t *testing.T) {
 	assert.Equal(t, "inst-no-proxy-auth", listTable.Table.GetCell(2, 2).Text)
 	assert.Equal(t, "us-central1", listTable.Table.GetCell(2, 3).Text)
 }
+
+func TestGetSelectedInstanceURL(t *testing.T) {
+	app := tview.NewApplication()
+	_ = List(app)
+
+	// No instances
+	instances = []model.Instance{}
+	assert.Equal(t, "", GetSelectedInstanceURL())
+
+	// Instances with URL and Proxy
+	instances = []model.Instance{
+		{
+			Name: "projects/p/locations/r/instances/i1",
+			URLs: []string{"https://primary.run.app"},
+		},
+		{
+			Name: "projects/p/locations/r/instances/i2",
+			URLs: []string{"https://primary2.run.app"},
+			Proxy: &model_service.ProxyStatus{
+				Enabled: true,
+				Port:    9090,
+				URL:     "http://127.0.0.1:9090",
+			},
+		},
+		{
+			Name: "projects/p/locations/r/instances/i3",
+		},
+	}
+	Load(instances)
+
+	// Header row selected (row 0)
+	listTable.Table.Select(0, 0)
+	assert.Equal(t, "", GetSelectedInstanceURL())
+
+	// Row 1 selected (URL from URLs[0])
+	listTable.Table.Select(1, 0)
+	assert.Equal(t, "https://primary.run.app", GetSelectedInstanceURL())
+
+	// Row 2 selected (Proxy enabled URL)
+	listTable.Table.Select(2, 0)
+	assert.Equal(t, "http://127.0.0.1:9090", GetSelectedInstanceURL())
+
+	// Row 3 selected (No URLs, no proxy)
+	listTable.Table.Select(3, 0)
+	assert.Equal(t, "", GetSelectedInstanceURL())
+}
+
+func TestHandleShortcuts(t *testing.T) {
+	app := tview.NewApplication()
+	_ = List(app)
+	testInsts := []model.Instance{
+		{Name: "i1", URLs: []string{"http://test"}},
+	}
+	Load(testInsts)
+	listTable.Table.Select(1, 0)
+
+	// Test 'o' shortcut
+	ev := tcell.NewEventKey(tcell.KeyRune, 'o', tcell.ModNone)
+	assert.NotPanics(t, func() {
+		ret := HandleShortcuts(ev)
+		_ = ret
+	})
+
+	// Test unknown key
+	ev2 := tcell.NewEventKey(tcell.KeyRune, 'z', tcell.ModNone)
+	ret := HandleShortcuts(ev2)
+	assert.Equal(t, ev2, ret)
+}
+
+func TestHandleShortcuts_ProxyOpenURL(t *testing.T) {
+	app := tview.NewApplication()
+	_ = List(app)
+	testInsts := []model.Instance{
+		{
+			Name: "i1",
+			URLs: []string{"http://public"},
+			Proxy: &model_service.ProxyStatus{
+				Enabled: true,
+				Port:    8080,
+				URL:     "http://127.0.0.1:8080",
+			},
+		},
+	}
+	Load(testInsts)
+	listTable.Table.Select(1, 0)
+
+	ev := tcell.NewEventKey(tcell.KeyRune, 'o', tcell.ModNone)
+	assert.NotPanics(t, func() {
+		HandleShortcuts(ev)
+	})
+}
+
+func TestHandleShortcuts_Proxy(t *testing.T) {
+	app := tview.NewApplication()
+	_ = List(app)
+	testInsts := []model.Instance{
+		{Name: "i1", URLs: []string{"http://test"}},
+	}
+	Load(testInsts)
+	listTable.Table.Select(1, 0)
+
+	ev := tcell.NewEventKey(tcell.KeyRune, 'p', tcell.ModNone)
+	assert.NotPanics(t, func() {
+		HandleShortcuts(ev)
+	})
+}

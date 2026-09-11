@@ -544,6 +544,9 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 			}
 			return nil
 		}
+		if result := instance.HandleShortcuts(event); result == nil {
+			return nil
+		}
 	}
 
 	// Domain Mapping List

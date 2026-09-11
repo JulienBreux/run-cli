@@ -532,4 +532,12 @@ func TestShortcuts_InstanceList(t *testing.T) {
 	assert.Equal(t, instance.DELETE_MODAL_PAGE_ID, currentPageID)
 	rootPages.RemovePage(instance.DELETE_MODAL_PAGE_ID)
 	currentPageID = instance.LIST_PAGE_ID
+
+	// 'p' -> Toggle Proxy
+	resP := shortcuts(tcell.NewEventKey(tcell.KeyRune, 'p', tcell.ModNone))
+	assert.Nil(t, resP)
+
+	// 'o' -> Open URL
+	resO := shortcuts(tcell.NewEventKey(tcell.KeyRune, 'o', tcell.ModNone))
+	_ = resO
 }

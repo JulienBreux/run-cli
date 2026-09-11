@@ -30,11 +30,11 @@
 - [x] Task: Conductor - User Manual Verification 'TUI List View & Proxy Management' (Protocol in workflow.md) [checkpoint: 6eb277a]
 
 ## Phase 3: Authentication Modal & App Integration (TDD)
-- [~] Task: Create Instance Authentication Modal
-    - [ ] Write unit tests for Instance Auth modal in `internal/run/tui/app/instance/auth/auth_test.go`
-    - [ ] Implement modal in `internal/run/tui/app/instance/auth/auth.go` with dropdown and asynchronous save
-    - [ ] Run tests and verify coverage
-- [ ] Task: Wire Keyboard Events and Modal in Application Controller
+- [x] Task: Create Instance Authentication Modal a986123
+    - [x] Write unit tests for Instance Auth modal in `internal/run/tui/app/instance/auth/auth_test.go`
+    - [x] Implement modal in `internal/run/tui/app/instance/auth/auth.go` with dropdown and asynchronous save
+    - [x] Run tests and verify coverage
+- [~] Task: Wire Keyboard Events and Modal in Application Controller
     - [ ] Add `openInstanceAuthModal` in `internal/run/tui/app/modal.go`
     - [ ] Wire `a`, `p`, and `o` shortcuts in `internal/run/tui/app/app.go` for `instance.LIST_PAGE_ID`
     - [ ] Write unit tests in `internal/run/tui/app/app_test.go` and `modal_test.go`

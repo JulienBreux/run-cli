@@ -1,0 +1,5 @@
+Task: Update Instances Table Headers and Cells for PROXY and AUTH
+Summary: Added PROXY ('') and AUTH ('AUTH') column headers and expansions to the instance list table. Updated cell rendering to display '[green]P' when proxy is active and '[red]Yes'/'[green]No' according to InvokerIamDisabled. Updated GetSelectedInstance to reference name and region from columns 2 and 3. Added unit tests for rendering proxy and auth states with 90.3% coverage.
+Files modified:
+- internal/run/tui/app/instance/instance.go
+- internal/run/tui/app/instance/instance_test.go

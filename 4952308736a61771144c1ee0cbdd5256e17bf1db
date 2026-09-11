@@ -1,0 +1,6 @@
+Task: Register Shortcuts and Update Context Footer
+Summary: Registered 'a' (Auth), 'o' (Open URL), and 'p' (Proxy) shortcuts for CategoryInstanceList in shortcut.go Registry. Tested shortcut retrieval, dynamic proxy footer formatting ('Proxy (127.0.0.1:port)', 'Open URL (proxy)'), and context shortcut rendering for instances.
+Files modified:
+- internal/run/tui/app/shortcut/shortcut.go
+- internal/run/tui/app/shortcut/shortcut_test.go
+- internal/run/tui/app/instance/instance_test.go

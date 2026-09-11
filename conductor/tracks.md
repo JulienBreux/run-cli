@@ -14,6 +14,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: Add the same features as for services to manage authentication and proxy for instances**
+- [x] **Track: Add the same features as for services to manage authentication and proxy for instances**
 *Link: [./tracks/instance_auth_proxy_20260911/](./tracks/instance_auth_proxy_20260911/)*
 

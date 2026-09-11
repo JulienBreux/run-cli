@@ -39,10 +39,10 @@
     - [x] Wire `a`, `p`, and `o` shortcuts in `internal/run/tui/app/app.go` for `instance.LIST_PAGE_ID`
     - [x] Write unit tests in `internal/run/tui/app/app_test.go` and `modal_test.go`
     - [x] Run tests and verify coverage
-- [~] Task: Conductor - User Manual Verification 'Authentication Modal & App Integration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Authentication Modal & App Integration' (Protocol in workflow.md) [checkpoint: d766bbf]
 
 ## Phase 4: Verification & Documentation
-- [ ] Task: Document New Shortcuts in README.md
+- [~] Task: Document New Shortcuts in README.md
     - [ ] Update `README.md` with Instance proxy (`p`), auth (`a`), and open (`o`) shortcuts and table columns
 - [ ] Task: Quality Gates & Linting
     - [ ] Run `make test` to verify complete test suite and coverage

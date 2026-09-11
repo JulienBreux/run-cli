@@ -33,6 +33,8 @@ import (
 
 var (
 	listHeaders = []string{
+		"",
+		"AUTH",
 		"NAME",
 		"REGION",
 		"STATUS",
@@ -41,6 +43,8 @@ var (
 	}
 
 	listExpansions = []int{
+		1, // PROXY
+		1, // AUTH
 		2, // NAME
 		1, // REGION
 		1, // STATUS
@@ -143,12 +147,24 @@ func render(insts []model.Instance) {
 			updatedAt = humanize.Time(inst.UpdateTime)
 		}
 
+		proxyStatus := ""
+		if inst.Proxy != nil && inst.Proxy.Enabled {
+			proxyStatus = "[green]P"
+		}
+
+		authStatus := "[red]Yes"
+		if inst.InvokerIamDisabled {
+			authStatus = "[green]No"
+		}
+
 		row := i + 1
-		listTable.Table.SetCell(row, 0, tview.NewTableCell(inst.ID()))
-		listTable.Table.SetCell(row, 1, tview.NewTableCell(inst.Region))
-		listTable.Table.SetCell(row, 2, tview.NewTableCell(formattedStatus))
-		listTable.Table.SetCell(row, 3, tview.NewTableCell(containersStr))
-		listTable.Table.SetCell(row, 4, tview.NewTableCell(updatedAt))
+		listTable.Table.SetCell(row, 0, tview.NewTableCell(proxyStatus))
+		listTable.Table.SetCell(row, 1, tview.NewTableCell(authStatus))
+		listTable.Table.SetCell(row, 2, tview.NewTableCell(inst.ID()))
+		listTable.Table.SetCell(row, 3, tview.NewTableCell(inst.Region))
+		listTable.Table.SetCell(row, 4, tview.NewTableCell(formattedStatus))
+		listTable.Table.SetCell(row, 5, tview.NewTableCell(containersStr))
+		listTable.Table.SetCell(row, 6, tview.NewTableCell(updatedAt))
 	}
 
 	listTable.Table.SetTitle(fmt.Sprintf(" %s (%d) ", LIST_PAGE_TITLE, len(insts)))
@@ -161,8 +177,8 @@ func GetSelectedInstance() (string, string) {
 	if row < 1 {
 		return "", ""
 	}
-	name := listTable.Table.GetCell(row, 0).Text
-	region := listTable.Table.GetCell(row, 1).Text
+	name := listTable.Table.GetCell(row, 2).Text
+	region := listTable.Table.GetCell(row, 3).Text
 	return name, region
 }
 

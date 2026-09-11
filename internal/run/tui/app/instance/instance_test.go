@@ -25,6 +25,7 @@ import (
 	"github.com/JulienBreux/run-cli/internal/run/model/common/container"
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
 	model "github.com/JulienBreux/run-cli/internal/run/model/instance"
+	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/footer"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -60,10 +61,12 @@ func TestLoad(t *testing.T) {
 
 	assert.Equal(t, newInsts, instances)
 	assert.Equal(t, 2, listTable.Table.GetRowCount())
-	assert.Equal(t, "inst-1", listTable.Table.GetCell(1, 0).Text)
-	assert.Equal(t, "us-central1", listTable.Table.GetCell(1, 1).Text)
-	assert.Contains(t, listTable.Table.GetCell(1, 2).Text, "Ready")
-	assert.Contains(t, listTable.Table.GetCell(1, 3).Text, "c1")
+	assert.Equal(t, "", listTable.Table.GetCell(1, 0).Text)
+	assert.Contains(t, listTable.Table.GetCell(1, 1).Text, "Yes")
+	assert.Equal(t, "inst-1", listTable.Table.GetCell(1, 2).Text)
+	assert.Equal(t, "us-central1", listTable.Table.GetCell(1, 3).Text)
+	assert.Contains(t, listTable.Table.GetCell(1, 4).Text, "Ready")
+	assert.Contains(t, listTable.Table.GetCell(1, 5).Text, "c1")
 }
 
 func TestListReload(t *testing.T) {
@@ -104,7 +107,7 @@ func TestListReload(t *testing.T) {
 
 	assert.Equal(t, expected, instances)
 	assert.Equal(t, 2, listTable.Table.GetRowCount())
-	assert.Equal(t, "inst-reloaded", listTable.Table.GetCell(1, 0).Text)
+	assert.Equal(t, "inst-reloaded", listTable.Table.GetCell(1, 2).Text)
 }
 
 func TestListReload_Error(t *testing.T) {
@@ -150,8 +153,8 @@ func TestGetSelectedInstance(t *testing.T) {
 	}
 
 	row := 1
-	listTable.Table.SetCell(row, 0, tview.NewTableCell("inst-1"))
-	listTable.Table.SetCell(row, 1, tview.NewTableCell("us-central1"))
+	listTable.Table.SetCell(row, 2, tview.NewTableCell("inst-1"))
+	listTable.Table.SetCell(row, 3, tview.NewTableCell("us-central1"))
 	listTable.Table.Select(row, 0)
 
 	name, region := GetSelectedInstance()
@@ -231,10 +234,49 @@ func TestRender(t *testing.T) {
 	render(testInsts)
 
 	assert.Equal(t, 4, listTable.Table.GetRowCount())
-	assert.Equal(t, "inst-1", listTable.Table.GetCell(1, 0).Text)
-	assert.Equal(t, "us-central1", listTable.Table.GetCell(1, 1).Text)
-	assert.Contains(t, listTable.Table.GetCell(1, 2).Text, "Ready")
-	assert.Contains(t, listTable.Table.GetCell(1, 3).Text, "web, sidecar")
-	assert.Contains(t, listTable.Table.GetCell(2, 2).Text, "Failed")
-	assert.Contains(t, listTable.Table.GetCell(3, 2).Text, "Unknown")
+	assert.Equal(t, "", listTable.Table.GetCell(1, 0).Text)
+	assert.Contains(t, listTable.Table.GetCell(1, 1).Text, "Yes")
+	assert.Equal(t, "inst-1", listTable.Table.GetCell(1, 2).Text)
+	assert.Equal(t, "us-central1", listTable.Table.GetCell(1, 3).Text)
+	assert.Contains(t, listTable.Table.GetCell(1, 4).Text, "Ready")
+	assert.Contains(t, listTable.Table.GetCell(1, 5).Text, "web, sidecar")
+	assert.Contains(t, listTable.Table.GetCell(2, 4).Text, "Failed")
+	assert.Contains(t, listTable.Table.GetCell(3, 4).Text, "Unknown")
+}
+
+func TestRender_ProxyAndAuth(t *testing.T) {
+	app := tview.NewApplication()
+	_ = List(app)
+
+	testInsts := []model.Instance{
+		{
+			Name:   "projects/p/locations/r/instances/inst-proxy-auth",
+			Region: "us-central1",
+			Proxy: &model_service.ProxyStatus{
+				Enabled: true,
+				Port:    8080,
+				URL:     "http://127.0.0.1:8080",
+			},
+			InvokerIamDisabled: true, // Auth: No
+		},
+		{
+			Name:               "projects/p/locations/r/instances/inst-no-proxy-auth",
+			Region:             "us-central1",
+			Proxy:              nil,
+			InvokerIamDisabled: false, // Auth: Yes
+		},
+	}
+
+	render(testInsts)
+
+	assert.Equal(t, 3, listTable.Table.GetRowCount())
+	assert.Equal(t, "[green]P", listTable.Table.GetCell(1, 0).Text)
+	assert.Equal(t, "[green]No", listTable.Table.GetCell(1, 1).Text)
+	assert.Equal(t, "inst-proxy-auth", listTable.Table.GetCell(1, 2).Text)
+	assert.Equal(t, "us-central1", listTable.Table.GetCell(1, 3).Text)
+
+	assert.Equal(t, "", listTable.Table.GetCell(2, 0).Text)
+	assert.Equal(t, "[red]Yes", listTable.Table.GetCell(2, 1).Text)
+	assert.Equal(t, "inst-no-proxy-auth", listTable.Table.GetCell(2, 2).Text)
+	assert.Equal(t, "us-central1", listTable.Table.GetCell(2, 3).Text)
 }

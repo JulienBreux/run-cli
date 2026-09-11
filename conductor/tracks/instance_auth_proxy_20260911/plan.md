@@ -27,10 +27,10 @@
     - [x] Register `a`, `p`, and `o` in `internal/run/tui/app/shortcut/shortcut.go` under `CategoryInstanceList`
     - [x] Update dynamic shortcut bar in `instance.Shortcuts()` to show active proxy port when enabled
     - [x] Run tests in `shortcut_test.go` and `instance_test.go`
-- [~] Task: Conductor - User Manual Verification 'TUI List View & Proxy Management' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'TUI List View & Proxy Management' (Protocol in workflow.md) [checkpoint: 6eb277a]
 
 ## Phase 3: Authentication Modal & App Integration (TDD)
-- [ ] Task: Create Instance Authentication Modal
+- [~] Task: Create Instance Authentication Modal
     - [ ] Write unit tests for Instance Auth modal in `internal/run/tui/app/instance/auth/auth_test.go`
     - [ ] Implement modal in `internal/run/tui/app/instance/auth/auth.go` with dropdown and asynchronous save
     - [ ] Run tests and verify coverage

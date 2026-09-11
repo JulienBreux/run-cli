@@ -18,12 +18,12 @@
     - [x] Update `listHeaders` and `listExpansions` with `PROXY` and `AUTH` columns
     - [x] Render proxy status indicator (`[green]P[white]`) and auth status indicator (`[red]Yes[white]` / `[green]No[white]`)
     - [x] Run tests and verify coverage
-- [~] Task: Implement Proxy Toggle and Open URL Actions for Instances
-    - [ ] Write unit tests for `toggleProxy` and `OpenURL` logic in `internal/run/tui/app/instance/instance_test.go`
-    - [ ] Integrate `proxy.Manager` in `internal/run/tui/app/instance/instance.go` to start/stop proxy on instance primary URL
-    - [ ] Implement `GetSelectedInstanceURL()` and open browser URL logic (`o` key)
-    - [ ] Run tests and verify coverage
-- [ ] Task: Register Shortcuts and Update Context Footer
+- [x] Task: Implement Proxy Toggle and Open URL Actions for Instances 3627ee4
+    - [x] Write unit tests for `toggleProxy` and `OpenURL` logic in `internal/run/tui/app/instance/instance_test.go`
+    - [x] Integrate `proxy.Manager` in `internal/run/tui/app/instance/instance.go` to start/stop proxy on instance primary URL
+    - [x] Implement `GetSelectedInstanceURL()` and open browser URL logic (`o` key)
+    - [x] Run tests and verify coverage
+- [~] Task: Register Shortcuts and Update Context Footer
     - [ ] Register `a`, `p`, and `o` in `internal/run/tui/app/shortcut/shortcut.go` under `CategoryInstanceList`
     - [ ] Update dynamic shortcut bar in `instance.Shortcuts()` to show active proxy port when enabled
     - [ ] Run tests in `shortcut_test.go` and `instance_test.go`

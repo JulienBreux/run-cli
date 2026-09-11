@@ -89,6 +89,17 @@ func Delete(project, region, name string) error {
 	return err
 }
 
+// UpdateAuthentication updates the authentication setting for an instance.
+func UpdateAuthentication(ctx context.Context, project, region, name string, allowUnauthenticated bool) (*model.Instance, error) {
+	fullName := formatInstanceName(project, region, name)
+	resp, err := apiClient.UpdateAuthentication(ctx, fullName, allowUnauthenticated)
+	if err != nil {
+		return nil, err
+	}
+	inst := mapInstance(resp, region, project)
+	return &inst, nil
+}
+
 func formatInstanceName(project, region, name string) string {
 	if strings.HasPrefix(name, "projects/") {
 		return name

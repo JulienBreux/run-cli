@@ -27,6 +27,7 @@ import (
 	"github.com/googleapis/gax-go/v2"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
+	runv2 "google.golang.org/api/run/v2"
 )
 
 // Interfaces for mocking
@@ -36,6 +37,7 @@ type InstancesClientWrapper interface {
 	StartInstance(ctx context.Context, req *runpb.StartInstanceRequest, opts ...gax.CallOption) (InstanceOperationWrapper, error)
 	StopInstance(ctx context.Context, req *runpb.StopInstanceRequest, opts ...gax.CallOption) (InstanceOperationWrapper, error)
 	DeleteInstance(ctx context.Context, req *runpb.DeleteInstanceRequest, opts ...gax.CallOption) (InstanceOperationWrapper, error)
+	UpdateAuthentication(ctx context.Context, name string, allowUnauthenticated bool) (*runpb.Instance, error)
 	Close() error
 }
 
@@ -93,6 +95,21 @@ func (w *GCPInstancesClientWrapper) DeleteInstance(ctx context.Context, req *run
 	return &GCPInstanceOperationWrapper{waitFunc: op.Wait}, nil
 }
 
+func (w *GCPInstancesClientWrapper) UpdateAuthentication(ctx context.Context, name string, allowUnauthenticated bool) (*runpb.Instance, error) {
+	runService, err := runv2.NewService(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create run service: %w", err)
+	}
+	inst := &runv2.GoogleCloudRunV2Instance{
+		InvokerIamDisabled: allowUnauthenticated,
+	}
+	_, err = runService.Projects.Locations.Instances.Patch(name, inst).UpdateMask("invoker_iam_disabled").Context(ctx).Do()
+	if err != nil {
+		return nil, fmt.Errorf("failed to update instance authentication: %w", err)
+	}
+	return w.GetInstance(ctx, &runpb.GetInstanceRequest{Name: name})
+}
+
 func (w *GCPInstancesClientWrapper) Close() error {
 	return w.client.Close()
 }
@@ -120,6 +137,7 @@ type Client interface {
 	StartInstance(ctx context.Context, name string) (*runpb.Instance, error)
 	StopInstance(ctx context.Context, name string) (*runpb.Instance, error)
 	DeleteInstance(ctx context.Context, name string) (*runpb.Instance, error)
+	UpdateAuthentication(ctx context.Context, name string, allowUnauthenticated bool) (*runpb.Instance, error)
 }
 
 var _ Client = (*GCPClient)(nil)
@@ -236,4 +254,19 @@ func (c *GCPClient) DeleteInstance(ctx context.Context, name string) (*runpb.Ins
 	}
 
 	return op.Wait(ctx)
+}
+
+// UpdateAuthentication updates the authentication setting for an instance.
+func (c *GCPClient) UpdateAuthentication(ctx context.Context, name string, allowUnauthenticated bool) (*runpb.Instance, error) {
+	cClient, err := c.getClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := cClient.UpdateAuthentication(ctx, name, allowUnauthenticated)
+	if err != nil {
+		return nil, client.WrapError(err)
+	}
+
+	return resp, nil
 }

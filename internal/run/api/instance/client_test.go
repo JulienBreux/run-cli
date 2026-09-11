@@ -37,6 +37,7 @@ type MockClient struct {
 	StartInstanceFunc  func(ctx context.Context, name string) (*runpb.Instance, error)
 	StopInstanceFunc   func(ctx context.Context, name string) (*runpb.Instance, error)
 	DeleteInstanceFunc func(ctx context.Context, name string) (*runpb.Instance, error)
+	UpdateAuthenticationFunc func(ctx context.Context, name string, allowUnauthenticated bool) (*runpb.Instance, error)
 }
 
 func (m *MockClient) ListInstances(ctx context.Context, project, region string) ([]*runpb.Instance, error) {
@@ -70,6 +71,13 @@ func (m *MockClient) StopInstance(ctx context.Context, name string) (*runpb.Inst
 func (m *MockClient) DeleteInstance(ctx context.Context, name string) (*runpb.Instance, error) {
 	if m.DeleteInstanceFunc != nil {
 		return m.DeleteInstanceFunc(ctx, name)
+	}
+	return nil, nil
+}
+
+func (m *MockClient) UpdateAuthentication(ctx context.Context, name string, allowUnauthenticated bool) (*runpb.Instance, error) {
+	if m.UpdateAuthenticationFunc != nil {
+		return m.UpdateAuthenticationFunc(ctx, name, allowUnauthenticated)
 	}
 	return nil, nil
 }
@@ -330,6 +338,44 @@ func TestDelete_Error(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestUpdateAuthentication(t *testing.T) {
+	originalClient := apiClient
+	defer func() { apiClient = originalClient }()
+
+	mock := &MockClient{}
+	apiClient = mock
+
+	mock.UpdateAuthenticationFunc = func(ctx context.Context, name string, allowUnauthenticated bool) (*runpb.Instance, error) {
+		assert.Equal(t, "projects/p/locations/r/instances/inst1", name)
+		assert.True(t, allowUnauthenticated)
+		return &runpb.Instance{
+			Name:               name,
+			InvokerIamDisabled: allowUnauthenticated,
+		}, nil
+	}
+
+	inst, err := UpdateAuthentication(context.Background(), "p", "r", "inst1", true)
+	assert.NoError(t, err)
+	assert.NotNil(t, inst)
+	assert.True(t, inst.InvokerIamDisabled)
+}
+
+func TestUpdateAuthentication_Error(t *testing.T) {
+	originalClient := apiClient
+	defer func() { apiClient = originalClient }()
+
+	mock := &MockClient{}
+	apiClient = mock
+
+	mock.UpdateAuthenticationFunc = func(ctx context.Context, name string, allowUnauthenticated bool) (*runpb.Instance, error) {
+		return nil, assert.AnError
+	}
+
+	inst, err := UpdateAuthentication(context.Background(), "p", "r", "inst1", false)
+	assert.Error(t, err)
+	assert.Nil(t, inst)
+}
+
 // --- Mocks for GCPClient testing ---
 
 type MockInstancesClientWrapper struct {
@@ -338,6 +384,7 @@ type MockInstancesClientWrapper struct {
 	StartInstanceFunc  func(ctx context.Context, req *runpb.StartInstanceRequest, opts ...gax.CallOption) (InstanceOperationWrapper, error)
 	StopInstanceFunc   func(ctx context.Context, req *runpb.StopInstanceRequest, opts ...gax.CallOption) (InstanceOperationWrapper, error)
 	DeleteInstanceFunc func(ctx context.Context, req *runpb.DeleteInstanceRequest, opts ...gax.CallOption) (InstanceOperationWrapper, error)
+	UpdateAuthenticationFunc func(ctx context.Context, name string, allowUnauthenticated bool) (*runpb.Instance, error)
 	CloseFunc          func() error
 }
 
@@ -372,6 +419,13 @@ func (m *MockInstancesClientWrapper) StopInstance(ctx context.Context, req *runp
 func (m *MockInstancesClientWrapper) DeleteInstance(ctx context.Context, req *runpb.DeleteInstanceRequest, opts ...gax.CallOption) (InstanceOperationWrapper, error) {
 	if m.DeleteInstanceFunc != nil {
 		return m.DeleteInstanceFunc(ctx, req, opts...)
+	}
+	return nil, nil
+}
+
+func (m *MockInstancesClientWrapper) UpdateAuthentication(ctx context.Context, name string, allowUnauthenticated bool) (*runpb.Instance, error) {
+	if m.UpdateAuthenticationFunc != nil {
+		return m.UpdateAuthenticationFunc(ctx, name, allowUnauthenticated)
 	}
 	return nil, nil
 }
@@ -520,6 +574,23 @@ func TestGCPClient_DeleteInstance(t *testing.T) {
 	assert.NotNil(t, res)
 }
 
+func TestGCPClient_UpdateAuthentication(t *testing.T) {
+	ctx := context.Background()
+	mockWrapper := &MockInstancesClientWrapper{
+		UpdateAuthenticationFunc: func(ctx context.Context, name string, allowUnauthenticated bool) (*runpb.Instance, error) {
+			assert.Equal(t, "inst1", name)
+			assert.True(t, allowUnauthenticated)
+			return &runpb.Instance{Name: "inst1", InvokerIamDisabled: true}, nil
+		},
+	}
+
+	client := &GCPClient{client: mockWrapper}
+	res, err := client.UpdateAuthentication(ctx, "inst1", true)
+	assert.NoError(t, err)
+	assert.NotNil(t, res)
+	assert.True(t, res.InvokerIamDisabled)
+}
+
 func TestGCPClient_Errors(t *testing.T) {
 	ctx := context.Background()
 	mockWrapper := &MockInstancesClientWrapper{
@@ -535,6 +606,9 @@ func TestGCPClient_Errors(t *testing.T) {
 		DeleteInstanceFunc: func(ctx context.Context, req *runpb.DeleteInstanceRequest, opts ...gax.CallOption) (InstanceOperationWrapper, error) {
 			return nil, errors.New("delete error")
 		},
+		UpdateAuthenticationFunc: func(ctx context.Context, name string, allowUnauthenticated bool) (*runpb.Instance, error) {
+			return nil, errors.New("update auth error")
+		},
 	}
 
 	client := &GCPClient{client: mockWrapper}
@@ -549,6 +623,9 @@ func TestGCPClient_Errors(t *testing.T) {
 	assert.Error(t, err)
 
 	_, err = client.DeleteInstance(ctx, "name")
+	assert.Error(t, err)
+
+	_, err = client.UpdateAuthentication(ctx, "name", true)
 	assert.Error(t, err)
 }
 
@@ -578,6 +655,8 @@ func TestWrappers_Delegation(t *testing.T) {
 		assert.Panics(t, func() { _, _ = w.StopInstance(context.Background(), nil) })
 		assert.Panics(t, func() { _, _ = w.DeleteInstance(context.Background(), nil) })
 		assert.Panics(t, func() { _ = w.Close() })
+		_, err := w.UpdateAuthentication(context.Background(), "name", true)
+		assert.Error(t, err)
 	})
 
 	t.Run("GCPInstanceIteratorWrapper", func(t *testing.T) {

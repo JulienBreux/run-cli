@@ -1,0 +1,4 @@
+Task: Document New Shortcuts in README.md
+Summary: Updated README.md with Cloud Run Instance authentication management ('a') and local proxy ('p' and 'o') features.
+Files modified:
+- README.md

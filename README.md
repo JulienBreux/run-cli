@@ -52,7 +52,7 @@ The idea is to establish a high-performance, terminal-based alternative to the G
 
 ### 🖥️ Instances
 
-*   **Instance Management:** View, inspect, and manage your Google Cloud Run instances (`Ctrl+I`).
+*   **Instance Management:** View, inspect, and manage your Google Cloud Run instances (`Ctrl+N`).
 *   **Direct Lifecycle Actions:** Start (`s`), Stop (`x`), and Delete (`k`) instances interactively.
 *   **Instance Dashboard:** Explore multi-tab inspection dashboards including Overview, Containers, Conditions & Networking, and raw syntax-highlighted YAML/JSON definitions (`Enter`).
 *   **Log Viewer:** Stream Cloud Logging records specific to instances (`l`).

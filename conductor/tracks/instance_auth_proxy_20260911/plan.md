@@ -5,11 +5,11 @@
     - [x] Write unit test for Instance model proxy field and status in `internal/run/model/instance/instance_test.go`
     - [x] Add `Proxy *model_service.ProxyStatus` to `Instance` struct in `internal/run/model/instance/instance.go`
     - [x] Run tests and verify coverage
-- [ ] Task: Implement `UpdateAuthentication` API for Instances
-    - [ ] Extend `InstancesClientWrapper` interface and mock in `internal/run/api/instance/client.go`
-    - [ ] Write unit tests for `UpdateAuthentication` in `internal/run/api/instance/instance_test.go`
-    - [ ] Implement `UpdateAuthentication` in `internal/run/api/instance/instance.go`
-    - [ ] Run tests and verify coverage
+- [x] Task: Implement `UpdateAuthentication` API for Instances 8030329
+    - [x] Extend `InstancesClientWrapper` interface and mock in `internal/run/api/instance/client.go`
+    - [x] Write unit tests for `UpdateAuthentication` in `internal/run/api/instance/instance_test.go`
+    - [x] Implement `UpdateAuthentication` in `internal/run/api/instance/instance.go`
+    - [x] Run tests and verify coverage
 - [ ] Task: Conductor - User Manual Verification 'API & Data Model Support' (Protocol in workflow.md)
 
 ## Phase 2: TUI List View & Proxy Management (TDD)

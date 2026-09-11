@@ -1,0 +1,5 @@
+Task: Extend Instance Model with Proxy Status
+Summary: Added Proxy *model_service.ProxyStatus to the Instance struct and added unit test verifying proxy assignment.
+Files modified:
+- internal/run/model/instance/instance.go
+- internal/run/model/instance/instance_test.go

@@ -1,0 +1,5 @@
+Task: Create Instance Authentication Modal
+Summary: Implemented the Instance Authentication modal component in internal/run/tui/app/instance/auth/auth.go matching service authentication UX with dropdown for 'Require authentication' and 'Allow unauthenticated invocations'. Added async save operation with status spinner and error/completion callbacks. Added comprehensive unit tests in auth_test.go achieving 93.1% statement coverage.
+Files modified:
+- internal/run/tui/app/instance/auth/auth.go
+- internal/run/tui/app/instance/auth/auth_test.go

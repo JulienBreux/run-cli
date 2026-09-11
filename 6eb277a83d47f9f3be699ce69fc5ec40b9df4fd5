@@ -1,0 +1,11 @@
+Phase: TUI List View & Proxy Management
+Status: Approved by user
+Coverage Summary:
+- internal/run/tui/app/instance: 89.5%
+- internal/run/tui/app/shortcut: 100%
+- All test suites passing with 0 lint errors
+Verification Details:
+- Table headers & cells updated with PROXY ('P') and AUTH ('Yes'/'No')
+- Proxy toggle ('p') and open URL ('o') actions implemented and wired in app.go
+- Shortcuts registered under CategoryInstanceList with dynamic proxy footer formatting
+- Verified via automated tests and approved by user manual verification.

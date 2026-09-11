@@ -22,6 +22,7 @@ import (
 
 	"github.com/JulienBreux/run-cli/internal/run/model/common/condition"
 	"github.com/JulienBreux/run-cli/internal/run/model/common/container"
+	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -163,4 +164,19 @@ func TestInstanceID(t *testing.T) {
 
 	inst3 := Instance{Name: ""}
 	assert.Equal(t, "", inst3.ID())
+}
+
+func TestInstanceProxy(t *testing.T) {
+	inst := Instance{
+		Name: "test-instance",
+		Proxy: &model_service.ProxyStatus{
+			Enabled: true,
+			Port:    8080,
+			URL:     "http://127.0.0.1:8080",
+		},
+	}
+	assert.NotNil(t, inst.Proxy)
+	assert.True(t, inst.Proxy.Enabled)
+	assert.Equal(t, 8080, inst.Proxy.Port)
+	assert.Equal(t, "http://127.0.0.1:8080", inst.Proxy.URL)
 }

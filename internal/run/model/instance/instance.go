@@ -23,6 +23,7 @@ import (
 	"github.com/JulienBreux/run-cli/internal/run/model/common/condition"
 	"github.com/JulienBreux/run-cli/internal/run/model/common/container"
 	"github.com/JulienBreux/run-cli/internal/run/model/common/volume"
+	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
 )
 
 // Instance represents a Google Cloud Run Instance.
@@ -61,6 +62,7 @@ type Instance struct {
 	IapEnabled                 bool                   `json:"iapEnabled,omitempty"`
 	Region                     string                 `json:"region"`
 	Project                    string                 `json:"project"`
+	Proxy                      *model_service.ProxyStatus `json:"proxy,omitempty"`
 }
 
 // ContainerStatus holds container status information for an Instance.

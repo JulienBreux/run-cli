@@ -23,11 +23,11 @@
     - [x] Integrate `proxy.Manager` in `internal/run/tui/app/instance/instance.go` to start/stop proxy on instance primary URL
     - [x] Implement `GetSelectedInstanceURL()` and open browser URL logic (`o` key)
     - [x] Run tests and verify coverage
-- [~] Task: Register Shortcuts and Update Context Footer
-    - [ ] Register `a`, `p`, and `o` in `internal/run/tui/app/shortcut/shortcut.go` under `CategoryInstanceList`
-    - [ ] Update dynamic shortcut bar in `instance.Shortcuts()` to show active proxy port when enabled
-    - [ ] Run tests in `shortcut_test.go` and `instance_test.go`
-- [ ] Task: Conductor - User Manual Verification 'TUI List View & Proxy Management' (Protocol in workflow.md)
+- [x] Task: Register Shortcuts and Update Context Footer 4952308
+    - [x] Register `a`, `p`, and `o` in `internal/run/tui/app/shortcut/shortcut.go` under `CategoryInstanceList`
+    - [x] Update dynamic shortcut bar in `instance.Shortcuts()` to show active proxy port when enabled
+    - [x] Run tests in `shortcut_test.go` and `instance_test.go`
+- [~] Task: Conductor - User Manual Verification 'TUI List View & Proxy Management' (Protocol in workflow.md)
 
 ## Phase 3: Authentication Modal & App Integration (TDD)
 - [ ] Task: Create Instance Authentication Modal

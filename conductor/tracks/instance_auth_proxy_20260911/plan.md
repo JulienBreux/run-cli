@@ -34,12 +34,12 @@
     - [x] Write unit tests for Instance Auth modal in `internal/run/tui/app/instance/auth/auth_test.go`
     - [x] Implement modal in `internal/run/tui/app/instance/auth/auth.go` with dropdown and asynchronous save
     - [x] Run tests and verify coverage
-- [~] Task: Wire Keyboard Events and Modal in Application Controller
-    - [ ] Add `openInstanceAuthModal` in `internal/run/tui/app/modal.go`
-    - [ ] Wire `a`, `p`, and `o` shortcuts in `internal/run/tui/app/app.go` for `instance.LIST_PAGE_ID`
-    - [ ] Write unit tests in `internal/run/tui/app/app_test.go` and `modal_test.go`
-    - [ ] Run tests and verify coverage
-- [ ] Task: Conductor - User Manual Verification 'Authentication Modal & App Integration' (Protocol in workflow.md)
+- [x] Task: Wire Keyboard Events and Modal in Application Controller 61f9799
+    - [x] Add `openInstanceAuthModal` in `internal/run/tui/app/modal.go`
+    - [x] Wire `a`, `p`, and `o` shortcuts in `internal/run/tui/app/app.go` for `instance.LIST_PAGE_ID`
+    - [x] Write unit tests in `internal/run/tui/app/app_test.go` and `modal_test.go`
+    - [x] Run tests and verify coverage
+- [~] Task: Conductor - User Manual Verification 'Authentication Modal & App Integration' (Protocol in workflow.md)
 
 ## Phase 4: Verification & Documentation
 - [ ] Task: Document New Shortcuts in README.md

@@ -1,0 +1,7 @@
+Task: Implement Proxy Toggle and Open URL Actions for Instances
+Summary: Integrated proxy.Manager into instance TUI module with syncProxies and toggleProxy on the instance primary URL. Implemented GetSelectedInstanceURL() to prefer active proxy URL over cloud run primary URL. Added HandleShortcuts for 'p' (toggle proxy) and 'o' (open URL in browser) and integrated with app.go key routing. Added unit tests for proxy lifecycle, URL selection, and shortcut handling.
+Files modified:
+- internal/run/tui/app/instance/instance.go
+- internal/run/tui/app/instance/instance_test.go
+- internal/run/tui/app/app.go
+- internal/run/tui/app/app_test.go

@@ -54,6 +54,8 @@ The idea is to establish a high-performance, terminal-based alternative to the G
 
 *   **Instance Management:** View, inspect, and manage your Google Cloud Run instances (`Ctrl+I`).
 *   **Direct Lifecycle Actions:** Start (`s`), Stop (`x`), and Delete (`k`) instances interactively.
+*   **Authentication Management:** Toggle between "Require authentication" and "Allow unauthenticated invocations" directly from the interface (`a`).
+*   **Instance Proxy:** Locally proxy private instances with automatic authentication token injection (`p`) and open the active URL in your default browser (`o`).
 *   **Instance Dashboard:** Explore multi-tab inspection dashboards including Overview, Containers, Conditions & Networking, and raw syntax-highlighted YAML/JSON definitions (`Enter`).
 *   **Log Viewer:** Stream Cloud Logging records specific to instances (`l`).
 *   **Console Integration:** Direct shortcut (`Ctrl+Z`) to open the selected instance or instances list directly in Google Cloud Console.

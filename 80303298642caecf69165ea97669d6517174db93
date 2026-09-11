@@ -1,0 +1,6 @@
+Task: Implement UpdateAuthentication API for Instances
+Summary: Implemented UpdateAuthentication on Client, GCPClient, and GCPInstancesClientWrapper (using Google Cloud Run v2 REST Patch with UpdateMask) as well as the public api_instance.UpdateAuthentication function. Extended MockClient and MockInstancesClientWrapper with comprehensive unit tests achieving 84.7% statement coverage.
+Files modified:
+- internal/run/api/instance/client.go
+- internal/run/api/instance/instance.go
+- internal/run/api/instance/client_test.go

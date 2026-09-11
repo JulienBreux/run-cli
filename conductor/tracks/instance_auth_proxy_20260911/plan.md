@@ -1,10 +1,10 @@
 # Implementation Plan: Cloud Run Instances Authentication Management & Local Proxy Support
 
 ## Phase 1: API & Data Model Support (TDD)
-- [ ] Task: Extend Instance Model with Proxy Status
-    - [ ] Write unit test for Instance model proxy field and status in `internal/run/model/instance/instance_test.go`
-    - [ ] Add `Proxy *model_service.ProxyStatus` to `Instance` struct in `internal/run/model/instance/instance.go`
-    - [ ] Run tests and verify coverage
+- [x] Task: Extend Instance Model with Proxy Status 9ce2ad0
+    - [x] Write unit test for Instance model proxy field and status in `internal/run/model/instance/instance_test.go`
+    - [x] Add `Proxy *model_service.ProxyStatus` to `Instance` struct in `internal/run/model/instance/instance.go`
+    - [x] Run tests and verify coverage
 - [ ] Task: Implement `UpdateAuthentication` API for Instances
     - [ ] Extend `InstancesClientWrapper` interface and mock in `internal/run/api/instance/client.go`
     - [ ] Write unit tests for `UpdateAuthentication` in `internal/run/api/instance/instance_test.go`

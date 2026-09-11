@@ -13,12 +13,12 @@
 - [x] Task: Conductor - User Manual Verification 'API & Data Model Support' (Protocol in workflow.md)
 
 ## Phase 2: TUI List View & Proxy Management (TDD)
-- [ ] Task: Update Instances Table Headers and Cells for PROXY and AUTH
-    - [ ] Write unit tests for table rendering with proxy and auth statuses in `internal/run/tui/app/instance/instance_test.go`
-    - [ ] Update `listHeaders` and `listExpansions` with `PROXY` and `AUTH` columns
-    - [ ] Render proxy status indicator (`[green]P[white]`) and auth status indicator (`[red]Yes[white]` / `[green]No[white]`)
-    - [ ] Run tests and verify coverage
-- [ ] Task: Implement Proxy Toggle and Open URL Actions for Instances
+- [x] Task: Update Instances Table Headers and Cells for PROXY and AUTH 6072d28
+    - [x] Write unit tests for table rendering with proxy and auth statuses in `internal/run/tui/app/instance/instance_test.go`
+    - [x] Update `listHeaders` and `listExpansions` with `PROXY` and `AUTH` columns
+    - [x] Render proxy status indicator (`[green]P[white]`) and auth status indicator (`[red]Yes[white]` / `[green]No[white]`)
+    - [x] Run tests and verify coverage
+- [~] Task: Implement Proxy Toggle and Open URL Actions for Instances
     - [ ] Write unit tests for `toggleProxy` and `OpenURL` logic in `internal/run/tui/app/instance/instance_test.go`
     - [ ] Integrate `proxy.Manager` in `internal/run/tui/app/instance/instance.go` to start/stop proxy on instance primary URL
     - [ ] Implement `GetSelectedInstanceURL()` and open browser URL logic (`o` key)

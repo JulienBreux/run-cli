@@ -103,6 +103,9 @@ var Registry = []Shortcut{
 	{Key: "l", Rune: 'l', Description: "Logs", Category: CategoryInstanceList},
 	{Key: "s", Rune: 's', Description: "Start", Category: CategoryInstanceList},
 	{Key: "x", Rune: 'x', Description: "Stop", Category: CategoryInstanceList},
+	{Key: "a", Rune: 'a', Description: "Auth", Category: CategoryInstanceList},
+	{Key: "o", Rune: 'o', Description: "Open URL", Category: CategoryInstanceList},
+	{Key: "p", Rune: 'p', Description: "Proxy", Category: CategoryInstanceList},
 	{Key: "k", Rune: 'k', Description: "Delete", Category: CategoryInstanceList},
 	{Key: "enter", TCellKey: tcell.KeyEnter, Description: "Details", Category: CategoryInstanceList},
 

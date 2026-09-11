@@ -47,6 +47,17 @@ func TestGetByCategory(t *testing.T) {
 	// Test Empty Category
 	empty := GetByCategory("NonExistent")
 	assert.Empty(t, empty)
+
+	// Test Instance List Category
+	instShortcuts := GetByCategory(CategoryInstanceList)
+	assert.NotEmpty(t, instShortcuts)
+	keys := make(map[string]string)
+	for _, s := range instShortcuts {
+		keys[s.Key] = s.Description
+	}
+	assert.Equal(t, "Auth", keys["a"])
+	assert.Equal(t, "Open URL", keys["o"])
+	assert.Equal(t, "Proxy", keys["p"])
 }
 
 func TestFormatByCategory(t *testing.T) {

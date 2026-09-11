@@ -199,6 +199,31 @@ func TestShortcuts(t *testing.T) {
 	Shortcuts()
 }
 
+func TestShortcuts_Proxy(t *testing.T) {
+	_ = footer.New()
+	app := tview.NewApplication()
+	_ = List(app)
+
+	testInsts := []model.Instance{
+		{
+			Name: "projects/p/locations/r/instances/i1",
+			Proxy: &model_service.ProxyStatus{
+				Enabled: true,
+				Port:    1234,
+				URL:     "http://local",
+			},
+		},
+	}
+	Load(testInsts)
+	listTable.Table.Select(1, 0)
+
+	Shortcuts()
+
+	text := footer.ContextShortcutView.GetText(true)
+	assert.Contains(t, text, "Proxy (127.0.0.1:1234)")
+	assert.Contains(t, text, "Open URL (proxy)")
+}
+
 func TestRender(t *testing.T) {
 	app := tview.NewApplication()
 	_ = List(app)

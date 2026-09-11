@@ -1,0 +1,7 @@
+Task: Wire Keyboard Events and Modal in Application Controller
+Summary: Added openInstanceAuthModal in internal/run/tui/app/modal.go to present the instance authentication modal and refresh on completion. Handled 'a' key in app.go when on instance list page to trigger openInstanceAuthModal. Added unit tests in modal_test.go and app_test.go. All tests passing and 0 lint errors.
+Files modified:
+- internal/run/tui/app/modal.go
+- internal/run/tui/app/modal_test.go
+- internal/run/tui/app/app.go
+- internal/run/tui/app/app_test.go

@@ -1,0 +1,9 @@
+Phase: API & Data Model Support
+Checkpoint Commit: 1365dcef1ea1bc04c5bff6180f5cde99d496069b
+Automated Tests Command: make test && make lint && make build
+Automated Tests Result: All unit tests passed, coverage >= 80%, 0 lint issues, build succeeded.
+Manual Verification Steps:
+1. Verify Instance Model: Inspect internal/run/model/instance/instance.go to confirm Proxy field is present.
+2. Verify API Support: Inspect internal/run/api/instance/instance.go and internal/run/api/instance/client.go to confirm UpdateAuthentication is declared and implemented with Cloud Run REST Patch.
+3. Execute Unit Tests: Run 'go test -v -cover ./internal/run/model/instance/... ./internal/run/api/instance/...' and verify tests pass with high coverage.
+User Confirmation: Explicitly approved by user.

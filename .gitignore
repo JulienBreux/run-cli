@@ -17,6 +17,7 @@ bin/
 dist/
 *.out
 coverage.*
+coverage_*
 *.coverprofile
 profile.cov
 

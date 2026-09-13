@@ -22,6 +22,7 @@ import (
 	"github.com/JulienBreux/run-cli/internal/run/command/version"
 	"github.com/JulienBreux/run-cli/internal/run/config"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app"
+	"github.com/JulienBreux/run-cli/pkg/term"
 	"github.com/spf13/cobra"
 )
 
@@ -36,6 +37,7 @@ func New(in io.Reader, out, err io.Writer) (cmd *cobra.Command) {
 		Use:   "run",
 		Short: "Run is a CLI to play with Google Cloud Run interactively.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			defer term.ResetTitle()
 			cfg, err := configLoad()
 			if err != nil {
 				return err

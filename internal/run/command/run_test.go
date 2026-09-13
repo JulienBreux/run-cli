@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/JulienBreux/run-cli/internal/run/config"
+	"github.com/JulienBreux/run-cli/pkg/term"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -42,9 +43,13 @@ func TestRunE(t *testing.T) {
 			return nil
 		}
 
+		var termBuf bytes.Buffer
+		term.Output = &termBuf
+
 		cmd := New(&bytes.Buffer{}, &bytes.Buffer{}, &bytes.Buffer{})
 		err := cmd.RunE(cmd, []string{})
 		assert.NoError(t, err)
+		assert.Equal(t, "\033]0;\007", termBuf.String())
 	})
 
 	t.Run("ConfigLoadError", func(t *testing.T) {

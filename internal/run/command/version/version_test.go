@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/JulienBreux/run-cli/internal/run/command/version"
+	"github.com/JulienBreux/run-cli/pkg/term"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -45,11 +46,18 @@ func TestNewCmdVersion(t *testing.T) {
 	// Test execution
 	cmd.SetOut(out)
 	cmd.SetErr(err)
-	
+
+	var termBuf bytes.Buffer
+	term.Output = &termBuf
+
 	// Execute the command
 	execErr := cmd.Execute()
 	assert.NoError(t, execErr)
-	
+
+	// Verify terminal title was set to "Run | Version" and then reset
+	assert.Contains(t, termBuf.String(), "\033]0;Run | Version\007")
+	assert.True(t, bytes.HasSuffix(termBuf.Bytes(), []byte("\033]0;\007")))
+
 	// Verify output contains version info
 	// Note: exact content depends on pkg/version globals, but we expect at least "Version:"
 	assert.Contains(t, out.String(), "Version:")

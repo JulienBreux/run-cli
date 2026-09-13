@@ -19,6 +19,7 @@ package version
 import (
 	"io"
 
+	"github.com/JulienBreux/run-cli/pkg/term"
 	"github.com/JulienBreux/run-cli/pkg/version"
 	"github.com/spf13/cobra"
 )
@@ -42,6 +43,8 @@ func NewCmdVersion(in io.Reader, out, err io.Writer) (cmd *cobra.Command) {
 // run returns the command.
 func run(out io.Writer) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		term.SetFormattedTitle("Version")
+		defer term.ResetTitle()
 		version.Print(out, output)
 	}
 }

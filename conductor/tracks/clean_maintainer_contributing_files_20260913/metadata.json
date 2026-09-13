@@ -1,0 +1,8 @@
+{
+  "track_id": "clean_maintainer_contributing_files_20260913",
+  "type": "chore",
+  "status": "new",
+  "created_at": "2026-09-13T14:49:13Z",
+  "updated_at": "2026-09-13T14:49:13Z",
+  "description": "Clean maintainer and contributing files in this project. Using this conventions: https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file Refer to this issue https://github.com/JulienBreux/run-cli/issues/51"
+}

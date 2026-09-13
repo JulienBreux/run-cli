@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: In the header, place Instance before Services**
+- [x] **Track: In the header, place Instance before Services**
 *Link: [./tracks/header_instances_before_services_20260913/](./tracks/header_instances_before_services_20260913/)*

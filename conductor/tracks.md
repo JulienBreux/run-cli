@@ -24,7 +24,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: In the instances list, move the Auth column as first and use color for Yes/No like Services. Remove the containers column.**
+- [x] **Track: In the instances list, move the Auth column as first and use color for Yes/No like Services. Remove the containers column.**
 *Link: [./tracks/instances_list_columns_20260913/](./tracks/instances_list_columns_20260913/)*
 
 ---

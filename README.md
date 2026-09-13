@@ -52,7 +52,7 @@ The idea is to establish a high-performance, terminal-based alternative to the G
 
 ### 🖥️ Instances
 
-*   **Instance Management:** View, inspect, and manage your Google Cloud Run instances (`Ctrl+I`).
+*   **Instance Management:** View, inspect, and manage your Google Cloud Run instances (`Ctrl+N`).
 *   **Direct Lifecycle Actions:** Start (`s`), Stop (`x`), and Delete (`k`) instances interactively.
 *   **Authentication Management:** Toggle between "Require authentication" and "Allow unauthenticated invocations" directly from the interface (`a`).
 *   **Instance Proxy:** Locally proxy private instances with automatic authentication token injection (`p`) and open the active URL in your default browser (`o`).

@@ -19,6 +19,7 @@ package shortcut
 import (
 	"testing"
 
+	"github.com/gdamore/tcell/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,13 +28,17 @@ func TestRegistry(t *testing.T) {
 
 	// Check for a few expected shortcuts
 	foundHelp := false
+	foundInstance := false
 	for _, s := range Registry {
 		if s.Key == "?" && s.Rune == '?' {
 			foundHelp = true
-			break
+		}
+		if s.Key == "ctrl+n" && s.TCellKey == tcell.KeyCtrlN && s.Description == "Instances" && s.Category == CategoryGlobal {
+			foundInstance = true
 		}
 	}
 	assert.True(t, foundHelp, "Registry should contain the help shortcut '?'")
+	assert.True(t, foundInstance, "Registry should contain 'ctrl+n' for Instances")
 }
 
 func TestGetByCategory(t *testing.T) {

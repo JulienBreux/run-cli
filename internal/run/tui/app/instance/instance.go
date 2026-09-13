@@ -65,7 +65,7 @@ var (
 const (
 	LIST_PAGE_TITLE    = "Instances"
 	LIST_PAGE_ID       = "instances-list"
-	LIST_PAGE_SHORTCUT = tcell.KeyCtrlI
+	LIST_PAGE_SHORTCUT = tcell.KeyCtrlN
 )
 
 var ListInstancesFunc = api_instance.List

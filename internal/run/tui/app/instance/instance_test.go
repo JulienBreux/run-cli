@@ -32,6 +32,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestShortcutConstants(t *testing.T) {
+	assert.Equal(t, tcell.KeyCtrlN, LIST_PAGE_SHORTCUT)
+	assert.Equal(t, "Instances", LIST_PAGE_TITLE)
+	assert.Equal(t, "instances-list", LIST_PAGE_ID)
+}
+
 func TestList(t *testing.T) {
 	app := tview.NewApplication()
 	tbl := List(app)

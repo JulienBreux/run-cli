@@ -22,10 +22,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [x] **Track: Clean maintainer and contributing files in this project.**
 *Link: [./tracks/clean_maintainer_contributing_files_20260913/](./tracks/clean_maintainer_contributing_files_20260913/)*
 
----
-
-- [ ] **Track: Change the term CLI title depending on the display (Services, Jobs, etc.). Use the pattern "Run | Services" and "Run | Services | xxx", etc**
-*Link: [./tracks/terminal_cli_title_20260913/](./tracks/terminal_cli_title_20260913/)*
 
 ---
 

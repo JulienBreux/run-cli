@@ -4,8 +4,8 @@
 - [x] Task: Update GoReleaser Changelog Exclusion Filters cefefb2
     - [x] Update `.goreleaser.yaml` changelog filters to exclude `(?i)conductor` and scoped `docs` / `test` patterns
     - [x] Validate configuration using `goreleaser check`
-- [ ] Task: Add Manual Trigger to GitHub Actions Release Workflow
-    - [ ] Update `.github/workflows/release.yml` to include `workflow_dispatch` trigger
+- [x] Task: Add Manual Trigger to GitHub Actions Release Workflow 1eb48ee
+    - [x] Update `.github/workflows/release.yml` to include `workflow_dispatch` trigger
 - [ ] Task: Conductor - User Manual Verification 'GoReleaser Changelog Configuration & GitHub Actions Workflow Update' (Protocol in workflow.md)
 
 ## Phase 2: Validation, Verification & Integration

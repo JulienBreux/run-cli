@@ -10,10 +10,10 @@
 - [x] Task: Conductor - User Manual Verification 'Maintainer Roster & Core Contribution Guidelines' (Protocol in workflow.md)
 
 ## Phase 2: Community Health Documents & Templates
-- [ ] Task: Add Code of Conduct, Security Policy, and Support Guidelines
-    - [ ] Create `CODE_OF_CONDUCT.md` adopting Contributor Covenant v2.1
-    - [ ] Create `SECURITY.md` defining supported versions and vulnerability disclosure channels
-    - [ ] Create `SUPPORT.md` detailing help channels, discussions, and issue guidance
+- [x] Task: Add Code of Conduct, Security Policy, and Support Guidelines [54e8b50]
+    - [x] Create `CODE_OF_CONDUCT.md` adopting Contributor Covenant v2.1
+    - [x] Create `SECURITY.md` defining supported versions and vulnerability disclosure channels
+    - [x] Create `SUPPORT.md` detailing help channels, discussions, and issue guidance
 - [ ] Task: Create GitHub Pull Request Template
     - [ ] Create `.github/pull_request_template.md` with PR checklist, issue reference, and testing verification
 - [ ] Task: Conductor - User Manual Verification 'Community Health Documents & Templates' (Protocol in workflow.md)

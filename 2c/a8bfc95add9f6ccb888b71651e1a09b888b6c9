@@ -1,0 +1,8 @@
+Task: Write failing unit tests for global shortcut ordering
+
+Summary: Added TestRegistry_GlobalOrder to verify ctrl+n (Instances) appears before ctrl+s (Services) in shortcut.Registry.
+
+Modified files:
+- internal/run/tui/app/shortcut/shortcut_test.go
+
+Why: TDD Red phase to ensure test fails prior to updating shortcut registry ordering.

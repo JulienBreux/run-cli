@@ -1,0 +1,3 @@
+Task: Create GitHub Pull Request Template
+Summary: Created .github/pull_request_template.md specifying description, related issue link, type of change, and quality checklist.
+Files: .github/pull_request_template.md

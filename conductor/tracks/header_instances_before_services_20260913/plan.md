@@ -10,9 +10,9 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Reorder Shortcut Registry' (Protocol in workflow.md) (b6c03a4)
 
 ## Phase 2: Header Verification and Quality Assurance
-- [ ] Task: Verify header shortcut rendering
-    - [ ] Add/update test in `internal/run/tui/component/header/header_test.go` to verify header shortcut layout behavior
-    - [ ] Confirm tests pass
+- [x] Task: Verify header shortcut rendering (52d2b3d)
+    - [x] Add/update test in `internal/run/tui/component/header/header_test.go` to verify header shortcut layout behavior
+    - [x] Confirm tests pass
 - [ ] Task: Run project quality gates and documentation updates
     - [ ] Run `make test` to ensure full test suite passes with >80% coverage
     - [ ] Run `make lint` to verify code style

@@ -32,3 +32,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [ ] **Track: Change the term CLI title depending on the display (Services, Jobs, etc.). Use the pattern "Run | Services" and "Run | Services | xxx", etc**
 *Link: [./tracks/terminal_cli_title_20260913/](./tracks/terminal_cli_title_20260913/)*
 
+---
+
+- [ ] **Track: In Go releaser, do not include “conductor” commits in releases changelog**
+*Link: [./tracks/goreleaser_exclude_conductor_20260913/](./tracks/goreleaser_exclude_conductor_20260913/)*
+

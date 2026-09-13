@@ -1,0 +1,3 @@
+Task: Create MAINTAINERS.md and Extract Roster
+Summary: Created MAINTAINERS.md extracting the maintainers and contributors table from CONTRIBUTING.md. Defined ownership, roles, and added links to CONTRIBUTING.md.
+Files: MAINTAINERS.md

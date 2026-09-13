@@ -19,7 +19,7 @@
 - [x] Task: Conductor - User Manual Verification 'Community Health Documents & Templates' (Protocol in workflow.md)
 
 ## Phase 3: Repository Documentation Alignment & Validation
-- [ ] Task: Update README.md and Community Links
-    - [ ] Update `README.md` to reference the new community health files (`CONTRIBUTING.md`, `MAINTAINERS.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `SUPPORT.md`)
-    - [ ] Ensure all relative cross-document links across `.github/` and root documentation resolve cleanly
+- [x] Task: Update README.md and Community Links [2cab92e]
+    - [x] Update `README.md` to reference the new community health files (`CONTRIBUTING.md`, `MAINTAINERS.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `SUPPORT.md`)
+    - [x] Ensure all relative cross-document links across `.github/` and root documentation resolve cleanly
 - [ ] Task: Conductor - User Manual Verification 'Repository Documentation Alignment & Validation' (Protocol in workflow.md)

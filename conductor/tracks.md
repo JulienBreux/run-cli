@@ -23,8 +23,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 *Link: [./tracks/clean_maintainer_contributing_files_20260913/](./tracks/clean_maintainer_contributing_files_20260913/)*
 
 
----
-
-- [ ] **Track: In Go releaser, do not include “conductor” commits in releases changelog**
-*Link: [./tracks/goreleaser_exclude_conductor_20260913/](./tracks/goreleaser_exclude_conductor_20260913/)*
-

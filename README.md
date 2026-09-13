@@ -156,7 +156,13 @@ make regions-update
 
 ## 💪 Contributing
 
-Contributions are welcome! Please feel free to submit a pull request or open an issue.
+Contributions are welcome! We appreciate all contributions, from bug reports and documentation enhancements to code and feature additions.
+
+- **Contribution Guidelines**: Please review our [Contributing Guidelines](CONTRIBUTING.md) to get started with setup, development targets, and conventions.
+- **Maintainers & Contributors**: See our roster of maintainers and contributors in [MAINTAINERS.md](MAINTAINERS.md).
+- **Code of Conduct**: This project is governed by the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
+- **Support & Questions**: Need help or want to discuss ideas? Refer to [SUPPORT.md](SUPPORT.md).
+- **Security**: To report a security vulnerability, please see [SECURITY.md](SECURITY.md).
 
 ## 📄 License
 

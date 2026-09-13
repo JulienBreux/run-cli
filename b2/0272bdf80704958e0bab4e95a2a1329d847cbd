@@ -1,0 +1,12 @@
+Task: Centralized Title Formatting & Terminal Control Utility
+Summary of changes:
+- Created pkg/term package providing FormatTitle, SetTitle, ResetTitle, and SetFormattedTitle.
+- Added comprehensive unit tests in pkg/term/term_test.go with 100% statement coverage.
+- Handled ANSI OSC 0 escape sequences and verified safe handling when Output writer is nil.
+
+Files created:
+- pkg/term/term.go
+- pkg/term/term_test.go
+
+Why:
+Provides a centralized, reusable utility for formatting and updating terminal window/tab titles across both CLI subcommands and interactive TUI views.

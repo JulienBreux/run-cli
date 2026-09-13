@@ -1,0 +1,7 @@
+Task: Add Manual Trigger to GitHub Actions Release Workflow
+Summary:
+- Updated '.github/workflows/release.yml' to include 'workflow_dispatch' under the 'on:' events.
+- Preserved existing pull_request and tag push triggers, credentials, and actions.
+
+Why:
+Enables triggering manual release runs directly from the GitHub Actions web UI or via gh workflow run.

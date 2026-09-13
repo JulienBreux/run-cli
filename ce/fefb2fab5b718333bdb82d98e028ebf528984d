@@ -1,0 +1,9 @@
+Task: Update GoReleaser Changelog Exclusion Filters
+Summary:
+- Updated '.goreleaser.yaml' changelog exclusion filters:
+  - Added '(?i)conductor' to exclude all conductor commits regardless of casing or scope.
+  - Updated '^docs(\(.*\))?:' and '^test(\(.*\))?:' to exclude scoped documentation and test commits.
+- Validated configuration using 'goreleaser check'.
+
+Why:
+Ensures release changelogs omit internal Conductor metadata/plans and developer documentation/tests.

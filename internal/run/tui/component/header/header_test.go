@@ -17,10 +17,12 @@ limitations under the License.
 package header_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/header"
+	"github.com/rivo/tview"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -61,4 +63,33 @@ func TestUpdateInfo(t *testing.T) {
 	
 	// Note: Testing side effects on global variables is brittle in parallel tests, 
 	// but acceptable here given the legacy code structure.
+}
+
+func TestHeader_ShortcutsOrder(t *testing.T) {
+	testInfo := info.Info{
+		Project: "test-project",
+		Region:  "us-central1",
+		User:    "test-user",
+	}
+
+	h := header.New(testInfo)
+	assert.NotNil(t, h)
+	assert.Equal(t, 3, h.GetItemCount())
+
+	// Item 1 is the shortcuts Flex
+	shortcutsFlex, ok := h.GetItem(1).(*tview.Flex)
+	assert.True(t, ok)
+	assert.Equal(t, 2, shortcutsFlex.GetItemCount())
+
+	// Item 1 of shortcutsFlex is col2 which contains resource shortcuts
+	col2, ok := shortcutsFlex.GetItem(1).(*tview.TextView)
+	assert.True(t, ok)
+
+	text := col2.GetText(true)
+	assert.Contains(t, text, "<ctrl+n>")
+	assert.Contains(t, text, "<ctrl+s>")
+
+	idxInstance := strings.Index(text, "<ctrl+n>")
+	idxService := strings.Index(text, "<ctrl+s>")
+	assert.Less(t, idxInstance, idxService, "Instances (<ctrl+n>) should appear before Services (<ctrl+s>) in header shortcuts column")
 }

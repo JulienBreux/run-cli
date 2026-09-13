@@ -51,9 +51,9 @@ const (
 
 var Registry = []Shortcut{
 	// Global
+	{Key: "ctrl+n", TCellKey: tcell.KeyCtrlN, Description: "Instances", Category: CategoryGlobal},
 	{Key: "ctrl+s", TCellKey: tcell.KeyCtrlS, Description: "Services", Category: CategoryGlobal},
 	{Key: "ctrl+j", TCellKey: tcell.KeyCtrlJ, Description: "Jobs", Category: CategoryGlobal},
-	{Key: "ctrl+n", TCellKey: tcell.KeyCtrlN, Description: "Instances", Category: CategoryGlobal},
 	{Key: "ctrl+w", TCellKey: tcell.KeyCtrlW, Description: "Worker Pools", Category: CategoryGlobal},
 	{Key: "ctrl+d", TCellKey: tcell.KeyCtrlD, Description: "Domain Mappings", Category: CategoryGlobal},
 	{Key: "ctrl+p", TCellKey: tcell.KeyCtrlP, Description: "Project", Category: CategoryGlobal},

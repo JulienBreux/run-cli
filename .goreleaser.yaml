@@ -48,9 +48,9 @@ changelog:
   sort: asc
   filters:
     exclude:
-      - "^docs:"
-      - "^test:"
-      - "^chore(conductor):"
+      - "(?i)conductor"
+      - "^docs(\\(.*\\))?:"
+      - "^test(\\(.*\\))?:"
   groups:
     - title: Features
       regexp: "^.*feat[(\\w)]*:+.*$"

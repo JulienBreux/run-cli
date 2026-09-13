@@ -1,9 +1,9 @@
 # Implementation Plan: Exclude Conductor Commits from GoReleaser Changelog & Update Release Workflow
 
 ## Phase 1: GoReleaser Changelog Configuration & GitHub Actions Workflow Update
-- [ ] Task: Update GoReleaser Changelog Exclusion Filters
-    - [ ] Update `.goreleaser.yaml` changelog filters to exclude `(?i)conductor` and scoped `docs` / `test` patterns
-    - [ ] Validate configuration using `goreleaser check`
+- [x] Task: Update GoReleaser Changelog Exclusion Filters cefefb2
+    - [x] Update `.goreleaser.yaml` changelog filters to exclude `(?i)conductor` and scoped `docs` / `test` patterns
+    - [x] Validate configuration using `goreleaser check`
 - [ ] Task: Add Manual Trigger to GitHub Actions Release Workflow
     - [ ] Update `.github/workflows/release.yml` to include `workflow_dispatch` trigger
 - [ ] Task: Conductor - User Manual Verification 'GoReleaser Changelog Configuration & GitHub Actions Workflow Update' (Protocol in workflow.md)

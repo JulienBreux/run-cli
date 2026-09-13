@@ -22,3 +22,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [x] **Track: Clean maintainer and contributing files in this project.**
 *Link: [./tracks/clean_maintainer_contributing_files_20260913/](./tracks/clean_maintainer_contributing_files_20260913/)*
 
+---
+
+- [ ] **Track: In the instances list, move the Auth column as first and use color for Yes/No like Services. Remove the containers column.**
+*Link: [./tracks/instances_list_columns_20260913/](./tracks/instances_list_columns_20260913/)*
+

@@ -1,9 +1,9 @@
 # Implementation Plan: Dynamic Terminal CLI Title
 
 ## Phase 1: Title Utility & Non-TUI Commands
-- [ ] Task: Centralized Title Formatting & Terminal Control Utility
-    - [ ] Write unit tests for title formatting (`FormatTitle`) and terminal OSC escape sequence handling in `pkg/term`
-    - [ ] Implement `pkg/term` with `FormatTitle` and terminal title set/reset functions
+- [x] Task: Centralized Title Formatting & Terminal Control Utility b20272b
+    - [x] Write unit tests for title formatting (`FormatTitle`) and terminal OSC escape sequence handling in `pkg/term`
+    - [x] Implement `pkg/term` with `FormatTitle` and terminal title set/reset functions
 - [ ] Task: Integrate Title Management in CLI Subcommands
     - [ ] Write unit tests verifying terminal title lifecycle in Cobra subcommands
     - [ ] Update `version` command and root command hooks to set terminal title and restore on exit

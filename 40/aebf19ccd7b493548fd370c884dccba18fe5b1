@@ -1,0 +1,8 @@
+Task: Reorder global shortcuts in registry
+
+Summary: Moved ctrl+n (Instances) ahead of ctrl+s (Services) in shortcut.Registry under CategoryGlobal.
+
+Modified files:
+- internal/run/tui/app/shortcut/shortcut.go
+
+Why: Ensures Instances is listed before Services across global shortcut presentations including the header and help modal.

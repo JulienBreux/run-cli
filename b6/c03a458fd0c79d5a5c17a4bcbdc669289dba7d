@@ -1,0 +1,11 @@
+Phase Checkpoint Report: Phase 1: Reorder Shortcut Registry
+
+Automated Tests:
+- Command: go test -v ./internal/run/tui/app/shortcut/...
+- Result: PASS
+
+Manual Verification:
+1. Execute go test -v -run TestRegistry_GlobalOrder ./internal/run/tui/app/shortcut
+2. Confirmed PASS: TestRegistry_GlobalOrder demonstrating Instances ordered before Services.
+
+User Confirmation: Approved by user.

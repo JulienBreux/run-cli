@@ -4,9 +4,9 @@
 - [x] Task: Create MAINTAINERS.md and Extract Roster [59efcf0]
     - [x] Create `MAINTAINERS.md` containing the maintainers and contributors table extracted from `CONTRIBUTING.md`
     - [x] Add ownership structure, role definitions, and link to `CONTRIBUTING.md`
-- [ ] Task: Rewrite CONTRIBUTING.md with Actionable Guidelines
-    - [ ] Draft comprehensive contribution guidelines in `CONTRIBUTING.md` (prerequisites, build commands, testing, conventions, PR workflow)
-    - [ ] Link `CONTRIBUTING.md` to `MAINTAINERS.md`, Code of Conduct, Security, and Support
+- [x] Task: Rewrite CONTRIBUTING.md with Actionable Guidelines [ff0588c]
+    - [x] Draft comprehensive contribution guidelines in `CONTRIBUTING.md` (prerequisites, build commands, testing, conventions, PR workflow)
+    - [x] Link `CONTRIBUTING.md` to `MAINTAINERS.md`, Code of Conduct, Security, and Support
 - [ ] Task: Conductor - User Manual Verification 'Maintainer Roster & Core Contribution Guidelines' (Protocol in workflow.md)
 
 ## Phase 2: Community Health Documents & Templates

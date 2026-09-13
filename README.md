@@ -28,6 +28,7 @@ The idea is to establish a high-performance, terminal-based alternative to the G
 ### 🌍 Global
 
 *   **Interactive TUI:** A user-friendly terminal interface to manage your Cloud Run resources.
+*   **Dynamic Terminal Title:** Context-aware window/terminal title displaying the current view, inspected resource, or active modal (e.g., `Run | Services`, `Run | Services | frontend`, `Run | Help`).
 *   **Project & Region Selection:** Easily switch between your Google Cloud projects and regions.
 *   **Log Viewer:** Stream logs from your services directly in the terminal.
 *   **Konami Code:** Try the legendary code for a little surprise!

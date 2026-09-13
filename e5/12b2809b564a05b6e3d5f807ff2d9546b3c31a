@@ -1,0 +1,18 @@
+Task: Integrate Dynamic Titles in TUI Modals & Overlays
+Summary of changes:
+- Integrated pushAppTitle and popAppTitle across all modals in internal/run/tui/app/modal.go:
+  - Project Modal: 'Run | Switch Project'
+  - Region Modal: 'Run | Switch Region'
+  - Help Modal: 'Run | Help'
+  - Credits Modal: 'Run | Credits'
+  - Log Modals: 'Run | <Resource> | Logs'
+  - Describe Modals: 'Run | <Resource> | Describe'
+  - Scale Modals: 'Run | Services | Scale', 'Run | Worker Pools | Scale'
+  - Auth Modals: 'Run | Services | Authentication', 'Run | Instances | Authentication'
+  - Traffic Split Modal: 'Run | Services | Traffic'
+  - Domain Mapping Info Modal: 'Run | Domain Mappings | Info'
+- Integrated modal title push and restore in Instance Delete modal in internal/run/tui/app/app.go.
+- Expanded unit tests in internal/run/tui/app/app_test.go covering modal title updates and restoration.
+
+Why:
+Ensures contextual titles are shown when dialogs and modals are open, and underlying page titles are properly restored on dismissal.

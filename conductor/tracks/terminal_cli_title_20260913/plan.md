@@ -4,9 +4,9 @@
 - [x] Task: Centralized Title Formatting & Terminal Control Utility b20272b
     - [x] Write unit tests for title formatting (`FormatTitle`) and terminal OSC escape sequence handling in `pkg/term`
     - [x] Implement `pkg/term` with `FormatTitle` and terminal title set/reset functions
-- [ ] Task: Integrate Title Management in CLI Subcommands
-    - [ ] Write unit tests verifying terminal title lifecycle in Cobra subcommands
-    - [ ] Update `version` command and root command hooks to set terminal title and restore on exit
+- [x] Task: Integrate Title Management in CLI Subcommands c0d096b
+    - [x] Write unit tests verifying terminal title lifecycle in Cobra subcommands
+    - [x] Update `version` command and root command hooks to set terminal title and restore on exit
 - [ ] Task: Conductor - User Manual Verification 'Title Utility & Non-TUI Commands' (Protocol in workflow.md)
 
 ## Phase 2: TUI Application Title Management

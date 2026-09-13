@@ -1,0 +1,8 @@
+Task: Verify header shortcut rendering
+
+Summary: Added TestHeader_ShortcutsOrder to assert that Instances (<ctrl+n>) renders before Services (<ctrl+s>) in the header component shortcut column.
+
+Modified files:
+- internal/run/tui/component/header/header_test.go
+
+Why: Ensures header layout reflects the desired ordering of Instances before Services.

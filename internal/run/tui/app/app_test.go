@@ -17,10 +17,12 @@ limitations under the License.
 package app
 
 import (
+	"bytes"
 	"testing"
 	"time"
 
 	"github.com/JulienBreux/run-cli/internal/run/config"
+	"github.com/JulienBreux/run-cli/pkg/term"
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
 	model_domainmapping "github.com/JulienBreux/run-cli/internal/run/model/domainmapping"
 	model_instance "github.com/JulienBreux/run-cli/internal/run/model/instance"
@@ -549,4 +551,75 @@ func TestShortcuts_InstanceList(t *testing.T) {
 	// 'o' -> Open URL
 	resO := shortcuts(tcell.NewEventKey(tcell.KeyRune, 'o', tcell.ModNone))
 	_ = resO
+}
+
+func TestNavigationAndDashboardTitles(t *testing.T) {
+	setupTestApp()
+	_ = buildLayout()
+
+	var termBuf bytes.Buffer
+	origOutput := term.Output
+	term.Output = &termBuf
+	defer func() { term.Output = origOutput }()
+
+	// Test pageTitle function
+	assert.Equal(t, "Run | Services", pageTitle(service.LIST_PAGE_ID))
+	assert.Equal(t, "Run | Jobs", pageTitle(job.LIST_PAGE_ID))
+	assert.Equal(t, "Run | Instances", pageTitle(instance.LIST_PAGE_ID))
+	assert.Equal(t, "Run | Worker Pools", pageTitle(workerpool.LIST_PAGE_ID))
+	assert.Equal(t, "Run | Domain Mappings", pageTitle(domainmapping.LIST_PAGE_ID))
+	assert.Equal(t, "Run", pageTitle("unknown_page"))
+
+	// Test list page transitions via switchTo
+	switchTo(service.LIST_PAGE_ID)
+	assert.Equal(t, "Run | Services", currentTitle)
+	assert.Contains(t, termBuf.String(), "\033]0;Run | Services\007")
+
+	termBuf.Reset()
+	switchTo(job.LIST_PAGE_ID)
+	assert.Equal(t, "Run | Jobs", currentTitle)
+	assert.Contains(t, termBuf.String(), "\033]0;Run | Jobs\007")
+
+	termBuf.Reset()
+	switchTo(instance.LIST_PAGE_ID)
+	assert.Equal(t, "Run | Instances", currentTitle)
+	assert.Contains(t, termBuf.String(), "\033]0;Run | Instances\007")
+
+	termBuf.Reset()
+	switchTo(workerpool.LIST_PAGE_ID)
+	assert.Equal(t, "Run | Worker Pools", currentTitle)
+	assert.Contains(t, termBuf.String(), "\033]0;Run | Worker Pools\007")
+
+	termBuf.Reset()
+	switchTo(domainmapping.LIST_PAGE_ID)
+	assert.Equal(t, "Run | Domain Mappings", currentTitle)
+	assert.Contains(t, termBuf.String(), "\033]0;Run | Domain Mappings\007")
+
+	// Test dashboard page titles with selected resources
+	service.Load([]model_service.Service{{Name: "svc-alpha", Region: "us-central1"}})
+	service.List(app).Table.Select(1, 0)
+	termBuf.Reset()
+	switchTo(service.DASHBOARD_PAGE_ID)
+	assert.Equal(t, "Run | Services | svc-alpha", currentTitle)
+	assert.Contains(t, termBuf.String(), "\033]0;Run | Services | svc-alpha\007")
+
+	job.Load([]model_job.Job{{Name: "job-beta", Region: "us-central1"}})
+	job.List(app).Table.Select(1, 0)
+	termBuf.Reset()
+	switchTo(job.DASHBOARD_PAGE_ID)
+	assert.Equal(t, "Run | Jobs | job-beta", currentTitle)
+	assert.Contains(t, termBuf.String(), "\033]0;Run | Jobs | job-beta\007")
+
+	instance.Load([]model_instance.Instance{{Name: "inst-gamma", Region: "us-central1"}})
+	instance.List(app).Table.Select(1, 0)
+	termBuf.Reset()
+	switchTo(instance.DASHBOARD_PAGE_ID)
+	assert.Equal(t, "Run | Instances | inst-gamma", currentTitle)
+	assert.Contains(t, termBuf.String(), "\033]0;Run | Instances | inst-gamma\007")
+
+	// Test title push and pop
+	pushAppTitle("Run | Modal Test")
+	assert.Equal(t, "Run | Modal Test", currentTitle)
+	popAppTitle()
+	assert.Equal(t, "Run | Instances | inst-gamma", currentTitle)
 }

@@ -38,6 +38,7 @@ import (
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/header"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/loader"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/spinner"
+	"github.com/JulienBreux/run-cli/pkg/term"
 	"github.com/gdamore/tcell/v2"
 	"github.com/pkg/browser"
 	"github.com/rivo/tview"
@@ -51,6 +52,8 @@ var (
 
 	previousPageID string
 	currentPageID  string
+	currentTitle   string
+	titleStack     []string
 	currentInfo    info.Info
 	currentConfig  *config.Config
 
@@ -91,6 +94,7 @@ const (
 // Run runs the application.
 func Run(cfg *config.Config) error {
 	currentConfig = cfg
+	setAppTitle(term.FormatTitle("Loading..."))
 	app = tview.NewApplication()
 	app.SetInputCapture(shortcuts)
 
@@ -165,6 +169,7 @@ func initializeApp(cfg *config.Config) {
 		previousPageID = ""
 		currentPageID = service.LIST_PAGE_ID
 		pages.SwitchToPage(service.LIST_PAGE_ID)
+		setAppTitle(pageTitle(service.LIST_PAGE_ID))
 		service.Shortcuts()
 		hideLoading()
 	})
@@ -594,6 +599,58 @@ func showError(err error) {
 	footerPages.SwitchToPage("error")
 }
 
+func setAppTitle(title string) {
+	currentTitle = title
+	term.SetTitle(title)
+}
+
+func pushAppTitle(title string) {
+	titleStack = append(titleStack, currentTitle)
+	setAppTitle(title)
+}
+
+func popAppTitle() {
+	if len(titleStack) > 0 {
+		prev := titleStack[len(titleStack)-1]
+		titleStack = titleStack[:len(titleStack)-1]
+		setAppTitle(prev)
+	} else if currentPageID != "" {
+		setAppTitle(pageTitle(currentPageID))
+	}
+}
+
+func pageTitle(pageID string) string {
+	switch pageID {
+	case service.LIST_PAGE_ID:
+		return term.FormatTitle("Services")
+	case service.DASHBOARD_PAGE_ID:
+		if s := service.GetSelectedServiceFull(); s != nil {
+			return term.FormatTitle("Services", s.Name)
+		}
+		return term.FormatTitle("Services")
+	case job.LIST_PAGE_ID:
+		return term.FormatTitle("Jobs")
+	case job.DASHBOARD_PAGE_ID:
+		if j := job.GetSelectedJobFull(); j != nil {
+			return term.FormatTitle("Jobs", j.Name)
+		}
+		return term.FormatTitle("Jobs")
+	case instance.LIST_PAGE_ID:
+		return term.FormatTitle("Instances")
+	case instance.DASHBOARD_PAGE_ID:
+		if inst := instance.GetSelectedInstanceFull(); inst != nil {
+			return term.FormatTitle("Instances", inst.Name)
+		}
+		return term.FormatTitle("Instances")
+	case workerpool.LIST_PAGE_ID:
+		return term.FormatTitle("Worker Pools")
+	case domainmapping.LIST_PAGE_ID:
+		return term.FormatTitle("Domain Mappings")
+	default:
+		return term.FormatTitle()
+	}
+}
+
 func switchTo(pageID string) {
 	if currentPageID == service.DASHBOARD_PAGE_ID && pageID != service.DASHBOARD_PAGE_ID {
 		service.DashboardClear()
@@ -605,6 +662,8 @@ func switchTo(pageID string) {
 	previousPageID = currentPageID
 	currentPageID = pageID
 	pages.SwitchToPage(pageID)
+	titleStack = nil
+	setAppTitle(pageTitle(pageID))
 
 	callback := func(err error) {
 		if err != nil {

@@ -1,0 +1,9 @@
+Phase 1 Verification Report:
+- Automated Tests: 'make test' executed successfully.
+- Manual Verification Steps:
+  1. Launch the CLI: make run or ./bin/run
+  2. Navigate to Instances: Press Ctrl+N
+  3. Verify columns order: '', 'AUTH', 'NAME', 'REGION', 'STATUS', 'LAST UPDATED'
+  4. Verify CONTAINERS column is removed
+  5. Verify AUTH styling [red]Yes / [green]No
+- User Confirmation: Confirmed by user.

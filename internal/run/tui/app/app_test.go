@@ -623,3 +623,111 @@ func TestNavigationAndDashboardTitles(t *testing.T) {
 	popAppTitle()
 	assert.Equal(t, "Run | Instances | inst-gamma", currentTitle)
 }
+
+func TestModalTitles(t *testing.T) {
+	setupTestApp()
+	_ = buildLayout()
+
+	switchTo(service.LIST_PAGE_ID)
+	assert.Equal(t, "Run | Services", currentTitle)
+
+	// Help modal
+	openHelpModal()
+	assert.Equal(t, "Run | Help", currentTitle)
+	popAppTitle()
+	assert.Equal(t, "Run | Services", currentTitle)
+
+	// Project modal
+	openProjectModal()
+	assert.Equal(t, "Run | Switch Project", currentTitle)
+	popAppTitle()
+	assert.Equal(t, "Run | Services", currentTitle)
+
+	// Region modal
+	openRegionModal()
+	assert.Equal(t, "Run | Switch Region", currentTitle)
+	popAppTitle()
+	assert.Equal(t, "Run | Services", currentTitle)
+
+	// Credits modal
+	openCreditsModal()
+	assert.Equal(t, "Run | Credits", currentTitle)
+	popAppTitle()
+	assert.Equal(t, "Run | Services", currentTitle)
+
+	// Service scale modal
+	s := &model_service.Service{Name: "svc-1", Region: "us-central1"}
+	openServiceScaleModal(s)
+	assert.Equal(t, "Run | Services | Scale", currentTitle)
+	popAppTitle()
+	assert.Equal(t, "Run | Services", currentTitle)
+
+	// Service auth modal
+	openServiceAuthModal(s)
+	assert.Equal(t, "Run | Services | Authentication", currentTitle)
+	popAppTitle()
+	assert.Equal(t, "Run | Services", currentTitle)
+
+	// Instance auth modal
+	inst := &model_instance.Instance{Name: "inst-1", Region: "us-central1"}
+	openInstanceAuthModal(inst)
+	assert.Equal(t, "Run | Instances | Authentication", currentTitle)
+	popAppTitle()
+	assert.Equal(t, "Run | Services", currentTitle)
+
+	// Worker pool scale modal
+	w := &model_workerpool.WorkerPool{Name: "wp-1", Region: "us-central1"}
+	openWorkerPoolScaleModal(w)
+	assert.Equal(t, "Run | Worker Pools | Scale", currentTitle)
+	popAppTitle()
+	assert.Equal(t, "Run | Services", currentTitle)
+
+	// Log modal
+	openLogModal("svc-1", "us-central1", "service")
+	assert.Equal(t, "Run | Services | Logs", currentTitle)
+	popAppTitle()
+	assert.Equal(t, "Run | Services", currentTitle)
+
+	openLogModal("job-1", "us-central1", "job")
+	assert.Equal(t, "Run | Jobs | Logs", currentTitle)
+	popAppTitle()
+	assert.Equal(t, "Run | Services", currentTitle)
+
+	openLogModal("inst-1", "us-central1", "instance")
+	assert.Equal(t, "Run | Instances | Logs", currentTitle)
+	popAppTitle()
+	assert.Equal(t, "Run | Services", currentTitle)
+
+	// Traffic modal
+	openServiceTrafficSplitModal(s, nil)
+	assert.Equal(t, "Run | Services | Traffic", currentTitle)
+	popAppTitle()
+	assert.Equal(t, "Run | Services", currentTitle)
+
+	// Domain mapping info modal
+	openDomainMappingInfoModal(&model_domainmapping.DomainMapping{Name: "example.com"})
+	assert.Equal(t, "Run | Domain Mappings | Info", currentTitle)
+	popAppTitle()
+	assert.Equal(t, "Run | Services", currentTitle)
+
+	// Describe modals
+	openDescribeModal(s, "Describe Service")
+	assert.Equal(t, "Run | Services | Describe", currentTitle)
+	popAppTitle()
+	assert.Equal(t, "Run | Services", currentTitle)
+
+	openDescribeModal(&model_job.Job{Name: "job-1"}, "Describe Job")
+	assert.Equal(t, "Run | Jobs | Describe", currentTitle)
+	popAppTitle()
+	assert.Equal(t, "Run | Services", currentTitle)
+
+	openDescribeModal(inst, "Describe Instance")
+	assert.Equal(t, "Run | Instances | Describe", currentTitle)
+	popAppTitle()
+	assert.Equal(t, "Run | Services", currentTitle)
+
+	openDescribeModal(w, "Describe Worker Pool")
+	assert.Equal(t, "Run | Worker Pools | Describe", currentTitle)
+	popAppTitle()
+	assert.Equal(t, "Run | Services", currentTitle)
+}

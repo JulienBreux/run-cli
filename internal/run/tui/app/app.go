@@ -529,6 +529,7 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 			if name != "" {
 				deleteModal := instance.DeleteModal(app, currentInfo.Project, region, name, func(deleted bool, err error) {
 					rootPages.RemovePage(instance.DELETE_MODAL_PAGE_ID)
+					popAppTitle()
 					currentPageID = previousPageID
 					pages.SwitchToPage(currentPageID)
 					app.SetFocus(pages)
@@ -544,6 +545,7 @@ func shortcuts(event *tcell.EventKey) *tcell.EventKey {
 				rootPages.AddPage(instance.DELETE_MODAL_PAGE_ID, deleteModal, true, true)
 				previousPageID = currentPageID
 				currentPageID = instance.DELETE_MODAL_PAGE_ID
+				pushAppTitle(term.FormatTitle("Instances", "Delete"))
 				footer.ContextShortcutView.Clear()
 				app.SetFocus(deleteModal)
 			}

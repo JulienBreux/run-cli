@@ -22,6 +22,7 @@ import (
 	model_project "github.com/JulienBreux/run-cli/internal/run/model/common/project"
 	model_domainmapping "github.com/JulienBreux/run-cli/internal/run/model/domainmapping"
 	model_instance "github.com/JulienBreux/run-cli/internal/run/model/instance"
+	model_job "github.com/JulienBreux/run-cli/internal/run/model/job"
 	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
 	model_revision "github.com/JulienBreux/run-cli/internal/run/model/service/revision"
 	model_workerpool "github.com/JulienBreux/run-cli/internal/run/model/workerpool"
@@ -43,6 +44,7 @@ import (
 	workerpool_scale "github.com/JulienBreux/run-cli/internal/run/tui/app/workerpool/scale"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/footer"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/header"
+	"github.com/JulienBreux/run-cli/pkg/term"
 )
 
 func openProjectModal() {
@@ -56,6 +58,7 @@ func openProjectModal() {
 		header.UpdateInfo(currentInfo)
 	}, func() {
 		rootPages.RemovePage(project.MODAL_PAGE_ID)
+		popAppTitle()
 		switchTo(previousPageID)
 	})
 
@@ -63,6 +66,7 @@ func openProjectModal() {
 
 	previousPageID = currentPageID
 	currentPageID = project.MODAL_PAGE_ID
+	pushAppTitle(term.FormatTitle("Switch Project"))
 
 	footer.ContextShortcutView.Clear()
 	app.SetFocus(projectModal)
@@ -79,6 +83,7 @@ func openRegionModal() {
 		header.UpdateInfo(currentInfo)
 	}, func() {
 		rootPages.RemovePage(region.MODAL_PAGE_ID)
+		popAppTitle()
 		switchTo(previousPageID)
 	})
 
@@ -86,6 +91,7 @@ func openRegionModal() {
 
 	previousPageID = currentPageID
 	currentPageID = region.MODAL_PAGE_ID
+	pushAppTitle(term.FormatTitle("Switch Region"))
 
 	footer.ContextShortcutView.Clear()
 	app.SetFocus(regionModal)
@@ -104,6 +110,7 @@ func openLogModal(name, region, logType string) {
 
 	logModal := log.LogModal(app, currentInfo.Project, filter, name, func() {
 		rootPages.RemovePage(log.MODAL_PAGE_ID)
+		popAppTitle()
 		currentPageID = previousPageID
 		pages.SwitchToPage(currentPageID)
 		app.SetFocus(pages)
@@ -122,6 +129,18 @@ func openLogModal(name, region, logType string) {
 
 	previousPageID = currentPageID
 	currentPageID = log.MODAL_PAGE_ID
+	var logScope string
+	switch logType {
+	case "service":
+		logScope = "Services"
+	case "job":
+		logScope = "Jobs"
+	case "instance":
+		logScope = "Instances"
+	default:
+		logScope = "Logs"
+	}
+	pushAppTitle(term.FormatTitle(logScope, "Logs"))
 
 	footer.ContextShortcutView.Clear()
 	app.SetFocus(logModal)
@@ -130,6 +149,7 @@ func openLogModal(name, region, logType string) {
 func openDescribeModal(resource any, title string) {
 	describeModal := describe.DescribeModal(app, resource, title, func() {
 		rootPages.RemovePage(describe.MODAL_PAGE_ID)
+		popAppTitle()
 		currentPageID = previousPageID
 		pages.SwitchToPage(currentPageID)
 		app.SetFocus(pages)
@@ -150,6 +170,31 @@ func openDescribeModal(resource any, title string) {
 
 	previousPageID = currentPageID
 	currentPageID = describe.MODAL_PAGE_ID
+	var descScope string
+	switch resource.(type) {
+	case *model_service.Service, model_service.Service:
+		descScope = "Services"
+	case *model_job.Job, model_job.Job:
+		descScope = "Jobs"
+	case *model_instance.Instance, model_instance.Instance:
+		descScope = "Instances"
+	case *model_workerpool.WorkerPool, model_workerpool.WorkerPool:
+		descScope = "Worker Pools"
+	default:
+		switch previousPageID {
+		case service.LIST_PAGE_ID, service.DASHBOARD_PAGE_ID:
+			descScope = "Services"
+		case job.LIST_PAGE_ID, job.DASHBOARD_PAGE_ID:
+			descScope = "Jobs"
+		case instance.LIST_PAGE_ID, instance.DASHBOARD_PAGE_ID:
+			descScope = "Instances"
+		case workerpool.LIST_PAGE_ID:
+			descScope = "Worker Pools"
+		default:
+			descScope = "Describe"
+		}
+	}
+	pushAppTitle(term.FormatTitle(descScope, "Describe"))
 
 	footer.ContextShortcutView.Clear()
 	app.SetFocus(describeModal)
@@ -158,6 +203,7 @@ func openDescribeModal(resource any, title string) {
 func openServiceScaleModal(s *model_service.Service) {
 	scaleModal := service_scale.Modal(app, s, rootPages, func(refresh bool) {
 		rootPages.RemovePage(service_scale.MODAL_PAGE_ID)
+		popAppTitle()
 		if refresh {
 			switchTo(previousPageID)
 		} else {
@@ -171,6 +217,7 @@ func openServiceScaleModal(s *model_service.Service) {
 	rootPages.AddPage(service_scale.MODAL_PAGE_ID, scaleModal, true, true)
 	previousPageID = currentPageID
 	currentPageID = service_scale.MODAL_PAGE_ID
+	pushAppTitle(term.FormatTitle("Services", "Scale"))
 
 	footer.ContextShortcutView.Clear()
 	app.SetFocus(scaleModal)
@@ -179,6 +226,7 @@ func openServiceScaleModal(s *model_service.Service) {
 func openServiceAuthModal(s *model_service.Service) {
 	authModal := service_auth.Modal(app, s, rootPages, func(refresh bool) {
 		rootPages.RemovePage(service_auth.MODAL_PAGE_ID)
+		popAppTitle()
 		if refresh {
 			switchTo(previousPageID)
 		} else {
@@ -192,6 +240,7 @@ func openServiceAuthModal(s *model_service.Service) {
 	rootPages.AddPage(service_auth.MODAL_PAGE_ID, authModal, true, true)
 	previousPageID = currentPageID
 	currentPageID = service_auth.MODAL_PAGE_ID
+	pushAppTitle(term.FormatTitle("Services", "Authentication"))
 
 	footer.ContextShortcutView.Clear()
 	app.SetFocus(authModal)
@@ -207,6 +256,7 @@ func openInstanceAuthModal(inst *model_instance.Instance) {
 
 	authModal := instance_auth.Modal(app, inst, rootPages, func(refresh bool) {
 		rootPages.RemovePage(instance_auth.MODAL_PAGE_ID)
+		popAppTitle()
 		if refresh {
 			switchTo(previousPageID)
 		} else {
@@ -220,6 +270,7 @@ func openInstanceAuthModal(inst *model_instance.Instance) {
 	rootPages.AddPage(instance_auth.MODAL_PAGE_ID, authModal, true, true)
 	previousPageID = currentPageID
 	currentPageID = instance_auth.MODAL_PAGE_ID
+	pushAppTitle(term.FormatTitle("Instances", "Authentication"))
 
 	footer.ContextShortcutView.Clear()
 	app.SetFocus(authModal)
@@ -228,6 +279,7 @@ func openInstanceAuthModal(inst *model_instance.Instance) {
 func openServiceTrafficSplitModal(s *model_service.Service, revs []model_revision.Revision) {
 	trafficModal := service_traffic.Modal(app, s, revs, func(refresh bool) {
 		rootPages.RemovePage(service_traffic.MODAL_PAGE_ID)
+		popAppTitle()
 		if refresh {
 			switchTo(previousPageID)
 		} else {
@@ -247,6 +299,7 @@ func openServiceTrafficSplitModal(s *model_service.Service, revs []model_revisio
 	rootPages.AddPage(service_traffic.MODAL_PAGE_ID, trafficModal, true, true)
 	previousPageID = currentPageID
 	currentPageID = service_traffic.MODAL_PAGE_ID
+	pushAppTitle(term.FormatTitle("Services", "Traffic"))
 
 	footer.ContextShortcutView.Clear()
 	app.SetFocus(trafficModal)
@@ -254,6 +307,7 @@ func openServiceTrafficSplitModal(s *model_service.Service, revs []model_revisio
 func openWorkerPoolScaleModal(w *model_workerpool.WorkerPool) {
 	scaleModal := workerpool_scale.Modal(app, w, rootPages, func(refresh bool) {
 		rootPages.RemovePage(workerpool_scale.MODAL_PAGE_ID)
+		popAppTitle()
 		if refresh {
 			switchTo(previousPageID)
 		} else {
@@ -267,6 +321,7 @@ func openWorkerPoolScaleModal(w *model_workerpool.WorkerPool) {
 	rootPages.AddPage(workerpool_scale.MODAL_PAGE_ID, scaleModal, true, true)
 	previousPageID = currentPageID
 	currentPageID = workerpool_scale.MODAL_PAGE_ID
+	pushAppTitle(term.FormatTitle("Worker Pools", "Scale"))
 
 	footer.ContextShortcutView.Clear()
 	app.SetFocus(scaleModal)
@@ -275,12 +330,14 @@ func openWorkerPoolScaleModal(w *model_workerpool.WorkerPool) {
 func openCreditsModal() {
 	c := credits.New(app, func() {
 		rootPages.RemovePage(credits.MODAL_PAGE_ID)
+		popAppTitle()
 		switchTo(previousPageID)
 	})
 
 	rootPages.AddPage(credits.MODAL_PAGE_ID, c, true, true)
 	previousPageID = currentPageID
 	currentPageID = credits.MODAL_PAGE_ID
+	pushAppTitle(term.FormatTitle("Credits"))
 
 	footer.ContextShortcutView.Clear()
 	app.SetFocus(c)
@@ -290,6 +347,7 @@ func openCreditsModal() {
 func openHelpModal() {
 	helpModal := help.HelpModal(app, func() {
 		rootPages.RemovePage(help.MODAL_PAGE_ID)
+		popAppTitle()
 		currentPageID = previousPageID
 		pages.SwitchToPage(currentPageID)
 		app.SetFocus(pages)
@@ -314,6 +372,7 @@ func openHelpModal() {
 
 	previousPageID = currentPageID
 	currentPageID = help.MODAL_PAGE_ID
+	pushAppTitle(term.FormatTitle("Help"))
 
 	footer.ContextShortcutView.Clear()
 	app.SetFocus(helpModal)
@@ -322,6 +381,7 @@ func openHelpModal() {
 func openDomainMappingInfoModal(dm *model_domainmapping.DomainMapping) {
 	modal := domainmapping.DomainMappingInfoModal(app, dm, func() {
 		rootPages.RemovePage(domainmapping.MODAL_PAGE_ID)
+		popAppTitle()
 		currentPageID = previousPageID
 		pages.SwitchToPage(currentPageID)
 		app.SetFocus(pages)
@@ -331,6 +391,7 @@ func openDomainMappingInfoModal(dm *model_domainmapping.DomainMapping) {
 	rootPages.AddPage(domainmapping.MODAL_PAGE_ID, modal, true, true)
 	previousPageID = currentPageID
 	currentPageID = domainmapping.MODAL_PAGE_ID
+	pushAppTitle(term.FormatTitle("Domain Mappings", "Info"))
 
 	footer.ContextShortcutView.Clear()
 	app.SetFocus(modal)

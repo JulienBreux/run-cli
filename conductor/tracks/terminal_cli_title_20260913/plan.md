@@ -10,9 +10,9 @@
 - [x] Task: Conductor - User Manual Verification 'Title Utility & Non-TUI Commands' (Protocol in workflow.md) cf526f2
 
 ## Phase 2: TUI Application Title Management
-- [ ] Task: Integrate Dynamic Titles in TUI Navigation & Dashboard
-    - [ ] Write unit tests in `internal/run/tui/app/app_test.go` verifying title updates on startup, list views, and detail dashboards
-    - [ ] Implement title state management in `internal/run/tui/app/app.go` (`switchToPage`, startup, detail views)
+- [x] Task: Integrate Dynamic Titles in TUI Navigation & Dashboard 8166e98
+    - [x] Write unit tests in `internal/run/tui/app/app_test.go` verifying title updates on startup, list views, and detail dashboards
+    - [x] Implement title state management in `internal/run/tui/app/app.go` (`switchToPage`, startup, detail views)
 - [ ] Task: Integrate Dynamic Titles in TUI Modals & Overlays
     - [ ] Write unit tests verifying title push and restore for modals (Help, Scale, Auth, Project, Region)
     - [ ] Implement modal title push and restore logic in `internal/run/tui/app/app.go`

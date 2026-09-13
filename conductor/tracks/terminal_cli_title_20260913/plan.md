@@ -13,9 +13,9 @@
 - [x] Task: Integrate Dynamic Titles in TUI Navigation & Dashboard 8166e98
     - [x] Write unit tests in `internal/run/tui/app/app_test.go` verifying title updates on startup, list views, and detail dashboards
     - [x] Implement title state management in `internal/run/tui/app/app.go` (`switchToPage`, startup, detail views)
-- [ ] Task: Integrate Dynamic Titles in TUI Modals & Overlays
-    - [ ] Write unit tests verifying title push and restore for modals (Help, Scale, Auth, Project, Region)
-    - [ ] Implement modal title push and restore logic in `internal/run/tui/app/app.go`
+- [x] Task: Integrate Dynamic Titles in TUI Modals & Overlays e512b28
+    - [x] Write unit tests verifying title push and restore for modals (Help, Scale, Auth, Project, Region)
+    - [x] Implement modal title push and restore logic in `internal/run/tui/app/app.go`
 - [ ] Task: Conductor - User Manual Verification 'TUI Application Title Management' (Protocol in workflow.md)
 
 ## Phase 3: Validation, Verification & Integration

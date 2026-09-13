@@ -1,10 +1,10 @@
 # Implementation Plan: Instance List Columns and Auth Styling
 
 ## Phase 1: Table Column Adjustments & Styling
-- [ ] Task: Update Instances Table Headers, Expansions, and Cell Rendering
-    - [ ] Update unit tests in `internal/run/tui/app/instance/instance_test.go` to assert the 6-column layout, absence of CONTAINERS column, and new LAST UPDATED column index
-    - [ ] Update `listHeaders`, `listExpansions`, and `render()` in `internal/run/tui/app/instance/instance.go` to remove CONTAINERS and reindex columns
-    - [ ] Ensure Auth column retains `[red]Yes` / `[green]No` colored styling matching Services
+- [x] Task: Update Instances Table Headers, Expansions, and Cell Rendering 504629a
+    - [x] Update unit tests in `internal/run/tui/app/instance/instance_test.go` to assert the 6-column layout, absence of CONTAINERS column, and new LAST UPDATED column index
+    - [x] Update `listHeaders`, `listExpansions`, and `render()` in `internal/run/tui/app/instance/instance.go` to remove CONTAINERS and reindex columns
+    - [x] Ensure Auth column retains `[red]Yes` / `[green]No` colored styling matching Services
 - [ ] Task: Conductor - User Manual Verification 'Table Column Adjustments & Styling' (Protocol in workflow.md)
 
 ## Phase 2: Validation, Verification & Integration

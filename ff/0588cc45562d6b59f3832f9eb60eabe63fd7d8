@@ -1,0 +1,3 @@
+Task: Rewrite CONTRIBUTING.md with Actionable Guidelines
+Summary: Rewrote CONTRIBUTING.md with clear prerequisites, development workflow targets (make build, test, lint), coding conventions (TDD, license header, Conventional Commits), PR process, and cross-links to MAINTAINERS.md and community files.
+Files: CONTRIBUTING.md

@@ -1,9 +1,9 @@
 # Implementation Plan: Place Instances before Services in Header
 
 ## Phase 1: Reorder Shortcut Registry
-- [ ] Task: Write failing unit tests for global shortcut ordering
-    - [ ] Add unit test in `internal/run/tui/app/shortcut/shortcut_test.go` asserting that `ctrl+n` (Instances) appears before `ctrl+s` (Services) in `shortcut.Registry`
-    - [ ] Run test and confirm red failure
+- [x] Task: Write failing unit tests for global shortcut ordering (2ca8bfc)
+    - [x] Add unit test in `internal/run/tui/app/shortcut/shortcut_test.go` asserting that `ctrl+n` (Instances) appears before `ctrl+s` (Services) in `shortcut.Registry`
+    - [x] Run test and confirm red failure
 - [ ] Task: Reorder global shortcuts in registry
     - [ ] Move `ctrl+n` (Instances) before `ctrl+s` (Services) in `shortcut.Registry` in `internal/run/tui/app/shortcut/shortcut.go`
     - [ ] Run unit tests and confirm green success

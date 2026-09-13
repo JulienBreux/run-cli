@@ -1,0 +1,8 @@
+{
+  "track_id": "terminal_cli_title_20260913",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-09-13T17:40:45Z",
+  "updated_at": "2026-09-13T17:40:45Z",
+  "description": "Change the term CLI title depending on the display (Services, Jobs, etc.). Use the pattern \"Run | Services\" and \"Run | Services | xxx\", etc"
+}

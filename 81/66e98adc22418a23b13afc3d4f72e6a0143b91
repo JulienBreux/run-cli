@@ -1,0 +1,9 @@
+Task: Integrate Dynamic Titles in TUI Navigation & Dashboard
+Summary of changes:
+- Added terminal title state management (currentTitle, titleStack, setAppTitle, pushAppTitle, popAppTitle, pageTitle) in internal/run/tui/app/app.go.
+- Updated Run to set title to 'Run | Loading...' during startup.
+- Updated initializeApp and switchTo to update terminal title dynamically across all list pages (Services, Jobs, Instances, Worker Pools, Domain Mappings) and detail dashboards.
+- Added comprehensive unit tests in internal/run/tui/app/app_test.go.
+
+Why:
+Ensures terminal title accurately reflects the active view and resource being inspected in the interactive TUI dashboard.

@@ -43,17 +43,15 @@ var (
 		"NAME",
 		"REGION",
 		"STATUS",
-		"CONTAINERS",
 		"LAST UPDATED",
 	}
 
 	listExpansions = []int{
 		1, // PROXY
 		1, // AUTH
-		2, // NAME
+		3, // NAME
 		1, // REGION
 		1, // STATUS
-		2, // CONTAINERS
 		2, // LAST UPDATED
 	}
 
@@ -145,15 +143,6 @@ func render(insts []model.Instance) {
 	listTable.SetHeadersWithExpansions(listHeaders, listExpansions)
 
 	for i, inst := range insts {
-		var containerNames []string
-		for _, c := range inst.Containers {
-			containerNames = append(containerNames, c.Name)
-		}
-		containersStr := strings.Join(containerNames, ", ")
-		if containersStr == "" {
-			containersStr = "-"
-		}
-
 		status := inst.Status()
 		var formattedStatus string
 		switch status {
@@ -188,8 +177,7 @@ func render(insts []model.Instance) {
 		listTable.Table.SetCell(row, 2, tview.NewTableCell(inst.ID()))
 		listTable.Table.SetCell(row, 3, tview.NewTableCell(inst.Region))
 		listTable.Table.SetCell(row, 4, tview.NewTableCell(formattedStatus))
-		listTable.Table.SetCell(row, 5, tview.NewTableCell(containersStr))
-		listTable.Table.SetCell(row, 6, tview.NewTableCell(updatedAt))
+		listTable.Table.SetCell(row, 5, tview.NewTableCell(updatedAt))
 	}
 
 	listTable.Table.SetTitle(fmt.Sprintf(" %s (%d) ", LIST_PAGE_TITLE, len(insts)))

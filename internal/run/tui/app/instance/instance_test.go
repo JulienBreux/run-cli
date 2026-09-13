@@ -43,6 +43,15 @@ func TestList(t *testing.T) {
 	tbl := List(app)
 	assert.NotNil(t, tbl)
 	assert.Equal(t, LIST_PAGE_TITLE, tbl.Title)
+	assert.Equal(t, []string{"", "AUTH", "NAME", "REGION", "STATUS", "LAST UPDATED"}, listHeaders)
+	assert.Equal(t, []int{1, 1, 3, 1, 1, 2}, listExpansions)
+	assert.Equal(t, 6, listTable.Table.GetColumnCount())
+	assert.Equal(t, "", listTable.Table.GetCell(0, 0).Text)
+	assert.Equal(t, "AUTH", listTable.Table.GetCell(0, 1).Text)
+	assert.Equal(t, "NAME", listTable.Table.GetCell(0, 2).Text)
+	assert.Equal(t, "REGION", listTable.Table.GetCell(0, 3).Text)
+	assert.Equal(t, "STATUS", listTable.Table.GetCell(0, 4).Text)
+	assert.Equal(t, "LAST UPDATED", listTable.Table.GetCell(0, 5).Text)
 }
 
 func TestLoad(t *testing.T) {
@@ -67,12 +76,13 @@ func TestLoad(t *testing.T) {
 
 	assert.Equal(t, newInsts, instances)
 	assert.Equal(t, 2, listTable.Table.GetRowCount())
+	assert.Equal(t, 6, listTable.Table.GetColumnCount())
 	assert.Equal(t, "", listTable.Table.GetCell(1, 0).Text)
-	assert.Contains(t, listTable.Table.GetCell(1, 1).Text, "Yes")
+	assert.Equal(t, "[red]Yes", listTable.Table.GetCell(1, 1).Text)
 	assert.Equal(t, "inst-1", listTable.Table.GetCell(1, 2).Text)
 	assert.Equal(t, "us-central1", listTable.Table.GetCell(1, 3).Text)
-	assert.Contains(t, listTable.Table.GetCell(1, 4).Text, "Ready")
-	assert.Contains(t, listTable.Table.GetCell(1, 5).Text, "c1")
+	assert.Equal(t, "[green]Ready", listTable.Table.GetCell(1, 4).Text)
+	assert.NotEmpty(t, listTable.Table.GetCell(1, 5).Text)
 }
 
 func TestListReload(t *testing.T) {
@@ -265,14 +275,15 @@ func TestRender(t *testing.T) {
 	render(testInsts)
 
 	assert.Equal(t, 4, listTable.Table.GetRowCount())
+	assert.Equal(t, 6, listTable.Table.GetColumnCount())
 	assert.Equal(t, "", listTable.Table.GetCell(1, 0).Text)
-	assert.Contains(t, listTable.Table.GetCell(1, 1).Text, "Yes")
+	assert.Equal(t, "[red]Yes", listTable.Table.GetCell(1, 1).Text)
 	assert.Equal(t, "inst-1", listTable.Table.GetCell(1, 2).Text)
 	assert.Equal(t, "us-central1", listTable.Table.GetCell(1, 3).Text)
-	assert.Contains(t, listTable.Table.GetCell(1, 4).Text, "Ready")
-	assert.Contains(t, listTable.Table.GetCell(1, 5).Text, "web, sidecar")
-	assert.Contains(t, listTable.Table.GetCell(2, 4).Text, "Failed")
-	assert.Contains(t, listTable.Table.GetCell(3, 4).Text, "Unknown")
+	assert.Equal(t, "[green]Ready", listTable.Table.GetCell(1, 4).Text)
+	assert.NotEmpty(t, listTable.Table.GetCell(1, 5).Text)
+	assert.Equal(t, "[red]Failed", listTable.Table.GetCell(2, 4).Text)
+	assert.Equal(t, "[grey]Unknown", listTable.Table.GetCell(3, 4).Text)
 }
 
 func TestRender_ProxyAndAuth(t *testing.T) {

@@ -18,8 +18,8 @@
     - [x] Implement modal title push and restore logic in `internal/run/tui/app/app.go`
 - [x] Task: Conductor - User Manual Verification 'TUI Application Title Management' (Protocol in workflow.md) 1b9efc3
 
-## Phase 3: Validation, Verification & Integration
+## Phase 3: Validation, Verification & Integration [checkpoint: bdc5b7d]
 - [x] Task: Full Suite Verification & Build f030729
     - [x] Run `make test` across all packages to verify test coverage and pass rate
     - [x] Run `make lint` and `make build` to confirm code style and clean compilation
-- [ ] Task: Conductor - User Manual Verification 'Validation, Verification & Integration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Validation, Verification & Integration' (Protocol in workflow.md) bdc5b7d

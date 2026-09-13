@@ -1,0 +1,8 @@
+Task: Integrate Title Management in CLI Subcommands
+Summary of changes:
+- Updated version command to set formatted terminal title to 'Run | Version' and reset on exit via defer term.ResetTitle().
+- Updated root command RunE to reset terminal title on application exit via defer term.ResetTitle().
+- Added unit tests in internal/run/command/version/version_test.go and internal/run/command/run_test.go.
+
+Why:
+Ensures terminal emulator title reflects CLI subcommand state during execution and restores clean title on command exit.

@@ -41,6 +41,23 @@ func TestRegistry(t *testing.T) {
 	assert.True(t, foundInstance, "Registry should contain 'ctrl+n' for Instances")
 }
 
+func TestRegistry_GlobalOrder(t *testing.T) {
+	globalShortcuts := GetByCategory(CategoryGlobal)
+	instanceIndex := -1
+	serviceIndex := -1
+	for i, s := range globalShortcuts {
+		if s.Key == "ctrl+n" {
+			instanceIndex = i
+		}
+		if s.Key == "ctrl+s" {
+			serviceIndex = i
+		}
+	}
+	assert.NotEqual(t, -1, instanceIndex, "ctrl+n shortcut should be present in global shortcuts")
+	assert.NotEqual(t, -1, serviceIndex, "ctrl+s shortcut should be present in global shortcuts")
+	assert.Less(t, instanceIndex, serviceIndex, "Instances (ctrl+n) should appear before Services (ctrl+s)")
+}
+
 func TestGetByCategory(t *testing.T) {
 	// Test Service List Category
 	shortcuts := GetByCategory(CategoryServiceList)

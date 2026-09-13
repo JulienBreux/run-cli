@@ -24,11 +24,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: In the instances list, move the Auth column as first and use color for Yes/No like Services. Remove the containers column.**
-*Link: [./tracks/instances_list_columns_20260913/](./tracks/instances_list_columns_20260913/)*
-
----
-
 - [ ] **Track: Change the term CLI title depending on the display (Services, Jobs, etc.). Use the pattern "Run | Services" and "Run | Services | xxx", etc**
 *Link: [./tracks/terminal_cli_title_20260913/](./tracks/terminal_cli_title_20260913/)*
 

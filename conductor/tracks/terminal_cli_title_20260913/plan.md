@@ -1,13 +1,13 @@
 # Implementation Plan: Dynamic Terminal CLI Title
 
-## Phase 1: Title Utility & Non-TUI Commands
+## Phase 1: Title Utility & Non-TUI Commands [checkpoint: cf526f2]
 - [x] Task: Centralized Title Formatting & Terminal Control Utility b20272b
     - [x] Write unit tests for title formatting (`FormatTitle`) and terminal OSC escape sequence handling in `pkg/term`
     - [x] Implement `pkg/term` with `FormatTitle` and terminal title set/reset functions
 - [x] Task: Integrate Title Management in CLI Subcommands c0d096b
     - [x] Write unit tests verifying terminal title lifecycle in Cobra subcommands
     - [x] Update `version` command and root command hooks to set terminal title and restore on exit
-- [ ] Task: Conductor - User Manual Verification 'Title Utility & Non-TUI Commands' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Title Utility & Non-TUI Commands' (Protocol in workflow.md) cf526f2
 
 ## Phase 2: TUI Application Title Management
 - [ ] Task: Integrate Dynamic Titles in TUI Navigation & Dashboard

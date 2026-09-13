@@ -23,5 +23,6 @@ We express our sincere gratitude to all community members who have contributed t
 
 | Name | GitHub ID | Affiliation |
 | ---- | --------- | ----------- |
+| Valentin Deleplace | [Deleplace](https://github.com/Deleplace) | Google |
 
 To add yourself to this table, submit a pull request as outlined in [CONTRIBUTING.md](CONTRIBUTING.md).

@@ -1,0 +1,14 @@
+Task: Update Instances Table Headers, Expansions, and Cell Rendering
+Summary of changes:
+- Removed CONTAINERS column from Instances list table headers and cell rendering.
+- Re-indexed columns: Proxy (col 0), Auth (col 1), Name (col 2), Region (col 3), Status (col 4), Last Updated (col 5).
+- Updated column expansion weights to [1, 1, 3, 1, 1, 2] for better horizontal spacing.
+- Preserved Auth column colored styling ([red]Yes / [green]No) matching Services.
+- Updated unit tests in internal/run/tui/app/instance/instance_test.go asserting column count, header labels, and cell values.
+
+Files modified:
+- internal/run/tui/app/instance/instance.go
+- internal/run/tui/app/instance/instance_test.go
+
+Why:
+Aligns the Instances table with Services, removing redundant container names from the list view while improving spacing and readability.

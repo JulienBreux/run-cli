@@ -1,9 +1,9 @@
 # Implementation Plan: Clean Maintainer and Community Health Files
 
 ## Phase 1: Maintainer Roster & Core Contribution Guidelines
-- [ ] Task: Create MAINTAINERS.md and Extract Roster
-    - [ ] Create `MAINTAINERS.md` containing the maintainers and contributors table extracted from `CONTRIBUTING.md`
-    - [ ] Add ownership structure, role definitions, and link to `CONTRIBUTING.md`
+- [x] Task: Create MAINTAINERS.md and Extract Roster [59efcf0]
+    - [x] Create `MAINTAINERS.md` containing the maintainers and contributors table extracted from `CONTRIBUTING.md`
+    - [x] Add ownership structure, role definitions, and link to `CONTRIBUTING.md`
 - [ ] Task: Rewrite CONTRIBUTING.md with Actionable Guidelines
     - [ ] Draft comprehensive contribution guidelines in `CONTRIBUTING.md` (prerequisites, build commands, testing, conventions, PR workflow)
     - [ ] Link `CONTRIBUTING.md` to `MAINTAINERS.md`, Code of Conduct, Security, and Support

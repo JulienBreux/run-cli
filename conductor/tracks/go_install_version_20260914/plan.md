@@ -23,7 +23,7 @@
 - [x] Task: Implement asynchronous header notification in `internal/run/tui/component/header` (ff81d33)
     - [x] Trigger background update check on header initialization and refresh header text if an update is found
     - [x] Run unit tests and confirm success (Green phase)
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Remote Update Checker & TUI Notification' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Remote Update Checker & TUI Notification' (Protocol in workflow.md) [checkpoint: edfce46]
 
 ## Phase 3: Quality Gates & Documentation
 - [ ] Task: Verify CLI version command output and integration tests

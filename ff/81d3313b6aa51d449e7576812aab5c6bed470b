@@ -1,0 +1,4 @@
+Task: Implement asynchronous header notification in internal/run/tui/component/header
+Summary: Implemented SetUpdateAvailable and StartUpdateCheck in header component and integrated background check in app initialization loop to update header with subtle update notice without blocking TUI startup.
+Files: internal/run/tui/component/header/header.go, internal/run/tui/component/header/header_test.go, internal/run/tui/app/app.go
+Why: Inform users non-intrusively in the TUI when a new version is released.

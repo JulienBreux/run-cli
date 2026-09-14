@@ -40,6 +40,10 @@ func New(currentInfo info.Info) *tview.Flex {
 		AddItem(logo.New(), 50, 1, false)
 }
 
+// SetUpdateAvailable sets the available update version and refreshes the info view.
+func SetUpdateAvailable(latestVersion string) {
+}
+
 // UpdateInfo updates the info view.
 func UpdateInfo(currentInfo info.Info) {
 	infoView.Clear()

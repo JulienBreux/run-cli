@@ -93,3 +93,31 @@ func TestHeader_ShortcutsOrder(t *testing.T) {
 	idxService := strings.Index(text, "<ctrl+s>")
 	assert.Less(t, idxInstance, idxService, "Instances (<ctrl+n>) should appear before Services (<ctrl+s>) in header shortcuts column")
 }
+
+func TestHeader_UpdateNotice(t *testing.T) {
+	testInfo := info.Info{
+		Project: "test-project",
+		Region:  "us-central1",
+		User:    "test-user",
+	}
+
+	h := header.New(testInfo)
+	assert.NotNil(t, h)
+
+	infoCol, ok := h.GetItem(0).(*tview.TextView)
+	assert.True(t, ok)
+
+	text := infoCol.GetText(true)
+	assert.Contains(t, text, "Version:")
+	assert.NotContains(t, text, "update:")
+
+	header.SetUpdateAvailable("v9.9.9")
+
+	textWithUpdate := infoCol.GetText(true)
+	assert.Contains(t, textWithUpdate, "Version:")
+	assert.Contains(t, textWithUpdate, "(update: v9.9.9)")
+
+	// Reset for subsequent tests
+	header.SetUpdateAvailable("")
+}
+

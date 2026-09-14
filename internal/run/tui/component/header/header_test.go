@@ -121,3 +121,17 @@ func TestHeader_UpdateNotice(t *testing.T) {
 	header.SetUpdateAvailable("")
 }
 
+func TestStartUpdateCheck(t *testing.T) {
+	testInfo := info.Info{
+		Project: "test-project",
+		Region:  "us-central1",
+		User:    "test-user",
+	}
+	_ = header.New(testInfo)
+
+	assert.NotPanics(t, func() {
+		header.StartUpdateCheck(nil)
+	})
+}
+
+

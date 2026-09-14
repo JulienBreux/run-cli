@@ -17,6 +17,7 @@ limitations under the License.
 package header
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
@@ -27,7 +28,9 @@ import (
 )
 
 var (
-	infoView *tview.TextView
+	infoView     *tview.TextView
+	lastInfo     info.Info
+	updateNotice string
 )
 
 // New returns a TView header.
@@ -42,16 +45,45 @@ func New(currentInfo info.Info) *tview.Flex {
 
 // SetUpdateAvailable sets the available update version and refreshes the info view.
 func SetUpdateAvailable(latestVersion string) {
+	updateNotice = latestVersion
+	if infoView != nil {
+		UpdateInfo(lastInfo)
+	}
+}
+
+// StartUpdateCheck starts an asynchronous background check for updates and updates the header if one is available.
+func StartUpdateCheck(app *tview.Application) {
+	go func() {
+		hasUpdate, latest, err := version.CheckUpdate(context.Background(), version.Version)
+		if err != nil || !hasUpdate {
+			return
+		}
+		if app != nil {
+			app.QueueUpdateDraw(func() {
+				SetUpdateAvailable(latest)
+			})
+		} else {
+			SetUpdateAvailable(latest)
+		}
+	}()
 }
 
 // UpdateInfo updates the info view.
 func UpdateInfo(currentInfo info.Info) {
+	lastInfo = currentInfo
+	if infoView == nil {
+		return
+	}
 	infoView.Clear()
 
 	_, _ = fmt.Fprintf(infoView, "[white]Project:        [#bd93f9]%s\n", currentInfo.Project)
 	_, _ = fmt.Fprintf(infoView, "[white]Region:         [#bd93f9]%s\n", currentInfo.Region)
 	_, _ = fmt.Fprintf(infoView, "[white]User:           [#bd93f9]%s\n", currentInfo.User)
-	_, _ = fmt.Fprintf(infoView, "[white]Version:        [#bd93f9]%s\n", version.Version)
+	if updateNotice != "" {
+		_, _ = fmt.Fprintf(infoView, "[white]Version:        [#bd93f9]%s [yellow](update: %s)[white]\n", version.Version, updateNotice)
+	} else {
+		_, _ = fmt.Fprintf(infoView, "[white]Version:        [#bd93f9]%s\n", version.Version)
+	}
 }
 
 // returns the info column.

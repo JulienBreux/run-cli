@@ -172,6 +172,7 @@ func initializeApp(cfg *config.Config) {
 		setAppTitle(pageTitle(service.LIST_PAGE_ID))
 		service.Shortcuts()
 		hideLoading()
+		header.StartUpdateCheck(app)
 	})
 }
 

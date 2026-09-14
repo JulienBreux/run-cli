@@ -26,9 +26,9 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Remote Update Checker & TUI Notification' (Protocol in workflow.md) [checkpoint: edfce46]
 
 ## Phase 3: Quality Gates & Documentation
-- [ ] Task: Verify CLI version command output and integration tests
-    - [ ] Update `internal/run/command/version/version_test.go` to verify version output formatting
-    - [ ] Confirm all command tests pass
+- [x] Task: Verify CLI version command output and integration tests (79a285c)
+    - [x] Update `internal/run/command/version/version_test.go` to verify version output formatting
+    - [x] Confirm all command tests pass
 - [ ] Task: Update README.md and documentation
     - [ ] Document version detection and update notification feature in `README.md`
 - [ ] Task: Run project quality gates

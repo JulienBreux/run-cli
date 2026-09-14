@@ -1,0 +1,4 @@
+Task: Implement build info resolution in pkg/version
+Summary: Implemented ResolveFromBuildInfo and init() hook in pkg/version/version.go to extract module version, VCS revision hash, dirty state, and build timestamp from runtime/debug.ReadBuildInfo() when ldflags are unset.
+Files: pkg/version/version.go
+Why: Ensure go install installations automatically detect and display correct semver version, commit hash, and build timestamp.

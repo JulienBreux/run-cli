@@ -11,9 +11,9 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Build Info Detection' (Protocol in workflow.md) (b63a49a)
 
 ## Phase 2: Remote Update Checker & TUI Notification
-- [ ] Task: Write failing unit tests for remote GitHub release check in `pkg/version`
-    - [ ] Add unit tests for latest release checking, semver comparison, and network failure tolerance
-    - [ ] Run tests and verify failure (Red phase)
+- [x] Task: Write failing unit tests for remote GitHub release check in `pkg/version` (198671d)
+    - [x] Add unit tests for latest release checking, semver comparison, and network failure tolerance
+    - [x] Run tests and verify failure (Red phase)
 - [ ] Task: Implement remote release checker in `pkg/version`
     - [ ] Implement non-blocking HTTP check against GitHub Releases API with 2s timeout
     - [ ] Run unit tests and confirm success (Green phase)

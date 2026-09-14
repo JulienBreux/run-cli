@@ -1,0 +1,4 @@
+Task: Implement remote release checker in pkg/version
+Summary: Implemented CheckUpdate to query GitHub releases with a 2-second timeout and CompareSemver to compare semantic versions while ignoring local dev builds.
+Files: pkg/version/version.go
+Why: Provide reusable and non-blocking remote release checking logic to notify users of available updates.

@@ -42,6 +42,7 @@ const (
 	CategoryGlobal           = "Global"
 	CategoryServiceList      = "Service List"
 	CategoryServiceDashboard = "Service Dashboard"
+	CategoryServiceObservability = "Service Observability"
 	CategoryJobList          = "Job List"
 	CategoryWorkerList       = "Worker List"
 	CategoryDomainMapping    = "Domain Mapping"
@@ -79,6 +80,14 @@ var Registry = []Shortcut{
 	{Key: "tab", TCellKey: tcell.KeyTab, Description: "Next Tab", Category: CategoryServiceDashboard},
 	{Key: "shift-tab", TCellKey: tcell.KeyBacktab, Description: "Prev Tab", Category: CategoryServiceDashboard},
 	{Key: "t", Rune: 't', Description: "Traffic Split", Category: CategoryServiceDashboard},
+
+	// Service Observability
+	{Key: "esc", TCellKey: tcell.KeyEscape, Description: "Back", Category: CategoryServiceObservability},
+	{Key: "tab", TCellKey: tcell.KeyTab, Description: "Next Tab", Category: CategoryServiceObservability},
+	{Key: "shift-tab", TCellKey: tcell.KeyBacktab, Description: "Prev Tab", Category: CategoryServiceObservability},
+	{Key: "1|6|d", Description: "Window", Category: CategoryServiceObservability},
+	{Key: "a", Rune: 'a', Description: "Auto-refresh", Category: CategoryServiceObservability},
+	{Key: "r", Rune: 'r', Description: "Refresh", Category: CategoryServiceObservability},
 
 	// Job List
 	{Key: "r", Rune: 'r', Description: "Refresh", Category: CategoryJobList},

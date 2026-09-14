@@ -38,6 +38,7 @@ The idea is to establish a high-performance, terminal-based alternative to the G
 *   **Service Management:** View, search, and manage your Cloud Run services.
 *   **Authentication Management:** Toggle between "Require authentication" and "Allow unauthenticated invocations" directly from the interface.
 *   **Service Dashboard:** Navigate to a dedicated dashboard for each service with multiple views.
+*   **Observability & Telemetry:** Real-time metrics in the Service Dashboard featuring KPI summary cards (Total Requests, 5xx Error Rate %, p95 Latency, Active Instances), Unicode sparkline trend graphs, window switcher (`1h` / `6h` / `24h`), auto-refresh toggle (`a`), and recent warning/error logs stream.
 *   **Service Proxy:** Locally proxy private services with automatic authentication token injection (press `p`).
 *   **Networking View:** Monitor ingress settings, endpoints status (URI, IAP), and VPC Access configurations.
 *   **Security View:** Check authentication requirements, service identity, encryption keys, and binary authorization policies.

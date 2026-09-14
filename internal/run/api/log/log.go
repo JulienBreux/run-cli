@@ -111,3 +111,29 @@ func formatEntry(entry *logging.Entry) string {
 	ts := entry.Timestamp.Format("15:04:05")
 	return fmt.Sprintf("[%s] %s", ts, payload)
 }
+
+// FetchRecentLogs fetches up to limit recent log entries matching the filter.
+func FetchRecentLogs(ctx context.Context, projectID, filter string, limit int) ([]*logging.Entry, error) {
+	client, err := clientFactory(ctx, projectID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create logging client: %w", err)
+	}
+	defer func() {
+		_ = client.Close()
+	}()
+
+	iter := client.Entries(ctx, logadmin.Filter(filter), logadmin.NewestFirst())
+	var entries []*logging.Entry
+	for len(entries) < limit {
+		entry, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		entries = append(entries, entry)
+	}
+	return entries, nil
+}
+

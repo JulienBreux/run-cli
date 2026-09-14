@@ -367,3 +367,53 @@ func TestWrappers_Delegation(t *testing.T) {
 		assert.Panics(t, func() { _, _ = it.Next() })
 	})
 }
+
+func TestFetchRecentLogs(t *testing.T) {
+	origFactory := clientFactory
+	defer func() { clientFactory = origFactory }()
+
+	t.Run("Success", func(t *testing.T) {
+		clientFactory = func(ctx context.Context, projectID string) (Client, error) {
+			return &MockClient{
+				EntriesFunc: func(ctx context.Context, opts ...interface{}) EntryIterator {
+					return &MockEntryIterator{
+						Items: []*logging.Entry{
+							{Payload: "Log 1"},
+							{Payload: "Log 2"},
+						},
+					}
+				},
+			}, nil
+		}
+
+		entries, err := FetchRecentLogs(context.Background(), "test-project", "severity >= ERROR", 5)
+		assert.NoError(t, err)
+		assert.Len(t, entries, 2)
+	})
+
+	t.Run("ClientFactoryError", func(t *testing.T) {
+		clientFactory = func(ctx context.Context, projectID string) (Client, error) {
+			return nil, errors.New("factory failed")
+		}
+
+		entries, err := FetchRecentLogs(context.Background(), "test-project", "severity >= ERROR", 5)
+		assert.Error(t, err)
+		assert.Nil(t, entries)
+	})
+
+	t.Run("IteratorError", func(t *testing.T) {
+		clientFactory = func(ctx context.Context, projectID string) (Client, error) {
+			return &MockClient{
+				EntriesFunc: func(ctx context.Context, opts ...interface{}) EntryIterator {
+					return &MockEntryIterator{
+						Err: errors.New("iterator error"),
+					}
+				},
+			}, nil
+		}
+
+		entries, err := FetchRecentLogs(context.Background(), "test-project", "severity >= ERROR", 5)
+		assert.Error(t, err)
+		assert.Nil(t, entries)
+	})
+}

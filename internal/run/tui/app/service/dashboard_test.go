@@ -246,3 +246,39 @@ func TestUpdateRevisionDetail(t *testing.T) {
 		assert.Equal(t, "", revisionsDetail.GetText(true))
 	})
 }
+
+func TestDashboard_ObservabilityTab(t *testing.T) {
+	_ = footer.New()
+	app := tview.NewApplication()
+	d := Dashboard(app)
+	assert.NotNil(t, d)
+
+	obs := GetObservabilityComponent()
+	assert.NotNil(t, obs)
+
+	// Set active tab to 1 (Observability)
+	activeTab = 1
+	dashboardService = &model_service.Service{
+		Name:   "my-service",
+		Region: "us-central1",
+	}
+	dashboardInfo = info.Info{Project: "my-project"}
+
+	assert.NotPanics(t, func() {
+		updateTabs()
+	})
+	assert.Contains(t, footer.ContextShortcutView.GetText(true), "Auto-refresh")
+
+	// Test observability key events passed through input handler
+	handler := d.GetInputCapture()
+	assert.NotNil(t, handler)
+
+	// '6' should set window to 6h
+	ev := handler(tcell.NewEventKey(tcell.KeyRune, '6', tcell.ModNone))
+	assert.Nil(t, ev)
+
+	// Clear dashboard
+	DashboardClear()
+	assert.Nil(t, dashboardService)
+}
+

@@ -24,6 +24,7 @@ import (
 	"github.com/JulienBreux/run-cli/internal/run/model/common/info"
 	model_service "github.com/JulienBreux/run-cli/internal/run/model/service"
 	model_revision "github.com/JulienBreux/run-cli/internal/run/model/service/revision"
+	"github.com/JulienBreux/run-cli/internal/run/tui/app/service/observability"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/service/revision"
 	"github.com/JulienBreux/run-cli/internal/run/tui/app/shortcut"
 	"github.com/JulienBreux/run-cli/internal/run/tui/component/footer"
@@ -41,11 +42,15 @@ var (
 	dashboardTabs      *tview.TextView
 	dashboardPages     *tview.Pages
 	dashboardService   *model_service.Service
+	dashboardInfo      info.Info
 	dashboardRevisions []model_revision.Revision
 
 	// Revisions tab components
 	revisionsList   *revision.ListComponent
 	revisionsDetail *revision.DetailComponent
+
+	// Observability tab component
+	observabilityComp *observability.ObservabilityComponent
 
 	// Networking tab components
 	networkingDetail *tview.TextView
@@ -75,7 +80,8 @@ func Dashboard(app *tview.Application) *tview.Flex {
 	// Revisions Tab
 	dashboardPages.AddPage(tabs[0], buildRevisionsTab(app), true, true)
 	// Observability Tab
-	dashboardPages.AddPage(tabs[1], tview.NewBox().SetTitle(" Observability (Placeholder) ").SetBorder(true), true, false)
+	observabilityComp = observability.NewObservabilityComponent(app)
+	dashboardPages.AddPage(tabs[1], observabilityComp.View, true, false)
 	// Networking Tab
 	dashboardPages.AddPage(tabs[2], buildNetworkingTab(), true, false)
 	// Security Tab
@@ -96,6 +102,11 @@ func Dashboard(app *tview.Application) *tview.Flex {
 			activeTab = (activeTab - 1 + len(tabs)) % len(tabs)
 			updateTabs()
 			return nil
+		}
+		if activeTab == 1 && observabilityComp != nil {
+			if res := observabilityComp.HandleInput(event); res == nil {
+				return nil
+			}
 		}
 		return event
 	})
@@ -248,6 +259,15 @@ func updateTabs() {
 		}
 	}
 	dashboardPages.SwitchToPage(tabs[activeTab])
+
+	if activeTab == 1 {
+		DashboardObservabilityShortcuts()
+		if dashboardService != nil && observabilityComp != nil {
+			observabilityComp.SetService(dashboardInfo.Project, dashboardService.Region, dashboardService.Name)
+		}
+	} else {
+		DashboardShortcuts()
+	}
 }
 
 func updateRevisionDetail(row int) {
@@ -257,11 +277,6 @@ func updateRevisionDetail(row int) {
 	}
 	revisionsDetail.Update(dashboardRevisions[row-1])
 }
-
-// GetSelectedServiceFull returns the full service object for the selected row.
-// func GetSelectedServiceFull() *model_service.Service {
-// This function doesn't exist in dashboard.go but in service.go (the list view).
-// dashboard.go manages the Detail view of a service.
 
 // GetAllRevisions returns all revisions for the current dashboard.
 func GetAllRevisions() []model_revision.Revision {
@@ -275,9 +290,13 @@ func GetDashboardService() *model_service.Service {
 
 // DashboardReload reloads the dashboard for a specific service.
 func DashboardReload(app *tview.Application, currentInfo info.Info, service *model_service.Service, onResult func(error)) {
+	dashboardInfo = currentInfo
 	dashboardService = service
 	dashboardHeader.SetText(fmt.Sprintf("[lightcyan]Service: [white]%s", service.Name))
 	activeTab = 0
+	if observabilityComp != nil {
+		observabilityComp.Clear()
+	}
 	updateTabs()
 	updateNetworkingTab()
 	updateSecurityTab()
@@ -313,6 +332,9 @@ func DashboardClear() {
 	dashboardRevisions = nil
 	revisionsList.Clear()
 	revisionsDetail.Clear()
+	if observabilityComp != nil {
+		observabilityComp.Clear()
+	}
 }
 
 // DashboardShortcuts sets the shortcuts for the dashboard.
@@ -321,3 +343,16 @@ func DashboardShortcuts() {
 	s := shortcut.FormatByCategory(shortcut.CategoryServiceDashboard, nil)
 	footer.ContextShortcutView.SetText(s)
 }
+
+// DashboardObservabilityShortcuts sets the shortcuts for the observability dashboard tab.
+func DashboardObservabilityShortcuts() {
+	footer.ContextShortcutView.Clear()
+	s := shortcut.FormatByCategory(shortcut.CategoryServiceObservability, nil)
+	footer.ContextShortcutView.SetText(s)
+}
+
+// GetObservabilityComponent returns the active observability component.
+func GetObservabilityComponent() *observability.ObservabilityComponent {
+	return observabilityComp
+}
+

@@ -1,10 +1,10 @@
 # Implementation Plan: Resolve Version Information for go install Builds and Check for Updates
 
 ## Phase 1: Build Info Detection
-- [ ] Task: Write failing unit tests for runtime/debug build info detection in `pkg/version`
-    - [ ] Add unit tests in `pkg/version/version_test.go` covering fallback to `runtime/debug.ReadBuildInfo()` when `Version == "dev"`
-    - [ ] Cover extraction of module version, commit hash (`vcs.revision`), dirty status (`vcs.modified`), and build date (`vcs.time`)
-    - [ ] Run tests and verify failure (Red phase)
+- [x] Task: Write failing unit tests for runtime/debug build info detection in `pkg/version` (813d739)
+    - [x] Add unit tests in `pkg/version/version_test.go` covering fallback to `runtime/debug.ReadBuildInfo()` when `Version == "dev"`
+    - [x] Cover extraction of module version, commit hash (`vcs.revision`), dirty status (`vcs.modified`), and build date (`vcs.time`)
+    - [x] Run tests and verify failure (Red phase)
 - [ ] Task: Implement build info resolution in `pkg/version`
     - [ ] Implement detection logic using `runtime/debug.ReadBuildInfo()` with fallback precedence
     - [ ] Run unit tests and confirm success (Green phase)

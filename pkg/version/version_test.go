@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"errors"
 	"regexp"
+	"runtime/debug"
 	"testing"
 	"time"
 
@@ -82,3 +83,109 @@ func TestPrintVersionText(t *testing.T) {
 	r = regexp.MustCompile(`Version:\s+dev\nCommit:\s+n/a\nBuild date:\s+[0-9T:Z-]+\n`)
 	assert.Regexp(t, r, w.String())
 }
+
+func TestResolveFromBuildInfo(t *testing.T) {
+	origVersion := version.Version
+	origCommit := version.Commit
+	origDate := version.RawDate
+	defer func() {
+		version.Version = origVersion
+		version.Commit = origCommit
+		version.RawDate = origDate
+	}()
+
+	t.Run("NilBuildInfo", func(t *testing.T) {
+		version.Version = "dev"
+		version.Commit = "n/a"
+		version.RawDate = "n/a"
+
+		version.ResolveFromBuildInfo(nil)
+
+		assert.Equal(t, "dev", version.Version)
+		assert.Equal(t, "n/a", version.Commit)
+		assert.Equal(t, "n/a", version.RawDate)
+	})
+
+	t.Run("PopulateFromBuildInfo", func(t *testing.T) {
+		version.Version = "dev"
+		version.Commit = "n/a"
+		version.RawDate = "n/a"
+
+		info := &debug.BuildInfo{
+			Main: debug.Module{
+				Version: "v1.2.3",
+			},
+			Settings: []debug.BuildSetting{
+				{Key: "vcs.revision", Value: "0123456789abcdef"},
+				{Key: "vcs.time", Value: "2026-09-14T10:00:00Z"},
+				{Key: "vcs.modified", Value: "false"},
+			},
+		}
+
+		version.ResolveFromBuildInfo(info)
+
+		assert.Equal(t, "v1.2.3", version.Version)
+		assert.Equal(t, "0123456789abcdef", version.Commit)
+		assert.Equal(t, "2026-09-14T10:00:00Z", version.RawDate)
+	})
+
+	t.Run("DirtyVCS", func(t *testing.T) {
+		version.Version = "dev"
+		version.Commit = "n/a"
+		version.RawDate = "n/a"
+
+		info := &debug.BuildInfo{
+			Main: debug.Module{
+				Version: "v1.2.3",
+			},
+			Settings: []debug.BuildSetting{
+				{Key: "vcs.revision", Value: "0123456789abcdef"},
+				{Key: "vcs.modified", Value: "true"},
+			},
+		}
+
+		version.ResolveFromBuildInfo(info)
+
+		assert.Equal(t, "v1.2.3", version.Version)
+		assert.Equal(t, "0123456789abcdef-dirty", version.Commit)
+	})
+
+	t.Run("PrecedenceOfLdflags", func(t *testing.T) {
+		version.Version = "v2.0.0"
+		version.Commit = "fedcba9876543210"
+		version.RawDate = "2026-01-01T00:00:00Z"
+
+		info := &debug.BuildInfo{
+			Main: debug.Module{
+				Version: "v1.0.0",
+			},
+			Settings: []debug.BuildSetting{
+				{Key: "vcs.revision", Value: "newrevision"},
+				{Key: "vcs.time", Value: "2026-09-14T12:00:00Z"},
+			},
+		}
+
+		version.ResolveFromBuildInfo(info)
+
+		assert.Equal(t, "v2.0.0", version.Version)
+		assert.Equal(t, "fedcba9876543210", version.Commit)
+		assert.Equal(t, "2026-01-01T00:00:00Z", version.RawDate)
+	})
+
+	t.Run("DevelOrEmptyVersionIgnored", func(t *testing.T) {
+		version.Version = "dev"
+		version.Commit = "n/a"
+		version.RawDate = "n/a"
+
+		info := &debug.BuildInfo{
+			Main: debug.Module{
+				Version: "(devel)",
+			},
+		}
+
+		version.ResolveFromBuildInfo(info)
+
+		assert.Equal(t, "dev", version.Version)
+	})
+}
+

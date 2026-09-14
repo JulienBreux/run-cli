@@ -19,10 +19,15 @@ package version
 import (
 	"fmt"
 	"io"
+	"runtime/debug"
 	"time"
 
 	"github.com/JulienBreux/run-cli/pkg/format"
 )
+
+// ResolveFromBuildInfo extracts version, commit, and date from the provided build info.
+func ResolveFromBuildInfo(info *debug.BuildInfo) {
+}
 
 var (
 	// Version is the semver release name of this build

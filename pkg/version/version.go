@@ -25,10 +25,6 @@ import (
 	"github.com/JulienBreux/run-cli/pkg/format"
 )
 
-// ResolveFromBuildInfo extracts version, commit, and date from the provided build info.
-func ResolveFromBuildInfo(info *debug.BuildInfo) {
-}
-
 var (
 	// Version is the semver release name of this build
 	Version = "dev"
@@ -37,6 +33,48 @@ var (
 	// RawDate is the time when this build was created in raw string
 	RawDate = "n/a"
 )
+
+func init() {
+	if info, ok := debug.ReadBuildInfo(); ok {
+		ResolveFromBuildInfo(info)
+	}
+}
+
+// ResolveFromBuildInfo extracts version, commit, and date from the provided build info.
+func ResolveFromBuildInfo(info *debug.BuildInfo) {
+	if info == nil {
+		return
+	}
+
+	if Version == "dev" && info.Main.Version != "" && info.Main.Version != "(devel)" {
+		Version = info.Main.Version
+	}
+
+	var revision, vcsTime string
+	var modified bool
+	for _, setting := range info.Settings {
+		switch setting.Key {
+		case "vcs.revision":
+			revision = setting.Value
+		case "vcs.time":
+			vcsTime = setting.Value
+		case "vcs.modified":
+			modified = setting.Value == "true"
+		}
+	}
+
+	if Commit == "n/a" && revision != "" {
+		if modified {
+			Commit = revision + "-dirty"
+		} else {
+			Commit = revision
+		}
+	}
+
+	if RawDate == "n/a" && vcsTime != "" {
+		RawDate = vcsTime
+	}
+}
 
 // version represents a version
 type version struct {

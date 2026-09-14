@@ -1,0 +1,8 @@
+{
+  "track_id": "go_install_version_20260914",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-09-14T10:45:30Z",
+  "updated_at": "2026-09-14T10:45:30Z",
+  "description": "I want to introduce the right version number when a user use go install instead of binary"
+}

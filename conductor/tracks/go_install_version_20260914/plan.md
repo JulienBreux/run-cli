@@ -14,9 +14,9 @@
 - [x] Task: Write failing unit tests for remote GitHub release check in `pkg/version` (198671d)
     - [x] Add unit tests for latest release checking, semver comparison, and network failure tolerance
     - [x] Run tests and verify failure (Red phase)
-- [ ] Task: Implement remote release checker in `pkg/version`
-    - [ ] Implement non-blocking HTTP check against GitHub Releases API with 2s timeout
-    - [ ] Run unit tests and confirm success (Green phase)
+- [x] Task: Implement remote release checker in `pkg/version` (12a85db)
+    - [x] Implement non-blocking HTTP check against GitHub Releases API with 2s timeout
+    - [x] Run unit tests and confirm success (Green phase)
 - [ ] Task: Write failing unit tests for header update notification
     - [ ] Add unit test in `internal/run/tui/component/header/header_test.go` for rendering version with update notice
     - [ ] Run tests and verify failure (Red phase)

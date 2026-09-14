@@ -72,6 +72,11 @@ The idea is to establish a high-performance, terminal-based alternative to the G
 *   **Domain Management:** View your custom domain mappings.
 *   **DNS Configuration:** Quickly access DNS record instructions for easy setup.
 
+### 🔄 Versioning & Release Updates
+
+*   **Go Module Version Detection:** Automatically resolves release version, commit hash, and build date when installed via `go install` using Go runtime build information.
+*   **Update Notifications:** Non-blocking background check unobtrusively alerts you in the TUI header whenever a newer release is published on GitHub.
+
 ## 🚀 Installation
 
 Run CLI is available on Linux, OSX and Windows platforms.
@@ -85,7 +90,7 @@ Run CLI is available on Linux, OSX and Windows platforms.
    brew install --cask julienbreux/run/run
    ```
 
-* Via `go get`
+* Via `go install`
 
     You can install **Run CLI** using `go install`:
 

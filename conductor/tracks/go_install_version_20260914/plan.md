@@ -31,8 +31,8 @@
     - [x] Confirm all command tests pass
 - [x] Task: Update README.md and documentation (2c96526)
     - [x] Document version detection and update notification feature in `README.md`
-- [ ] Task: Run project quality gates
-    - [ ] Run `make test` to ensure full test suite passes with >80% coverage
-    - [ ] Run `make lint` to verify code style
-    - [ ] Run `make build` to ensure clean build
+- [x] Task: Run project quality gates
+    - [x] Run `make test` to ensure full test suite passes with >80% coverage
+    - [x] Run `make lint` to verify code style
+    - [x] Run `make build` to ensure clean build
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Quality Gates & Documentation' (Protocol in workflow.md)

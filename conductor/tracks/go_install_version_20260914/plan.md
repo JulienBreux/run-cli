@@ -17,9 +17,9 @@
 - [x] Task: Implement remote release checker in `pkg/version` (12a85db)
     - [x] Implement non-blocking HTTP check against GitHub Releases API with 2s timeout
     - [x] Run unit tests and confirm success (Green phase)
-- [ ] Task: Write failing unit tests for header update notification
-    - [ ] Add unit test in `internal/run/tui/component/header/header_test.go` for rendering version with update notice
-    - [ ] Run tests and verify failure (Red phase)
+- [x] Task: Write failing unit tests for header update notification (0ce7321)
+    - [x] Add unit test in `internal/run/tui/component/header/header_test.go` for rendering version with update notice
+    - [x] Run tests and verify failure (Red phase)
 - [ ] Task: Implement asynchronous header notification in `internal/run/tui/component/header`
     - [ ] Trigger background update check on header initialization and refresh header text if an update is found
     - [ ] Run unit tests and confirm success (Green phase)

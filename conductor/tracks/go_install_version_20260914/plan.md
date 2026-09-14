@@ -20,9 +20,9 @@
 - [x] Task: Write failing unit tests for header update notification (0ce7321)
     - [x] Add unit test in `internal/run/tui/component/header/header_test.go` for rendering version with update notice
     - [x] Run tests and verify failure (Red phase)
-- [ ] Task: Implement asynchronous header notification in `internal/run/tui/component/header`
-    - [ ] Trigger background update check on header initialization and refresh header text if an update is found
-    - [ ] Run unit tests and confirm success (Green phase)
+- [x] Task: Implement asynchronous header notification in `internal/run/tui/component/header` (ff81d33)
+    - [x] Trigger background update check on header initialization and refresh header text if an update is found
+    - [x] Run unit tests and confirm success (Green phase)
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Remote Update Checker & TUI Notification' (Protocol in workflow.md)
 
 ## Phase 3: Quality Gates & Documentation

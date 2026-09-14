@@ -1,0 +1,4 @@
+Task: Write failing unit tests for remote GitHub release check in pkg/version
+Summary: Added unit tests in pkg/version/version_test.go for CompareSemver and CheckUpdate including latest release detection, up-to-date states, dev build exclusion, and HTTP error handling.
+Files: pkg/version/version.go, pkg/version/version_test.go
+Why: Establish TDD acceptance criteria (Red phase) for remote update checking.

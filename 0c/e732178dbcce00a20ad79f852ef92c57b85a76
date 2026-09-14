@@ -1,0 +1,4 @@
+Task: Write failing unit tests for header update notification
+Summary: Added unit test TestHeader_UpdateNotice in internal/run/tui/component/header/header_test.go verifying the version line renders update notices dynamically.
+Files: internal/run/tui/component/header/header.go, internal/run/tui/component/header/header_test.go
+Why: Establish TDD acceptance criteria (Red phase) for header update notice display.

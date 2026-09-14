@@ -6,6 +6,8 @@ RUN_ASSETS_DIR=./docs/assets
 RUN_DEMO_CAST_FILE=run.cast
 RUN_DEMO_GIF_FILE=run.cast
 
+.DEFAULT_GOAL := help
+
 generate: ## Run go generate
 	go generate
 
@@ -60,7 +62,7 @@ regions-update: ## Update list of regions in region.go using gcloud
 	@go fmt ./internal/run/api/region/...
 	@echo "Regions successfully updated in internal/run/api/region/region.go"
 
-help:
+help: ## Display this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: generate lint test coverage coverage-total coverage-html clean build build-image run run-container demo-record demo-to-gif help regions-update

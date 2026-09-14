@@ -52,6 +52,13 @@ This project and everyone participating in it is governed by the [Run CLI Code o
 
 The repository includes a `Makefile` with targets for standard development tasks:
 
+- **Help**: Display available targets (default when running `make` with no arguments):
+  ```bash
+  make
+  # or
+  make help
+  ```
+
 - **Build**: Compile the binary to `./bin/run`:
   ```bash
   make build

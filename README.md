@@ -114,7 +114,17 @@ This will start the interactive TUI, allowing you to manage your Google Cloud Ru
 
 ## 🛠️ Development
 
-This project uses a `Makefile` to streamline development.
+This project uses a `Makefile` to streamline development. Running `make` or `make help` displays all available targets.
+
+### Available Commands
+
+To view all available targets and descriptions:
+
+```sh
+make
+# or
+make help
+```
 
 ### Prerequisites
 

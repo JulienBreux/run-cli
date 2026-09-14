@@ -1,0 +1,4 @@
+Task: Write failing unit tests for runtime/debug build info detection in pkg/version
+Summary: Added unit tests in pkg/version/version_test.go covering fallback to runtime/debug.ReadBuildInfo(), module version extraction, VCS revision and dirty state handling, and build date extraction.
+Files: pkg/version/version.go, pkg/version/version_test.go
+Why: Establish TDD acceptance criteria (Red phase) for go install version resolution.

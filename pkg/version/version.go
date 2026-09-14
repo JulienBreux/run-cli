@@ -18,22 +18,127 @@ package version
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"runtime/debug"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/JulienBreux/run-cli/pkg/format"
 )
 
+type githubRelease struct {
+	TagName string `json:"tag_name"`
+	HTMLURL string `json:"html_url"`
+}
+
 // CheckUpdate checks GitHub releases to see if a newer version is available.
 func CheckUpdate(ctx context.Context, currentVersion string) (bool, string, error) {
-	return false, "", nil
+	if currentVersion == "dev" || currentVersion == "" {
+		return false, "", nil
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, GitHubReleaseURL, nil)
+	if err != nil {
+		return false, "", err
+	}
+	req.Header.Set("Accept", "application/vnd.github+json")
+	req.Header.Set("User-Agent", "run-cli/"+currentVersion)
+
+	client := &http.Client{Timeout: 2 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return false, "", err
+	}
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode != http.StatusOK {
+		return false, "", fmt.Errorf("unexpected status code from release API: %d", resp.StatusCode)
+	}
+
+	var release githubRelease
+	if err := json.NewDecoder(resp.Body).Decode(&release); err != nil {
+		return false, "", err
+	}
+
+	if release.TagName == "" {
+		return false, "", nil
+	}
+
+	if CompareSemver(currentVersion, release.TagName) < 0 {
+		return true, release.TagName, nil
+	}
+
+	return false, release.TagName, nil
 }
 
 // CompareSemver compares two semver version strings.
+// Returns -1 if v1 < v2, 0 if v1 == v2, 1 if v1 > v2.
 func CompareSemver(v1, v2 string) int {
+	maj1, min1, pat1, ok1 := parseSemver(v1)
+	maj2, min2, pat2, ok2 := parseSemver(v2)
+	if !ok1 || !ok2 {
+		return 0
+	}
+	if maj1 != maj2 {
+		if maj1 < maj2 {
+			return -1
+		}
+		return 1
+	}
+	if min1 != min2 {
+		if min1 < min2 {
+			return -1
+		}
+		return 1
+	}
+	if pat1 != pat2 {
+		if pat1 < pat2 {
+			return -1
+		}
+		return 1
+	}
+
+	hasPre1 := strings.Contains(strings.TrimPrefix(v1, "v"), "-")
+	hasPre2 := strings.Contains(strings.TrimPrefix(v2, "v"), "-")
+	if hasPre1 && !hasPre2 {
+		return -1
+	}
+	if !hasPre1 && hasPre2 {
+		return 1
+	}
 	return 0
+}
+
+func parseSemver(v string) (major, minor, patch int, ok bool) {
+	v = strings.TrimPrefix(v, "v")
+	parts := strings.Split(v, "-")
+	base := parts[0]
+	subParts := strings.Split(base, ".")
+	if len(subParts) == 0 {
+		return 0, 0, 0, false
+	}
+	var err error
+	major, err = strconv.Atoi(subParts[0])
+	if err != nil {
+		return 0, 0, 0, false
+	}
+	if len(subParts) > 1 {
+		minor, err = strconv.Atoi(subParts[1])
+		if err != nil {
+			return 0, 0, 0, false
+		}
+	}
+	if len(subParts) > 2 {
+		patch, err = strconv.Atoi(subParts[2])
+		if err != nil {
+			return 0, 0, 0, false
+		}
+	}
+	return major, minor, patch, true
 }
 
 var (

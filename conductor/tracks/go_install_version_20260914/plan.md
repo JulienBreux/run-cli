@@ -1,6 +1,6 @@
 # Implementation Plan: Resolve Version Information for go install Builds and Check for Updates
 
-## Phase 1: Build Info Detection
+## Phase 1: Build Info Detection [checkpoint: b63a49a]
 - [x] Task: Write failing unit tests for runtime/debug build info detection in `pkg/version` (813d739)
     - [x] Add unit tests in `pkg/version/version_test.go` covering fallback to `runtime/debug.ReadBuildInfo()` when `Version == "dev"`
     - [x] Cover extraction of module version, commit hash (`vcs.revision`), dirty status (`vcs.modified`), and build date (`vcs.time`)
@@ -8,7 +8,7 @@
 - [x] Task: Implement build info resolution in `pkg/version` (5dd25e2)
     - [x] Implement detection logic using `runtime/debug.ReadBuildInfo()` with fallback precedence
     - [x] Run unit tests and confirm success (Green phase)
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Build Info Detection' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Build Info Detection' (Protocol in workflow.md) (b63a49a)
 
 ## Phase 2: Remote Update Checker & TUI Notification
 - [ ] Task: Write failing unit tests for remote GitHub release check in `pkg/version`

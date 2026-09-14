@@ -17,6 +17,7 @@ limitations under the License.
 package version
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"runtime/debug"
@@ -25,7 +26,20 @@ import (
 	"github.com/JulienBreux/run-cli/pkg/format"
 )
 
+// CheckUpdate checks GitHub releases to see if a newer version is available.
+func CheckUpdate(ctx context.Context, currentVersion string) (bool, string, error) {
+	return false, "", nil
+}
+
+// CompareSemver compares two semver version strings.
+func CompareSemver(v1, v2 string) int {
+	return 0
+}
+
 var (
+	// GitHubReleaseURL is the endpoint used to check for the latest release.
+	GitHubReleaseURL = "https://api.github.com/repos/JulienBreux/run-cli/releases/latest"
+
 	// Version is the semver release name of this build
 	Version = "dev"
 	// Commit is the commit hash this build was created from

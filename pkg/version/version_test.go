@@ -18,7 +18,10 @@ package version_test
 
 import (
 	"bytes"
+	"context"
 	"errors"
+	"net/http"
+	"net/http/httptest"
 	"regexp"
 	"runtime/debug"
 	"testing"
@@ -186,6 +189,101 @@ func TestResolveFromBuildInfo(t *testing.T) {
 		version.ResolveFromBuildInfo(info)
 
 		assert.Equal(t, "dev", version.Version)
+	})
+}
+
+func TestCompareSemver(t *testing.T) {
+	tests := []struct {
+		v1       string
+		v2       string
+		expected int
+	}{
+		{"v0.1.0", "v0.2.0", -1},
+		{"v0.2.0", "v0.1.0", 1},
+		{"v1.0.0", "v1.0.0", 0},
+		{"1.0.0", "v1.0.0", 0},
+		{"v1.2.3", "v1.2.4", -1},
+		{"v2.0.0", "v1.9.9", 1},
+		{"v0.28.1", "v0.29.0", -1},
+		{"v0.28.1-0.20260914-commit", "v0.29.0", -1},
+		{"v0.29.0", "v0.28.1-0.20260914-commit", 1},
+		{"dev", "v0.29.0", 0},
+		{"invalid", "v0.29.0", 0},
+	}
+
+	for _, tt := range tests {
+		actual := version.CompareSemver(tt.v1, tt.v2)
+		assert.Equal(t, tt.expected, actual, "CompareSemver(%s, %s)", tt.v1, tt.v2)
+	}
+}
+
+func TestCheckUpdate(t *testing.T) {
+	t.Run("UpdateAvailable", func(t *testing.T) {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, "/repos/JulienBreux/run-cli/releases/latest", r.URL.Path)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"tag_name": "v0.30.0", "html_url": "https://github.com/JulienBreux/run-cli/releases/tag/v0.30.0"}`))
+		}))
+		defer server.Close()
+
+		origURL := version.GitHubReleaseURL
+		version.GitHubReleaseURL = server.URL + "/repos/JulienBreux/run-cli/releases/latest"
+		defer func() { version.GitHubReleaseURL = origURL }()
+
+		hasUpdate, latest, err := version.CheckUpdate(context.Background(), "v0.29.0")
+		assert.NoError(t, err)
+		assert.True(t, hasUpdate)
+		assert.Equal(t, "v0.30.0", latest)
+	})
+
+	t.Run("AlreadyUpToDate", func(t *testing.T) {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"tag_name": "v0.29.0"}`))
+		}))
+		defer server.Close()
+
+		origURL := version.GitHubReleaseURL
+		version.GitHubReleaseURL = server.URL + "/repos/JulienBreux/run-cli/releases/latest"
+		defer func() { version.GitHubReleaseURL = origURL }()
+
+		hasUpdate, latest, err := version.CheckUpdate(context.Background(), "v0.29.0")
+		assert.NoError(t, err)
+		assert.False(t, hasUpdate)
+		assert.Equal(t, "v0.29.0", latest)
+	})
+
+	t.Run("DevVersionNoUpdate", func(t *testing.T) {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"tag_name": "v0.30.0"}`))
+		}))
+		defer server.Close()
+
+		origURL := version.GitHubReleaseURL
+		version.GitHubReleaseURL = server.URL + "/repos/JulienBreux/run-cli/releases/latest"
+		defer func() { version.GitHubReleaseURL = origURL }()
+
+		hasUpdate, latest, err := version.CheckUpdate(context.Background(), "dev")
+		assert.NoError(t, err)
+		assert.False(t, hasUpdate)
+		assert.Equal(t, "", latest)
+	})
+
+	t.Run("ServerErrorGracefullyHandled", func(t *testing.T) {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusInternalServerError)
+		}))
+		defer server.Close()
+
+		origURL := version.GitHubReleaseURL
+		version.GitHubReleaseURL = server.URL + "/repos/JulienBreux/run-cli/releases/latest"
+		defer func() { version.GitHubReleaseURL = origURL }()
+
+		hasUpdate, latest, err := version.CheckUpdate(context.Background(), "v0.29.0")
+		assert.Error(t, err)
+		assert.False(t, hasUpdate)
+		assert.Equal(t, "", latest)
 	})
 }
 

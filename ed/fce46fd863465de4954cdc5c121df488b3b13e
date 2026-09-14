@@ -1,0 +1,3 @@
+Phase: Phase 2: Remote Update Checker & TUI Notification
+Summary: Added CompareSemver and CheckUpdate to query GitHub releases with 2s timeout. Added SetUpdateAvailable and StartUpdateCheck to header component to render subtle notification and check in background.
+Manual Verification: Confirmed and approved by user.

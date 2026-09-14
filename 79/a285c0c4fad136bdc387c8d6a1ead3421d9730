@@ -1,0 +1,4 @@
+Task: Verify CLI version command output and integration tests
+Summary: Updated internal/run/command/version/version_test.go to assert full formatting of Version, Commit, and Build date across text, JSON, and YAML formats.
+Files: internal/run/command/version/version_test.go
+Why: Ensure end-to-end correctness of version reporting in the CLI command interface.

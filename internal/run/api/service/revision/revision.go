@@ -20,6 +20,7 @@ import (
 	"context"
 	"sort"
 	"strings"
+	"time"
 
 	"cloud.google.com/go/run/apiv2/runpb"
 	model_container "github.com/JulienBreux/run-cli/internal/run/model/common/container"
@@ -41,11 +42,11 @@ func List(project, region, service string) ([]model.Revision, error) {
 	}
 
 	sort.Slice(revisions, func(i, j int) bool {
-		aZero := revisions[i].CreateTime.IsZero()
-		bZero := revisions[j].CreateTime.IsZero()
+		aZero := isZeroTime(revisions[i].CreateTime)
+		bZero := isZeroTime(revisions[j].CreateTime)
 
 		if aZero && bZero {
-			return revisions[i].Name > revisions[j].Name
+			return revisions[i].Name < revisions[j].Name
 		}
 		if aZero {
 			return false
@@ -55,13 +56,17 @@ func List(project, region, service string) ([]model.Revision, error) {
 		}
 
 		if revisions[i].CreateTime.Equal(revisions[j].CreateTime) {
-			return revisions[i].Name > revisions[j].Name
+			return revisions[i].Name < revisions[j].Name
 		}
 
-		return revisions[i].CreateTime.After(revisions[j].CreateTime)
+		return revisions[i].CreateTime.Before(revisions[j].CreateTime)
 	})
 
 	return revisions, nil
+}
+
+func isZeroTime(t time.Time) bool {
+	return t.IsZero() || t.Equal(time.Unix(0, 0).UTC())
 }
 
 func mapRevision(resp *runpb.Revision, service string) model.Revision {
@@ -113,10 +118,18 @@ func mapRevision(resp *runpb.Revision, service string) model.Revision {
 		author = resp.Annotations["serving.knative.dev/creator"]
 	}
 
+	var createTime, updateTime time.Time
+	if resp.CreateTime != nil {
+		createTime = resp.CreateTime.AsTime()
+	}
+	if resp.UpdateTime != nil {
+		updateTime = resp.UpdateTime.AsTime()
+	}
+
 	return model.Revision{
 		Name:                          name,
-		CreateTime:                    resp.CreateTime.AsTime(),
-		UpdateTime:                    resp.UpdateTime.AsTime(),
+		CreateTime:                    createTime,
+		UpdateTime:                    updateTime,
 		Service:                       service,
 		Containers:                    containers,
 		ExecutionEnvironment:          resp.ExecutionEnvironment.String(),

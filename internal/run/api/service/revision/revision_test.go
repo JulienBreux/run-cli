@@ -86,18 +86,18 @@ func TestList_Sorting(t *testing.T) {
 	apiClient = mock
 
 	now := time.Now()
-	t1 := now.Add(-2 * time.Hour)
-	t2 := now.Add(-1 * time.Hour)
-	t3 := now
+	t1 := now.Add(-2 * time.Hour) // oldest
+	t2 := now.Add(-1 * time.Hour) // mid
+	t3 := now                     // newest
 
 	mock.ListRevisionsFunc = func(ctx context.Context, project, region, service string) ([]*runpb.Revision, error) {
 		return []*runpb.Revision{
-			{Name: "rev-old", CreateTime: timestamppb.New(t1)},
-			{Name: "rev-zero-a", CreateTime: nil},
 			{Name: "rev-newest", CreateTime: timestamppb.New(t3)},
+			{Name: "rev-zero-b", CreateTime: nil},
+			{Name: "rev-old", CreateTime: timestamppb.New(t1)},
 			{Name: "rev-mid-b", CreateTime: timestamppb.New(t2)},
 			{Name: "rev-mid-a", CreateTime: timestamppb.New(t2)},
-			{Name: "rev-zero-b", CreateTime: nil},
+			{Name: "rev-zero-a", CreateTime: nil},
 		}, nil
 	}
 
@@ -105,19 +105,19 @@ func TestList_Sorting(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, revisions, 6)
 
-	// Expected order:
-	// 1. rev-newest (t3)
-	// 2. rev-mid-b (t2, name "rev-mid-b" > "rev-mid-a")
-	// 3. rev-mid-a (t2)
-	// 4. rev-old (t1)
-	// 5. rev-zero-b (zero CreateTime, tie-breaker "rev-zero-b" > "rev-zero-a")
-	// 6. rev-zero-a (zero CreateTime)
-	assert.Equal(t, "rev-newest", revisions[0].Name)
-	assert.Equal(t, "rev-mid-b", revisions[1].Name)
-	assert.Equal(t, "rev-mid-a", revisions[2].Name)
-	assert.Equal(t, "rev-old", revisions[3].Name)
-	assert.Equal(t, "rev-zero-b", revisions[4].Name)
-	assert.Equal(t, "rev-zero-a", revisions[5].Name)
+	// Expected order (ascending by CreateTime, ties by Name ascending, zero at end):
+	// 1. rev-old (t1)
+	// 2. rev-mid-a (t2, name "rev-mid-a" < "rev-mid-b")
+	// 3. rev-mid-b (t2)
+	// 4. rev-newest (t3)
+	// 5. rev-zero-a (zero CreateTime, tie-breaker "rev-zero-a" < "rev-zero-b")
+	// 6. rev-zero-b (zero CreateTime)
+	assert.Equal(t, "rev-old", revisions[0].Name)
+	assert.Equal(t, "rev-mid-a", revisions[1].Name)
+	assert.Equal(t, "rev-mid-b", revisions[2].Name)
+	assert.Equal(t, "rev-newest", revisions[3].Name)
+	assert.Equal(t, "rev-zero-a", revisions[4].Name)
+	assert.Equal(t, "rev-zero-b", revisions[5].Name)
 }
 
 func TestMapRevision(t *testing.T) {

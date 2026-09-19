@@ -42,7 +42,7 @@ The idea is to establish a high-performance, terminal-based alternative to the G
 *   **Service Proxy:** Locally proxy private services with automatic authentication token injection (press `p`).
 *   **Networking View:** Monitor ingress settings, endpoints status (URI, IAP), and VPC Access configurations.
 *   **Security View:** Check authentication requirements, service identity, encryption keys, and binary authorization policies.
-*   **Revision Management:** Detailed list of revisions sorted by creation date (most recent first) with traffic allocation, tags, and deployment history.
+*   **Revision Management:** Detailed list of revisions sorted by creation date (oldest first) with traffic allocation, tags, and deployment history.
 *   **Deep Insights:** Explore revision details including billing mode, startup CPU boost, concurrency, and request timeouts.
 *   **Resource Monitoring:** View container configurations, images, ports, and resource limits (Memory, CPU, and GPU/Accelerators).
 

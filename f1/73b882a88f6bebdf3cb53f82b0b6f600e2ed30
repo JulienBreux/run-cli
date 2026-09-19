@@ -1,0 +1,4 @@
+Task: Documentation & Issue Resolution
+Summary: Updated README.md to document that service revisions are displayed in descending chronological order (most recent first), addressing GitHub issue #59.
+Files Modified: README.md
+Why: Fulfill project guideline to document new features and communicate revision sorting behavior to users.

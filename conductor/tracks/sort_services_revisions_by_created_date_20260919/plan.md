@@ -5,9 +5,9 @@
     - [x] Add unit tests in `internal/run/api/service/revision/revision_test.go` asserting revisions returned by `List(...)` are ordered by `CreateTime` descending (most recent first)
     - [x] Add tests verifying tie-breaker sorting by revision `Name` descending when timestamps match
     - [x] Add tests verifying revisions with zero/unset `CreateTime` are placed at the end of the list
-- [ ] Task: Implement Revision Sorting in API Client (Green Phase)
-    - [ ] Implement descending sort logic in `internal/run/api/service/revision/revision.go`
-    - [ ] Verify all tests pass with `go test` / `make test` and module coverage remains >80%
+- [x] Task: Implement Revision Sorting in API Client (Green Phase) e4755dd
+    - [x] Implement descending sort logic in `internal/run/api/service/revision/revision.go`
+    - [x] Verify all tests pass with `go test` / `make test` and module coverage remains >80%
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: API Layer Revision Sorting (TDD)' (Protocol in workflow.md)
 
 ## Phase 2: Documentation & Full Verification

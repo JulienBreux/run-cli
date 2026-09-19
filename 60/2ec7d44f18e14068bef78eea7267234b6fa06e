@@ -1,0 +1,4 @@
+Task: Write Failing Unit Tests for Revision Sorting (Red Phase)
+Summary: Added TestList_Sorting to internal/run/api/service/revision/revision_test.go covering descending CreateTime order, secondary tie-breaking by Name, and zero timestamp handling. Confirmed failure against unsorted List implementation.
+Files Modified: internal/run/api/service/revision/revision_test.go
+Why: Adhere to TDD Red phase and specify expected descending revision sorting behavior for GitHub issue #59.

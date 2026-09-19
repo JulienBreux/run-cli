@@ -78,6 +78,45 @@ func TestList_Error(t *testing.T) {
 	assert.Nil(t, revisions)
 }
 
+func TestList_Sorting(t *testing.T) {
+	originalClient := apiClient
+	defer func() { apiClient = originalClient }()
+
+	mock := &MockClient{}
+	apiClient = mock
+
+	now := time.Now()
+	t1 := now.Add(-2 * time.Hour)
+	t2 := now.Add(-1 * time.Hour)
+	t3 := now
+
+	mock.ListRevisionsFunc = func(ctx context.Context, project, region, service string) ([]*runpb.Revision, error) {
+		return []*runpb.Revision{
+			{Name: "rev-old", CreateTime: timestamppb.New(t1)},
+			{Name: "rev-zero", CreateTime: nil},
+			{Name: "rev-newest", CreateTime: timestamppb.New(t3)},
+			{Name: "rev-mid-b", CreateTime: timestamppb.New(t2)},
+			{Name: "rev-mid-a", CreateTime: timestamppb.New(t2)},
+		}, nil
+	}
+
+	revisions, err := List("p", "r", "s")
+	assert.NoError(t, err)
+	assert.Len(t, revisions, 5)
+
+	// Expected order:
+	// 1. rev-newest (t3)
+	// 2. rev-mid-b (t2, name "rev-mid-b" > "rev-mid-a")
+	// 3. rev-mid-a (t2)
+	// 4. rev-old (t1)
+	// 5. rev-zero (nil/zero CreateTime at end)
+	assert.Equal(t, "rev-newest", revisions[0].Name)
+	assert.Equal(t, "rev-mid-b", revisions[1].Name)
+	assert.Equal(t, "rev-mid-a", revisions[2].Name)
+	assert.Equal(t, "rev-old", revisions[3].Name)
+	assert.Equal(t, "rev-zero", revisions[4].Name)
+}
+
 func TestMapRevision(t *testing.T) {
 	now := time.Now()
 	resp := &runpb.Revision{

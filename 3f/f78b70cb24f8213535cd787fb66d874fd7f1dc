@@ -1,0 +1,9 @@
+Phase: Phase 1: API Layer Revision Sorting (TDD)
+Automated Tests Command: go test -v -cover ./internal/run/api/service/revision/...
+Result: All tests passed with 92.2% statement coverage.
+Manual Verification Steps:
+1. Compile the application binary: make build
+2. Review unit test execution: Verify go test -v ./internal/run/api/service/revision/... passes covering newest-first sorting, ties broken by revision Name, and zero timestamp handling.
+3. Inspect API sorting: Confirm that revision.List(...) in internal/run/api/service/revision/revision.go orders the slice chronologically descending.
+4. Confirm that you see: All tests pass and revisions are sorted most recent first.
+User Confirmation: Explicitly approved by user.

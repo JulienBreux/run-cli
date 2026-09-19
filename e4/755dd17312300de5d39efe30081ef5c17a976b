@@ -1,0 +1,4 @@
+Task: Implement Revision Sorting in API Client (Green Phase)
+Summary: Implemented descending sort by CreateTime in revision.List, with secondary tie-breaking by Name descending and zero timestamps placed at the end. Updated test cases to verify branch coverage.
+Files Modified: internal/run/api/service/revision/revision.go, internal/run/api/service/revision/revision_test.go
+Why: Ensure revisions are ordered chronologically descending (most recent first) across the application, addressing issue #59.

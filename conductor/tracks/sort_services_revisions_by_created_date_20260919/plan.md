@@ -1,6 +1,6 @@
 # Implementation Plan - Sort Services Revisions by Created Date
 
-## Phase 1: API Layer Revision Sorting (TDD)
+## Phase 1: API Layer Revision Sorting (TDD) [checkpoint: 3ff78b7]
 - [x] Task: Write Failing Unit Tests for Revision Sorting (Red Phase) 602ec7d
     - [x] Add unit tests in `internal/run/api/service/revision/revision_test.go` asserting revisions returned by `List(...)` are ordered by `CreateTime` descending (most recent first)
     - [x] Add tests verifying tie-breaker sorting by revision `Name` descending when timestamps match
@@ -8,7 +8,7 @@
 - [x] Task: Implement Revision Sorting in API Client (Green Phase) e4755dd
     - [x] Implement descending sort logic in `internal/run/api/service/revision/revision.go`
     - [x] Verify all tests pass with `go test` / `make test` and module coverage remains >80%
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: API Layer Revision Sorting (TDD)' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: API Layer Revision Sorting (TDD)' (Protocol in workflow.md) 3ff78b7
 
 ## Phase 2: Documentation & Full Verification
 - [ ] Task: Documentation & Issue Resolution

@@ -18,6 +18,7 @@ package revision
 
 import (
 	"context"
+	"sort"
 	"strings"
 
 	"cloud.google.com/go/run/apiv2/runpb"
@@ -38,6 +39,27 @@ func List(project, region, service string) ([]model.Revision, error) {
 	for _, resp := range pbRevisions {
 		revisions = append(revisions, mapRevision(resp, service))
 	}
+
+	sort.Slice(revisions, func(i, j int) bool {
+		aZero := revisions[i].CreateTime.IsZero()
+		bZero := revisions[j].CreateTime.IsZero()
+
+		if aZero && bZero {
+			return revisions[i].Name > revisions[j].Name
+		}
+		if aZero {
+			return false
+		}
+		if bZero {
+			return true
+		}
+
+		if revisions[i].CreateTime.Equal(revisions[j].CreateTime) {
+			return revisions[i].Name > revisions[j].Name
+		}
+
+		return revisions[i].CreateTime.After(revisions[j].CreateTime)
+	})
 
 	return revisions, nil
 }

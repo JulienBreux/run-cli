@@ -93,28 +93,31 @@ func TestList_Sorting(t *testing.T) {
 	mock.ListRevisionsFunc = func(ctx context.Context, project, region, service string) ([]*runpb.Revision, error) {
 		return []*runpb.Revision{
 			{Name: "rev-old", CreateTime: timestamppb.New(t1)},
-			{Name: "rev-zero", CreateTime: nil},
+			{Name: "rev-zero-a", CreateTime: nil},
 			{Name: "rev-newest", CreateTime: timestamppb.New(t3)},
 			{Name: "rev-mid-b", CreateTime: timestamppb.New(t2)},
 			{Name: "rev-mid-a", CreateTime: timestamppb.New(t2)},
+			{Name: "rev-zero-b", CreateTime: nil},
 		}, nil
 	}
 
 	revisions, err := List("p", "r", "s")
 	assert.NoError(t, err)
-	assert.Len(t, revisions, 5)
+	assert.Len(t, revisions, 6)
 
 	// Expected order:
 	// 1. rev-newest (t3)
 	// 2. rev-mid-b (t2, name "rev-mid-b" > "rev-mid-a")
 	// 3. rev-mid-a (t2)
 	// 4. rev-old (t1)
-	// 5. rev-zero (nil/zero CreateTime at end)
+	// 5. rev-zero-b (zero CreateTime, tie-breaker "rev-zero-b" > "rev-zero-a")
+	// 6. rev-zero-a (zero CreateTime)
 	assert.Equal(t, "rev-newest", revisions[0].Name)
 	assert.Equal(t, "rev-mid-b", revisions[1].Name)
 	assert.Equal(t, "rev-mid-a", revisions[2].Name)
 	assert.Equal(t, "rev-old", revisions[3].Name)
-	assert.Equal(t, "rev-zero", revisions[4].Name)
+	assert.Equal(t, "rev-zero-b", revisions[4].Name)
+	assert.Equal(t, "rev-zero-a", revisions[5].Name)
 }
 
 func TestMapRevision(t *testing.T) {

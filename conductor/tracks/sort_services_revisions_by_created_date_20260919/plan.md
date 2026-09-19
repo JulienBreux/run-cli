@@ -11,9 +11,9 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: API Layer Revision Sorting (TDD)' (Protocol in workflow.md) 3ff78b7
 
 ## Phase 2: Documentation & Full Verification
-- [ ] Task: Documentation & Issue Resolution
-    - [ ] Update `README.md` to document that service revisions are displayed in descending chronological order (most recent first)
-    - [ ] Document resolution of GitHub issue #59
+- [x] Task: Documentation & Issue Resolution f173b88
+    - [x] Update `README.md` to document that service revisions are displayed in descending chronological order (most recent first)
+    - [x] Document resolution of GitHub issue #59
 - [ ] Task: Full Suite Verification & Build
     - [ ] Run `make test` to ensure all unit tests pass
     - [ ] Run `make lint` to verify zero linting or static analysis issues

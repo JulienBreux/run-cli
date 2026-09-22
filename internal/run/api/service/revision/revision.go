@@ -46,7 +46,7 @@ func List(project, region, service string) ([]model.Revision, error) {
 		bZero := isZeroTime(revisions[j].CreateTime)
 
 		if aZero && bZero {
-			return revisions[i].Name < revisions[j].Name
+			return revisions[i].Name > revisions[j].Name
 		}
 		if aZero {
 			return false
@@ -56,10 +56,10 @@ func List(project, region, service string) ([]model.Revision, error) {
 		}
 
 		if revisions[i].CreateTime.Equal(revisions[j].CreateTime) {
-			return revisions[i].Name < revisions[j].Name
+			return revisions[i].Name > revisions[j].Name
 		}
 
-		return revisions[i].CreateTime.Before(revisions[j].CreateTime)
+		return revisions[i].CreateTime.After(revisions[j].CreateTime)
 	})
 
 	return revisions, nil

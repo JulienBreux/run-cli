@@ -97,27 +97,30 @@ func TestList_Sorting(t *testing.T) {
 			{Name: "rev-old", CreateTime: timestamppb.New(t1)},
 			{Name: "rev-mid-b", CreateTime: timestamppb.New(t2)},
 			{Name: "rev-mid-a", CreateTime: timestamppb.New(t2)},
+			{Name: "rev-zero-c", CreateTime: timestamppb.New(time.Unix(0, 0).UTC())},
 			{Name: "rev-zero-a", CreateTime: nil},
 		}, nil
 	}
 
 	revisions, err := List("p", "r", "s")
 	assert.NoError(t, err)
-	assert.Len(t, revisions, 6)
+	assert.Len(t, revisions, 7)
 
-	// Expected order (ascending by CreateTime, ties by Name ascending, zero at end):
-	// 1. rev-old (t1)
-	// 2. rev-mid-a (t2, name "rev-mid-a" < "rev-mid-b")
-	// 3. rev-mid-b (t2)
-	// 4. rev-newest (t3)
-	// 5. rev-zero-a (zero CreateTime, tie-breaker "rev-zero-a" < "rev-zero-b")
-	// 6. rev-zero-b (zero CreateTime)
-	assert.Equal(t, "rev-old", revisions[0].Name)
-	assert.Equal(t, "rev-mid-a", revisions[1].Name)
-	assert.Equal(t, "rev-mid-b", revisions[2].Name)
-	assert.Equal(t, "rev-newest", revisions[3].Name)
-	assert.Equal(t, "rev-zero-a", revisions[4].Name)
+	// Expected order (descending by CreateTime, ties by Name descending, zero at end):
+	// 1. rev-newest (t3)
+	// 2. rev-mid-b (t2, name "rev-mid-b" > "rev-mid-a")
+	// 3. rev-mid-a (t2)
+	// 4. rev-old (t1)
+	// 5. rev-zero-c (zero CreateTime, tie-breaker "rev-zero-c" > "rev-zero-b")
+	// 6. rev-zero-b (zero CreateTime, tie-breaker "rev-zero-b" > "rev-zero-a")
+	// 7. rev-zero-a (zero CreateTime)
+	assert.Equal(t, "rev-newest", revisions[0].Name)
+	assert.Equal(t, "rev-mid-b", revisions[1].Name)
+	assert.Equal(t, "rev-mid-a", revisions[2].Name)
+	assert.Equal(t, "rev-old", revisions[3].Name)
+	assert.Equal(t, "rev-zero-c", revisions[4].Name)
 	assert.Equal(t, "rev-zero-b", revisions[5].Name)
+	assert.Equal(t, "rev-zero-a", revisions[6].Name)
 }
 
 func TestMapRevision(t *testing.T) {
